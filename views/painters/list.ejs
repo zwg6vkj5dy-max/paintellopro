@@ -1,0 +1,18 @@
+<% layout('layout') %>
+<h2>Find painters</h2>
+<form method="GET" action="/painters" class="search">
+  <input type="text" name="q" placeholder="Search by location or name" value="<%= (req.query && req.query.q) || '' %>">
+  <button type="submit">Search</button>
+</form>
+
+<div class="grid">
+  <% painters.forEach(p => { %>
+    <div class="card">
+      <img src="<%= p.profilePhoto || '/img/placeholder.jpg' %>" class="avatar">
+      <h3><%= p.name %></h3>
+      <p class="muted"><%= p.address || '—' %></p>
+      <span class="badge"><%= p.painterProfile.ratePerM2 %> DA/m²</span>
+      <a href="/painters/<%= p._id %>" class="btn">View profile</a>
+    </div>
+  <% }) %>
+</div>
