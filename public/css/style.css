@@ -67,3 +67,91 @@ h2 { margin-bottom: 1rem; }
 .alert-success { background: #dcfce7; color: #166534; }
 
 .slide-img { width: 100%; height: 360px; object-fit: cover; border-radius: 12px; }
+/* Paintello Pro Custom Styles */
+
+.hero-section {
+    background: linear-gradient(135deg, #4a6fff, #6c8eff);
+    color: white;
+    padding: 100px 0;
+}
+
+.card-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.star-rating {
+    color: #ffc107;
+}
+
+.avatar-placeholder {
+    background-color: #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.badge-premium {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #000;
+}
+
+/* Custom button styles */
+.btn-primary {
+    background-color: #4a6fff;
+    border-color: #4a6fff;
+}
+
+.btn-primary:hover {
+    background-color: #3a5fef;
+    border-color: #3a5fef;
+}
+
+/* Navigation enhancements */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 60px 0;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Form enhancements */
+.form-control:focus {
+    border-color: #4a6fff;
+    box-shadow: 0 0 0 0.2rem rgba(74, 111, 255, 0.25);
+}
+
+/* Alert enhancements */
+.alert {
+    border: none;
+    border-radius: 8px;
+}
+
+/* Card enhancements */
+.card {
+    border: none;
+    border-radius: 12px;
+}
+
+.card-header {
+    border-radius: 12px 12px 0 0 !important;
+}
