@@ -1,0 +1,22 @@
+<% layout('layout') %>
+<h2>Assigned projects</h2>
+
+<% projects.forEach(p => { %>
+  <div class="card">
+    <h3><%= p.details.description %></h3>
+    <p>Client: <%= p.client.name %> — Area: <%= p.details.area %> m²</p>
+    <p>Status: <span class="status <%= p.status %>"><%= p.status %></span></p>
+    <p>Net payout: <%= (p.painterNet || 0).toLocaleString('fr-DZ') %> DA</p>
+
+    <% if (p.beforePhotos && p.beforePhotos.length) { %>
+      <h4>Client espace photos</h4>
+      <div class="thumbs">
+        <% p.beforePhotos.forEach(photo => { %>
+          <img src="<%= photo %>" class="thumb">
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p class="muted">No client photos uploaded yet.</p>
+    <% } %>
+  </div>
+<% }) %>
