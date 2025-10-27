@@ -10,49 +10,45 @@ dotenv.config();
 
 const app = express();
 
-// MongoDB Connection with uppercase database name
+// MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://paintellocontact_db_user:nOqgkEfw3ZeCQZXk@paintello-pro.kxlmuok.mongodb.net/PAINTELLO-PRO?retryWrites=true&w=majority';
 
 console.log('🔗 Connecting to MongoDB...');
 
-// Improved MongoDB connection with better error handling
-mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  retryWrites: true,
-  w: 'majority'
-})
-.then(() => {
-  console.log('✅ MongoDB Connected successfully to PAINTELLO-PRO database');
-})
-.catch(err => {
-  console.log('❌ MongoDB connection error:', err.message);
-  // Don't exit the process, let the app continue without database
+// MongoDB connection with timeout
+const connectDB = async () => {
+  try {
+    await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('✅ MongoDB Connected successfully to PAINTELLO-PRO database');
+    return true;
+  } catch (err) {
+    console.log('❌ MongoDB connection error:', err.message);
+    return false;
+  }
+};
+
+// Initialize DB connection
+let dbConnected = false;
+connectDB().then(connected => {
+  dbConnected = connected;
 });
 
-// Session configuration with better error handling
+// Session configuration
 const sessionConfig = {
   secret: process.env.SESSION_SECRET || 'paintello-pro-super-secret-key-2024',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 14 * 24 * 60 * 60 * 1000 // 14 days
+    maxAge: 14 * 24 * 60 * 60 * 1000
   }
 };
 
-// Only add MongoStore if MongoDB is connected
-if (mongoose.connection.readyState === 1) {
-  sessionConfig.store = MongoStore.create({
-    mongoUrl: MONGODB_URI,
-    collectionName: 'sessions',
-    ttl: 14 * 24 * 60 * 60, // 14 days
-    autoRemove: 'native'
-  });
-} else {
-  console.log('⚠️  Using memory session store (MongoDB not available)');
-}
-
+// Use memory store for now to avoid MongoDB session issues
+console.log('⚠️  Using memory session store');
 app.use(session(sessionConfig));
 
 // Body parser middleware
@@ -75,38 +71,61 @@ app.use((req, res, next) => {
   next();
 });
 
-// Import and use routes with better error handling
-const loadRoute = (routePath, routeName) => {
+// Simple route loader
+const loadRoutes = () => {
+  // Auth routes
   try {
-    const route = require(routePath);
-    app.use(routePath.includes('auth') ? '/auth' : 
-            routePath.includes('client') ? '/client' :
-            routePath.includes('painter') ? '/painter' :
-            routePath.includes('admin') ? '/admin' : '/api', route);
-    console.log(`✅ ${routeName} routes loaded`);
+    const authRoutes = require('./routes/auth');
+    app.use('/auth', authRoutes);
+    console.log('✅ Auth routes loaded');
   } catch (error) {
-    console.log(`⚠️  ${routeName} routes not loaded:`, error.message);
-    // Create basic placeholder route
-    const router = express.Router();
-    router.get('*', (req, res) => {
-      res.status(501).render('shared/error', {
-        title: 'Feature Not Implemented',
-        error: 'This feature is currently under development.'
-      });
-    });
-    app.use(routePath.includes('auth') ? '/auth' : 
-            routePath.includes('client') ? '/client' :
-            routePath.includes('painter') ? '/painter' :
-            routePath.includes('admin') ? '/admin' : '/api', router);
+    console.log('❌ Auth routes failed:', error.message);
+    app.use('/auth', (req, res) => res.redirect('/'));
+  }
+
+  // Client routes
+  try {
+    const clientRoutes = require('./routes/client');
+    app.use('/client', clientRoutes);
+    console.log('✅ Client routes loaded');
+  } catch (error) {
+    console.log('❌ Client routes failed:', error.message);
+    app.use('/client', (req, res) => res.redirect('/auth/login'));
+  }
+
+  // Painter routes
+  try {
+    const painterRoutes = require('./routes/painter');
+    app.use('/painter', painterRoutes);
+    console.log('✅ Painter routes loaded');
+  } catch (error) {
+    console.log('❌ Painter routes failed:', error.message);
+    app.use('/painter', (req, res) => res.redirect('/auth/login'));
+  }
+
+  // Admin routes
+  try {
+    const adminRoutes = require('./routes/admin');
+    app.use('/admin', adminRoutes);
+    console.log('✅ Admin routes loaded');
+  } catch (error) {
+    console.log('❌ Admin routes failed:', error.message);
+    app.use('/admin', (req, res) => res.redirect('/auth/login'));
+  }
+
+  // API routes
+  try {
+    const apiRoutes = require('./routes/api');
+    app.use('/api', apiRoutes);
+    console.log('✅ API routes loaded');
+  } catch (error) {
+    console.log('❌ API routes failed:', error.message);
+    app.use('/api', (req, res) => res.json({ error: 'API not available' }));
   }
 };
 
 // Load all routes
-loadRoute('./routes/auth', 'Auth');
-loadRoute('./routes/client', 'Client');
-loadRoute('./routes/painter', 'Painter');
-loadRoute('./routes/admin', 'Admin');
-loadRoute('./routes/api', 'API');
+loadRoutes();
 
 // Public routes
 app.get('/', (req, res) => {
@@ -138,31 +157,31 @@ app.get('/contact', (req, res) => {
   });
 });
 
-// Health check endpoint (important for Heroku)
+// Health check endpoint
 app.get('/health', (req, res) => {
-  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
   res.json({ 
     status: 'OK', 
-    database: dbStatus,
+    database: dbConnected ? 'connected' : 'disconnected',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
   });
 });
 
-// Simple test route
+// Test route
 app.get('/test', (req, res) => {
   res.json({ 
-    message: 'Paintello Pro server is running!',
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    message: 'Paintello Pro is running! 🎨',
+    version: '1.0.0',
+    database: dbConnected ? '✅ Connected' : '❌ Disconnected'
   });
 });
 
-// Error handling middleware
+// Error handling
 app.use((err, req, res, next) => {
-  console.error('🚨 Error:', err.stack);
+  console.error('🚨 Error:', err.message);
   res.status(500).render('shared/error', { 
     title: 'Server Error',
-    error: process.env.NODE_ENV === 'production' ? 'Something went wrong!' : err.message
+    error: 'Something went wrong! Please try again later.'
   });
 });
 
@@ -175,12 +194,11 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🎨 Paintello Pro Server started successfully!`);
-  console.log(`📍 Running on: http://localhost:${PORT}`);
+  console.log(`📍 Running on: http://0.0.0.0:${PORT}`);
   console.log(`🏢 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🗄️ Database status: ${mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  console.log(`🗄️ Database: ${dbConnected ? '✅ Connected' : '❌ Disconnected'}`);
+  console.log(`🔗 Health check: http://0.0.0.0:${PORT}/health`);
+  console.log(`🧪 Test endpoint: http://0.0.0.0:${PORT}/test`);
 });
-
-module.exports = app;
