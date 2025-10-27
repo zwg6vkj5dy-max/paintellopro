@@ -4,7 +4,6 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const dotenv = require('dotenv');
 const path = require('path');
-const fs = require('fs');
 
 // Load env vars
 dotenv.config();
@@ -62,43 +61,46 @@ app.use((req, res, next) => {
   next();
 });
 
-// Load routes dynamically
-const loadRoutes = (routePath, routeFile) => {
-  const fullPath = path.join(__dirname, routePath, routeFile);
-  if (fs.existsSync(fullPath)) {
-    try {
-      return require(fullPath);
-    } catch (error) {
-      console.log(`⚠️  Route file ${routeFile} has errors:`, error.message);
-      return null;
-    }
-  } else {
-    console.log(`⚠️  Route file ${routeFile} not found, creating placeholder`);
-    // Create a basic router for missing files
-    const router = express.Router();
-    router.get('*', (req, res) => {
-      res.status(501).render('shared/error', {
-        title: 'Feature Not Implemented',
-        error: 'This feature is currently under development.'
-      });
-    });
-    return router;
-  }
-};
+// Import and use routes
+try {
+  const authRoutes = require('./routes/auth');
+  app.use('/auth', authRoutes);
+  console.log('✅ Auth routes loaded');
+} catch (error) {
+  console.log('⚠️  Auth routes not loaded:', error.message);
+}
 
-// Load all routes
-const authRoutes = loadRoutes('routes', 'auth.js');
-const clientRoutes = loadRoutes('routes', 'client.js');
-const painterRoutes = loadRoutes('routes', 'painter.js');
-const adminRoutes = loadRoutes('routes', 'admin.js');
-const apiRoutes = loadRoutes('routes', 'api.js');
+try {
+  const clientRoutes = require('./routes/client');
+  app.use('/client', clientRoutes);
+  console.log('✅ Client routes loaded');
+} catch (error) {
+  console.log('⚠️  Client routes not loaded:', error.message);
+}
 
-// Use routes if they exist
-if (authRoutes) app.use('/auth', authRoutes);
-if (clientRoutes) app.use('/client', clientRoutes);
-if (painterRoutes) app.use('/painter', painterRoutes);
-if (adminRoutes) app.use('/admin', adminRoutes);
-if (apiRoutes) app.use('/api', apiRoutes);
+try {
+  const painterRoutes = require('./routes/painter');
+  app.use('/painter', painterRoutes);
+  console.log('✅ Painter routes loaded');
+} catch (error) {
+  console.log('⚠️  Painter routes not loaded:', error.message);
+}
+
+try {
+  const adminRoutes = require('./routes/admin');
+  app.use('/admin', adminRoutes);
+  console.log('✅ Admin routes loaded');
+} catch (error) {
+  console.log('⚠️  Admin routes not loaded:', error.message);
+}
+
+try {
+  const apiRoutes = require('./routes/api');
+  app.use('/api', apiRoutes);
+  console.log('✅ API routes loaded');
+} catch (error) {
+  console.log('⚠️  API routes not loaded:', error.message);
+}
 
 // Public routes
 app.get('/', (req, res) => {
@@ -130,6 +132,15 @@ app.get('/contact', (req, res) => {
   });
 });
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Paintello Pro is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Error handling
 app.use((err, req, res, next) => {
   console.error('🚨 Error:', err.stack);
@@ -146,10 +157,14 @@ app.use((req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3000;
+// Only start server if this file is run directly (not when required)
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`🎨 Paintello Pro Server started successfully!`);
+    console.log(`📍 Running on: http://localhost:${PORT}`);
+    console.log(`🏢 Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
 
-app.listen(PORT, () => {
-  console.log(`🎨 Paintello Pro Server started successfully!`);
-  console.log(`📍 Running on: http://localhost:${PORT}`);
-  console.log(`🏢 Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+module.exports = app;
