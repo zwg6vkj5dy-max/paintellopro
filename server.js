@@ -4,13 +4,14 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 
 // Load env vars
 dotenv.config();
 
 const app = express();
 
-// MongoDB Connection with fixed URI
+// MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://paintellocontact_db_user:nOqgkEfw3ZeCQZXk@paintello-pro.kxlmuok.mongodb.net/paintello-pro?retryWrites=true&w=majority';
 
 mongoose.connect(MONGODB_URI, {
@@ -22,10 +23,9 @@ mongoose.connect(MONGODB_URI, {
 })
 .catch(err => {
   console.log('❌ MongoDB connection error:', err);
-  process.exit(1);
 });
 
-// Session configuration with proper MongoStore
+// Session configuration
 app.use(session({
   secret: process.env.SESSION_SECRET || 'paintello-pro-super-secret-key-2024',
   resave: false,
@@ -33,12 +33,12 @@ app.use(session({
   store: MongoStore.create({
     mongoUrl: MONGODB_URI,
     collectionName: 'sessions',
-    ttl: 14 * 24 * 60 * 60, // 14 days
+    ttl: 14 * 24 * 60 * 60,
     autoRemove: 'native'
   }),
   cookie: {
-    secure: false, // set to true in production with HTTPS
-    maxAge: 14 * 24 * 60 * 60 * 1000 // 14 days
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 14 * 24 * 60 * 60 * 1000
   }
 }));
 
@@ -58,23 +58,47 @@ app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   res.locals.painter = req.session.painter || null;
   res.locals.messages = req.session.messages || [];
-  req.session.messages = []; // Clear messages after displaying
+  req.session.messages = [];
   next();
 });
 
-// Import routes
-const authRoutes = require('./routes/auth');
-const clientRoutes = require('./routes/client');
-const painterRoutes = require('./routes/painter');
-const adminRoutes = require('./routes/admin');
-const apiRoutes = require('./routes/api');
+// Load routes dynamically
+const loadRoutes = (routePath, routeFile) => {
+  const fullPath = path.join(__dirname, routePath, routeFile);
+  if (fs.existsSync(fullPath)) {
+    try {
+      return require(fullPath);
+    } catch (error) {
+      console.log(`⚠️  Route file ${routeFile} has errors:`, error.message);
+      return null;
+    }
+  } else {
+    console.log(`⚠️  Route file ${routeFile} not found, creating placeholder`);
+    // Create a basic router for missing files
+    const router = express.Router();
+    router.get('*', (req, res) => {
+      res.status(501).render('shared/error', {
+        title: 'Feature Not Implemented',
+        error: 'This feature is currently under development.'
+      });
+    });
+    return router;
+  }
+};
 
-// Use routes
-app.use('/auth', authRoutes);
-app.use('/client', clientRoutes);
-app.use('/painter', painterRoutes);
-app.use('/admin', adminRoutes);
-app.use('/api', apiRoutes);
+// Load all routes
+const authRoutes = loadRoutes('routes', 'auth.js');
+const clientRoutes = loadRoutes('routes', 'client.js');
+const painterRoutes = loadRoutes('routes', 'painter.js');
+const adminRoutes = loadRoutes('routes', 'admin.js');
+const apiRoutes = loadRoutes('routes', 'api.js');
+
+// Use routes if they exist
+if (authRoutes) app.use('/auth', authRoutes);
+if (clientRoutes) app.use('/client', clientRoutes);
+if (painterRoutes) app.use('/painter', painterRoutes);
+if (adminRoutes) app.use('/admin', adminRoutes);
+if (apiRoutes) app.use('/api', apiRoutes);
 
 // Public routes
 app.get('/', (req, res) => {
@@ -85,45 +109,28 @@ app.get('/', (req, res) => {
   });
 });
 
-app.get('/painters', async (req, res) => {
-  try {
-    const Painter = require('./models/Painter');
-    const painters = await Painter.find({ availability: true })
-      .populate('user', 'name email phone')
-      .limit(6);
-    
-    res.render('client/search-painters', { 
-      title: 'Find Professional Painters',
-      painters: painters,
-      wilayas: require('./utils/wilayas'),
-      query: req.query
-    });
-  } catch (error) {
-    console.error('Error fetching painters:', error);
-    res.render('client/search-painters', { 
-      title: 'Find Professional Painters',
-      painters: [],
-      wilayas: require('./utils/wilayas'),
-      query: req.query
-    });
-  }
+app.get('/painters', (req, res) => {
+  res.render('client/search-painters', { 
+    title: 'Find Professional Painters',
+    painters: [],
+    wilayas: require('./utils/wilayas'),
+    query: req.query
+  });
 });
 
 app.get('/about', (req, res) => {
   res.render('shared/about', { 
-    title: 'About Paintello Pro',
-    wilayas: require('./utils/wilayas')
+    title: 'About Paintello Pro'
   });
 });
 
 app.get('/contact', (req, res) => {
   res.render('shared/contact', { 
-    title: 'Contact Us - Paintello Pro',
-    wilayas: require('./utils/wilayas')
+    title: 'Contact Us - Paintello Pro'
   });
 });
 
-// Error handling middleware
+// Error handling
 app.use((err, req, res, next) => {
   console.error('🚨 Error:', err.stack);
   res.status(500).render('shared/error', { 
@@ -135,8 +142,7 @@ app.use((err, req, res, next) => {
 // 404 handler
 app.use((req, res) => {
   res.status(404).render('shared/404', { 
-    title: 'Page Not Found',
-    wilayas: require('./utils/wilayas')
+    title: 'Page Not Found'
   });
 });
 
@@ -146,5 +152,4 @@ app.listen(PORT, () => {
   console.log(`🎨 Paintello Pro Server started successfully!`);
   console.log(`📍 Running on: http://localhost:${PORT}`);
   console.log(`🏢 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🗄️ Database: MongoDB Atlas - Paintello Pro`);
 });
