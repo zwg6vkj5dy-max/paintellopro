@@ -167,9 +167,10 @@ var userRoutes = require("./routes/user");
 //var saleRoutes = require("./routes/sale");
 //var electricalsRoutes = require("./routes/electricals");
 
+app.get('/', (req, res) => res.render('public/home'));
+app.get('/join-pro', (req, res) => res.render('public/join-pro'));
 
 
-app.use('/', routes)
 app.use("/user", userRoutes);
 //app.use("/sport", sportRoutes);
 //app.use("/sale", saleRoutes);
