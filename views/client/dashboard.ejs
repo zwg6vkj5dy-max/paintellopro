@@ -1,0 +1,162 @@
+<%- include('../partials/header', { title: 'Client Dashboard - Paintello Pro' }) %>
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <div class="avatar-placeholder bg-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style="width: 80px; height: 80px;">
+                        <i class="fas fa-user fa-2x text-white"></i>
+                    </div>
+                    <h5 class="card-title"><%= user.name %></h5>
+                    <p class="text-muted small">Client</p>
+                    <div class="d-grid gap-2">
+                        <a href="/client/create-order" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>New Order
+                        </a>
+                        <a href="/painters" class="btn btn-outline-primary">
+                            <i class="fas fa-search me-2"></i>Find Painters
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Quick Stats</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Total Orders</span>
+                        <span class="fw-bold text-primary"><%= stats.totalOrders || 0 %></span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Active Orders</span>
+                        <span class="fw-bold text-warning"><%= stats.activeOrders || 0 %></span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Completed</span>
+                        <span class="fw-bold text-success"><%= stats.completedOrders || 0 %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9 col-md-8">
+            <!-- Welcome Banner -->
+            <div class="alert alert-info border-0 mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle fa-2x me-3"></i>
+                    <div>
+                        <h5 class="alert-heading mb-1">Welcome to Paintello Pro!</h5>
+                        <p class="mb-0">Find professional painters in your area and get your painting projects done with quality and ease.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card card-hover border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-search fa-2x text-primary mb-3"></i>
+                            <h5>Find Painters</h5>
+                            <p class="text-muted small">Browse verified painters in your area</p>
+                            <a href="/painters" class="btn btn-outline-primary btn-sm">Explore</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card card-hover border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-plus fa-2x text-success mb-3"></i>
+                            <h5>New Order</h5>
+                            <p class="text-muted small">Create a new painting project</p>
+                            <a href="/client/create-order" class="btn btn-outline-success btn-sm">Create</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card card-hover border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-history fa-2x text-warning mb-3"></i>
+                            <h5>Order History</h5>
+                            <p class="text-muted small">View your past and current orders</p>
+                            <a href="/client/orders" class="btn btn-outline-warning btn-sm">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Orders</h5>
+                    <a href="/client/orders" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <% if (recentOrders.length === 0) { %>
+                    <div class="text-center py-4">
+                        <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No orders yet</h5>
+                        <p class="text-muted">Start by creating your first painting project</p>
+                        <a href="/client/create-order" class="btn btn-primary">Create First Order</a>
+                    </div>
+                    <% } else { %>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Painter</th>
+                                    <th>Service</th>
+                                    <th>Budget</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% recentOrders.forEach(order => { %>
+                                <tr>
+                                    <td>#<%= order._id.toString().slice(-6) %></td>
+                                    <td>
+                                        <% if (order.painter && order.painter.user) { %>
+                                        <%= order.painter.user.name %>
+                                        <% } else { %>
+                                        <span class="text-muted">Not assigned</span>
+                                        <% } %>
+                                    </td>
+                                    <td><%= order.serviceType %></td>
+                                    <td><%= order.budget %> DZD</td>
+                                    <td>
+                                        <span class="badge bg-<%= 
+                                            order.status === 'completed' ? 'success' :
+                                            order.status === 'in_progress' ? 'primary' :
+                                            order.status === 'accepted' ? 'info' :
+                                            order.status === 'pending' ? 'warning' : 'danger'
+                                        %>">
+                                            <%= order.status.replace('_', ' ').toUpperCase() %>
+                                        </span>
+                                    </td>
+                                    <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                                    <td>
+                                        <a href="/client/orders/<%= order._id %>" class="btn btn-sm btn-outline-primary">View</a>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
