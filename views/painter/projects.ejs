@@ -1,0 +1,10 @@
+<% layout('layouts/main') %>
+<h2>Assigned projects</h2>
+<ul>
+  <% projects.forEach(p => { %>
+    <li>
+      <strong><%= p.details.description %></strong>
+      — Client: <%= p.client.name %> — Status: <%= p.status %>
+    </li>
+  <% }) %>
+</ul>
