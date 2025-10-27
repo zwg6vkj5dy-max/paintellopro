@@ -1,24 +1,58 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const orderSchema = new Schema({
-  user: {type: Schema.Types.ObjectId, ref: 'User'},
-  cart: {type: Object, required: true},
-  address: {type: String, required: true},
-  name: {type: String, required: true},
-  city: {type: String, required: true},
-  country: {type: String, required: true},
-  
-  numero : {type: Number, required: true},
-   returnRequest: { 
-    type: Schema.Types.ObjectId, 
-    ref: 'ReturnRequest' 
+const orderSchema = new mongoose.Schema({
+  client: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
-  shippingFee: { type: Number, default: 0 },
-  deliveryDelay: { type: String },
-  totalWithShipping: { type: Number }
-}, { timestamps: true }); // Adding timestamps for created/updated dates
-
-
+  painter: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Painter',
+    required: true
+  },
+  serviceType: {
+    type: String,
+    required: true,
+    enum: ['interior', 'exterior', 'commercial', 'residential']
+  },
+  wilaya: {
+    type: String,
+    required: true
+  },
+  address: {
+    type: String,
+    required: true
+  },
+  area: {
+    type: Number,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  budget: {
+    type: Number,
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'accepted', 'in_progress', 'completed', 'cancelled'],
+    default: 'pending'
+  },
+  commission: {
+    type: Number,
+    required: true
+  },
+  totalAmount: {
+    type: Number,
+    required: true
+  },
+  scheduledDate: Date,
+  completedAt: Date
+}, {
+  timestamps: true
+});
 
 module.exports = mongoose.model('Order', orderSchema);
