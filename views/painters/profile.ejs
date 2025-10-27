@@ -1,0 +1,39 @@
+<% layout('layout') %>
+<div class="profile-header">
+  <img src="<%= painter.profilePhoto || '/img/placeholder.jpg' %>" class="avatar-large">
+  <div>
+    <h2><%= painter.name %></h2>
+    <p class="muted"><%= painter.address || '—' %></p>
+    <span class="badge"><%= painter.painterProfile.ratePerM2 %> DA/m²</span>
+    <div class="tags">
+      <% (painter.painterProfile.skills || []).forEach(s => { %>
+        <span class="tag"><%= s %></span>
+      <% }) %>
+    </div>
+    <form method="POST" action="/painters/<%= painter._id %>/book">
+      <button type="submit" class="btn btn-primary">Book this painter</button>
+    </form>
+  </div>
+</div>
+
+<h3>Portfolio</h3>
+<div class="swiper">
+  <div class="swiper-wrapper">
+    <% (painter.painterProfile.portfolio || []).forEach(photo => { %>
+      <div class="swiper-slide">
+        <img src="<%= photo %>" class="slide-img" alt="Painter work">
+      </div>
+    <% }) %>
+  </div>
+  <div class="swiper-button-next"></div>
+  <div class="swiper-button-prev"></div>
+</div>
+
+<script>
+  const swiper = new Swiper('.swiper', {
+    loop: true,
+    slidesPerView: 1,
+    spaceBetween: 16,
+    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }
+  });
+</script>
