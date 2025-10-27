@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title || 'Paintello' %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/css/style.css" rel="stylesheet">
+  <!-- Swiper for modern slider -->
+  <link rel="stylesheet" href="https://unpkg.com/swiper@9/swiper-bundle.min.css">
+</head>
+<body>
+  <%- include('partials/header') %>
+  <main class="container">
+    <%- include('partials/flash') %>
+    <%- body %>
+  </main>
+  <script src="https://unpkg.com/swiper@9/swiper-bundle.min.js"></script>
+</body>
+</html>
