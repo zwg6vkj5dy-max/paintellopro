@@ -1,22 +1,11 @@
-<% layout('layout') %>
-<h2>My projects</h2>
-
-<div class="grid">
+<% layout('layouts/main') %>
+<h2>Your projects</h2>
+<ul>
   <% projects.forEach(p => { %>
-    <div class="card">
-      <h3><%= p.details.description %></h3>
-      <p>Area: <%= p.details.area %> m²</p>
-      <p>Status: <span class="status <%= p.status %>"><%= p.status %></span></p>
-      <p>Total: <%= (p.clientTotal || 0).toLocaleString('fr-DZ') %> DA</p>
-      <p>Painter: <%= p.painter ? p.painter.name : 'Not assigned yet' %></p>
-
-      <% if (p.beforePhotos && p.beforePhotos.length) { %>
-        <div class="thumbs">
-          <% p.beforePhotos.slice(0,3).forEach(photo => { %>
-            <img src="<%= photo %>" class="thumb">
-          <% }) %>
-        </div>
-      <% } %>
-    </div>
+    <li>
+      <strong><%= p.details.description %></strong>
+      — Status: <%= p.status %>
+      — Painter: <%= p.painter ? p.painter.name : 'Not matched yet' %>
+    </li>
   <% }) %>
-</div>
+</ul>
