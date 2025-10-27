@@ -1,191 +1,104 @@
-<%- include('../partials/header', { title: 'Join as Painter - Paintello Pro' }) %>
+<form action="/auth/register-painter" method="POST">
+    <!-- Personal Information -->
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="name" class="form-label">Full Name *</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="phone" class="form-label">Phone Number *</label>
+            <input type="tel" class="form-control" id="phone" name="phone" required>
+        </div>
+    </div>
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <h2 class="card-title">
-                            <i class="fas fa-brush text-primary me-2"></i>
-                            Join Our Pro Team
-                        </h2>
-                        <p class="text-muted">Become a verified Paintello Pro painter and grow your business</p>
-                    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email Address *</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+    </div>
 
-                    <form action="/auth/register-painter" method="POST" enctype="multipart/form-data">
-                        <!-- Personal Information -->
-                        <h5 class="mb-3 text-primary">
-                            <i class="fas fa-user me-2"></i>Personal Information
-                        </h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="name" class="form-label">Full Name *</label>
-                                <input type="text" class="form-control" id="name" name="name" 
-                                       value="<%= oldInput.name || '' %>" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">Phone Number *</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" 
-                                       value="<%= oldInput.phone || '' %>" required>
-                            </div>
-                        </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="password" class="form-label">Password *</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="confirmPassword" class="form-label">Confirm Password *</label>
+            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+        </div>
+    </div>
 
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email Address *</label>
-                            <input type="email" class="form-control" id="email" name="email" 
-                                   value="<%= oldInput.email || '' %>" required>
-                        </div>
+    <!-- Professional Information -->
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="experience" class="form-label">Years of Experience *</label>
+            <input type="number" class="form-control" id="experience" name="experience" min="0" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="pricePerSqm" class="form-label">Price per m² (DZD) *</label>
+            <input type="number" class="form-control" id="pricePerSqm" name="pricePerSqm" min="0" required>
+        </div>
+    </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="password" class="form-label">Password *</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="confirmPassword" class="form-label">Confirm Password *</label>
-                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-                            </div>
-                        </div>
-
-                        <!-- Professional Information -->
-                        <h5 class="mb-3 mt-4 text-primary">
-                            <i class="fas fa-briefcase me-2"></i>Professional Information
-                        </h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="experience" class="form-label">Years of Experience *</label>
-                                <input type="number" class="form-control" id="experience" name="experience" 
-                                       value="<%= oldInput.experience || '' %>" min="0" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="pricePerSqm" class="form-label">Price per m² (DZD) *</label>
-                                <input type="number" class="form-control" id="pricePerSqm" name="pricePerSqm" 
-                                       value="<%= oldInput.pricePerSqm || '' %>" min="0" required>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Specialization *</label>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="specialization" value="interior" 
-                                               id="interior" <%= (oldInput.specialization && oldInput.specialization.includes('interior')) ? 'checked' : '' %>>
-                                        <label class="form-check-label" for="interior">Interior</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="specialization" value="exterior" 
-                                               id="exterior" <%= (oldInput.specialization && oldInput.specialization.includes('exterior')) ? 'checked' : '' %>>
-                                        <label class="form-check-label" for="exterior">Exterior</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="specialization" value="commercial" 
-                                               id="commercial" <%= (oldInput.specialization && oldInput.specialization.includes('commercial')) ? 'checked' : '' %>>
-                                        <label class="form-check-label" for="commercial">Commercial</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="specialization" value="residential" 
-                                               id="residential" <%= (oldInput.specialization && oldInput.specialization.includes('residential')) ? 'checked' : '' %>>
-                                        <label class="form-check-label" for="residential">Residential</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Location Information -->
-                        <h5 class="mb-3 mt-4 text-primary">
-                            <i class="fas fa-map-marker-alt me-2"></i>Location Information
-                        </h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="wilaya" class="form-label">Wilaya *</label>
-                                <select class="form-select" id="wilaya" name="wilaya" required>
-                                    <option value="">Select Wilaya</option>
-                                    <% wilayas.forEach(wilaya => { %>
-                                    <option value="<%= wilaya.name %>" 
-                                            <%= (oldInput.wilaya === wilaya.name) ? 'selected' : '' %>>
-                                        <%= wilaya.name %> (<%= wilaya.number %>)
-                                    </option>
-                                    <% }); %>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="wilayaNumber" class="form-label">Wilaya Number *</label>
-                                <input type="number" class="form-control" id="wilayaNumber" name="wilayaNumber" 
-                                       value="<%= oldInput.wilayaNumber || '' %>" readonly required>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Full Address *</label>
-                            <textarea class="form-control" id="address" name="address" rows="2" required><%= oldInput.address || '' %></textarea>
-                        </div>
-
-                        <!-- Verification -->
-                        <h5 class="mb-3 mt-4 text-primary">
-                            <i class="fas fa-id-card me-2"></i>Verification
-                        </h5>
-                        <div class="mb-3">
-                            <label for="idCard" class="form-label">ID Card Photo *</label>
-                            <input type="file" class="form-control" id="idCard" name="idCard" accept="image/*" required>
-                            <div class="form-text">Upload a clear photo of your national ID card for verification</div>
-                        </div>
-
-                        <!-- Portfolio (Optional) -->
-                        <div class="mb-3">
-                            <label for="portfolio" class="form-label">Portfolio Photos (Optional)</label>
-                            <input type="file" class="form-control" id="portfolio" name="portfolio" multiple accept="image/*">
-                            <div class="form-text">Upload photos of your previous work to showcase your skills</div>
-                        </div>
-
-                        <div class="form-check mb-4">
-                            <input class="form-check-input" type="checkbox" id="terms" required>
-                            <label class="form-check-label" for="terms">
-                                I agree to the <a href="#" class="text-decoration-none">Terms of Service</a>, 
-                                <a href="#" class="text-decoration-none">Privacy Policy</a>, and commission structure
-                            </label>
-                        </div>
-
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-user-check me-2"></i>Apply as Pro Painter
-                            </button>
-                        </div>
-
-                        <div class="text-center">
-                            <p class="mb-0">
-                                Already have an account? 
-                                <a href="/auth/login" class="text-decoration-none">Sign in</a>
-                            </p>
-                            <p class="mt-2">
-                                Looking to hire a painter? 
-                                <a href="/auth/register" class="text-decoration-none">Sign up as Client</a>
-                            </p>
-                        </div>
-                    </form>
+    <div class="mb-3">
+        <label class="form-label">Specialization *</label>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="specialization" value="interior" id="interior">
+                    <label class="form-check-label" for="interior">Interior</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="specialization" value="exterior" id="exterior">
+                    <label class="form-check-label" for="exterior">Exterior</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="specialization" value="commercial" id="commercial">
+                    <label class="form-check-label" for="commercial">Commercial</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="specialization" value="residential" id="residential">
+                    <label class="form-check-label" for="residential">Residential</label>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-document.getElementById('wilaya').addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    if (selectedOption.value) {
-        const wilayaNumber = selectedOption.text.match(/\((\d+)\)/)[1];
-        document.getElementById('wilayaNumber').value = wilayaNumber;
-    } else {
-        document.getElementById('wilayaNumber').value = '';
-    }
-});
-</script>
+    <!-- Location Information -->
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="wilaya" class="form-label">Wilaya *</label>
+            <select class="form-select" id="wilaya" name="wilaya" required>
+                <option value="">Select Wilaya</option>
+                <% wilayas.forEach(wilaya => { %>
+                <option value="<%= wilaya.name %>"><%= wilaya.name %> (<%= wilaya.number %>)</option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="wilayaNumber" class="form-label">Wilaya Number *</label>
+            <input type="number" class="form-control" id="wilayaNumber" name="wilayaNumber" readonly required>
+        </div>
+    </div>
 
-<%- include('../partials/footer') %>
+    <div class="mb-3">
+        <label for="address" class="form-label">Full Address *</label>
+        <textarea class="form-control" id="address" name="address" rows="2" required></textarea>
+    </div>
+
+    <div class="form-check mb-4">
+        <input class="form-check-input" type="checkbox" id="terms" required>
+        <label class="form-check-label" for="terms">
+            I agree to the terms and conditions
+        </label>
+    </div>
+
+    <div class="d-grid">
+        <button type="submit" class="btn btn-primary btn-lg">Apply as Pro Painter</button>
+    </div>
+</form>
