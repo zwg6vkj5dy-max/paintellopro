@@ -1,0 +1,13 @@
+<% layout('layouts/main') %>
+<h2>Your profile</h2>
+<form method="POST" action="/painter/profile">
+  <label>Skills (comma-separated)</label>
+  <input name="skills" value="<%= (painter.painterProfile?.skills || []).join(', ') %>">
+  <label>Available</label>
+  <select name="availability">
+    <option value="true" <%= painter.painterProfile?.availability ? 'selected' : '' %>>Yes</option>
+    <option value="false" <%= !painter.painterProfile?.availability ? 'selected' : '' %>>No</option>
+  </select>
+  <button type="submit">Save</button>
+</form>
+<p>Approved: <%= painter.painterProfile?.approved ? 'Yes' : 'Pending' %></p>
