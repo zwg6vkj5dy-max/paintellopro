@@ -1,0 +1,13 @@
+<% layout('layouts/main') %>
+<h2>Painters</h2>
+<ul>
+  <% painters.forEach(p => { %>
+    <li>
+      <strong><%= p.name %></strong>
+      — Approved: <%= p.painterProfile?.approved ? 'Yes' : 'No' %>
+      <form method="POST" action="/admin/painters/<%= p._id %>/approve" style="display:inline;">
+        <button type="submit">Approve</button>
+      </form>
+    </li>
+  <% }) %>
+</ul>
