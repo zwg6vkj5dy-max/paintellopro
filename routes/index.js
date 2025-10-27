@@ -77,7 +77,7 @@ router.post('/approve-painter/:id', async (req, res) => {
   res.redirect('/admin/painters');
 });
 
-/ List non-approved painters
+// List non-approved painters
 router.get('/painters', ensureAuth, ensureRole('admin'), async (req, res) => {
   const painters = await User.find({ role: 'painter' });
   res.render('admin/painters', { painters });
