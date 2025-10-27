@@ -1,0 +1,12 @@
+<% if (messages && messages.length > 0) { %>
+<div class="container mt-3">
+    <% messages.forEach(message => { %>
+    <div class="alert alert-<%= message.type %> alert-dismissible fade show" role="alert">
+        <%= message.text %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <% }); %>
+</div>
+<% } %>
+
+
