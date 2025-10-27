@@ -26,7 +26,8 @@ const orderSchema = new mongoose.Schema({
   },
   area: {
     type: Number,
-    required: true
+    required: true,
+    min: 1
   },
   description: {
     type: String,
@@ -34,7 +35,8 @@ const orderSchema = new mongoose.Schema({
   },
   budget: {
     type: Number,
-    required: true
+    required: true,
+    min: 0
   },
   status: {
     type: String,
