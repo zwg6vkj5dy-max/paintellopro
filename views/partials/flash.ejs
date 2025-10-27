@@ -1,0 +1,9 @@
+<% if (typeof flash !== 'undefined') { %>
+  <% (flash().error || []).forEach(msg => { %>
+    <div class="alert alert-error"><%= msg %></div>
+  <% }) %>
+  <% (flash().success || []).forEach(msg => { %>
+    <div class="alert alert-success"><%= msg %></div>
+  <% }) %>
+<% } %>
+
