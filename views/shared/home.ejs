@@ -1,95 +1,142 @@
 <%- include('../partials/header', { title: 'Paintello Pro - Find Professional Painters in Algeria' }) %>
 
-<div class="container-fluid px-0">
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container">
-            <div class="row align-items-center min-vh-100">
-                <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold mb-4">Find Professional Painters in Your Area</h1>
-                    <p class="lead mb-4">Connect with verified painters across Algeria. Quality service, fair prices, and guaranteed satisfaction for all your painting projects.</p>
-                    <div class="d-flex flex-wrap gap-3">
-                        <a href="/painters" class="btn btn-light btn-lg">
-                            <i class="fas fa-search me-2"></i>Find Painters
-                        </a>
-                        <a href="/auth/register-painter" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-brush me-2"></i>Join as Painter
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-6 text-center">
-                    <div class="hero-image-placeholder bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center"
-                         style="width: 400px; height: 400px;">
-                        <i class="fas fa-paint-roller fa-8x text-primary"></i>
-                    </div>
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Find Professional Painters in Your Area</h1>
+                <p class="lead mb-4">Connect with verified painters across Algeria. Quality service, fair prices, and guaranteed satisfaction for all your painting projects.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="/painters" class="btn btn-light btn-lg">
+                        <i class="fas fa-search me-2"></i>Find Painters
+                    </a>
+                    <a href="/auth/register-painter" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-brush me-2"></i>Join as Painter
+                    </a>
                 </div>
             </div>
+            <div class="col-lg-6 text-center">
+                <img src="/images/hero-painter.png" alt="Professional Painter" class="img-fluid" style="max-height: 400px;">
+            </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- How It Works -->
-    <section class="py-5 bg-light">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold">How Paintello Pro Works</h2>
-                <p class="text-muted lead">Simple steps to get your painting project done</p>
+<!-- How It Works -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">How Paintello Pro Works</h2>
+            <p class="text-muted lead">Simple steps to get your painting project done</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="bg-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style="width: 80px; height: 80px;">
+                        <i class="fas fa-search fa-2x text-white"></i>
+                    </div>
+                    <h5>Search Painters</h5>
+                    <p class="text-muted">Find verified painters in your wilaya with ratings and portfolios</p>
+                </div>
             </div>
-            <div class="row">
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="text-center">
-                        <div class="bg-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
-                             style="width: 80px; height: 80px;">
-                            <i class="fas fa-search fa-2x text-white"></i>
-                        </div>
-                        <h5>Search Painters</h5>
-                        <p class="text-muted">Find verified painters in your wilaya with ratings and portfolios</p>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="bg-success rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style="width: 80px; height: 80px;">
+                        <i class="fas fa-clipboard-list fa-2x text-white"></i>
                     </div>
+                    <h5>Create Order</h5>
+                    <p class="text-muted">Describe your project, set budget, and choose your preferred painter</p>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="text-center">
-                        <div class="bg-success rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
-                             style="width: 80px; height: 80px;">
-                            <i class="fas fa-clipboard-list fa-2x text-white"></i>
-                        </div>
-                        <h5>Create Order</h5>
-                        <p class="text-muted">Describe your project, set budget, and choose your preferred painter</p>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="bg-warning rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style="width: 80px; height: 80px;">
+                        <i class="fas fa-paint-roller fa-2x text-white"></i>
                     </div>
+                    <h5>Get It Painted</h5>
+                    <p class="text-muted">Professional painters complete your project with quality materials</p>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="text-center">
-                        <div class="bg-warning rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
-                             style="width: 80px; height: 80px;">
-                            <i class="fas fa-paint-roller fa-2x text-white"></i>
-                        </div>
-                        <h5>Get It Painted</h5>
-                        <p class="text-muted">Professional painters complete your project with quality materials</p>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="bg-info rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style="width: 80px; height: 80px;">
+                        <i class="fas fa-star fa-2x text-white"></i>
                     </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="text-center">
-                        <div class="bg-info rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
-                             style="width: 80px; height: 80px;">
-                            <i class="fas fa-star fa-2x text-white"></i>
-                        </div>
-                        <h5>Rate & Review</h5>
-                        <p class="text-muted">Share your experience and help maintain quality standards</p>
-                    </div>
+                    <h5>Rate & Review</h5>
+                    <p class="text-muted">Share your experience and help maintain quality standards</p>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- CTA Section -->
-    <section class="py-5 bg-primary text-white">
-        <div class="container text-center">
-            <h2 class="fw-bold mb-3">Ready to Start Your Painting Project?</h2>
-            <p class="lead mb-4">Join thousands of satisfied customers who found their perfect painter through Paintello Pro</p>
-            <div class="d-flex justify-content-center gap-3 flex-wrap">
-                <a href="/auth/register" class="btn btn-light btn-lg">Get Started as Client</a>
-                <a href="/auth/register-painter" class="btn btn-outline-light btn-lg">Join as Professional Painter</a>
+<!-- Featured Painters -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="fw-bold">Featured Painters</h2>
+                <p class="text-muted">Top-rated professionals in your area</p>
             </div>
+            <a href="/painters" class="btn btn-outline-primary">View All Painters</a>
         </div>
-    </section>
-</div>
+        <div class="row">
+            <% featuredPainters.forEach(painter => { %>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card card-hover shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar-placeholder bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                 style="width: 50px; height: 50px;">
+                                <i class="fas fa-brush text-white"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0"><%= painter.user.name %></h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    <%= painter.wilaya %>
+                                </small>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="star-rating mb-2">
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                <i class="fas fa-star <%= i <= painter.rating ? 'text-warning' : 'text-muted' %>"></i>
+                                <% } %>
+                                <span class="ms-1">(<%= painter.rating.toFixed(1) %>)</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span><%= painter.experience %> years experience</span>
+                                <span><%= painter.totalJobs %> jobs</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h5 text-primary mb-0"><%= painter.pricePerSqm %> DZD/m²</span>
+                            <a href="/painters/<%= painter._id %>" class="btn btn-primary btn-sm">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-3">Ready to Start Your Painting Project?</h2>
+        <p class="lead mb-4">Join thousands of satisfied customers who found their perfect painter through Paintello Pro</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="/auth/register" class="btn btn-light btn-lg">Get Started as Client</a>
+            <a href="/auth/register-painter" class="btn btn-outline-light btn-lg">Join as Professional Painter</a>
+        </div>
+    </div>
+</section>
 
 <%- include('../partials/footer') %>
