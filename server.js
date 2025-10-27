@@ -104,7 +104,7 @@ mongoose.connect('mongodb+srv://Islem:cmygNChSy2L9Q4xt@paintello.cu30n.mongodb.n
     app.use(validator());
     app.use(cookieParser());
     var store = new MongoDBStore({
-      uri: 'mongodb+srv://Islem:cmygNChSy2L9Q4xt@paintello.cu30n.mongodb.net/paintello?retryWrites=true&w=majority',
+      uri: 'mongodb+srv://paintellocontact_db_user:nOqgkEfw3ZeCQZXk@paintello-pro.kxlmuok.mongodb.net//paintello-pro?retryWrites=true&w=majority',
       collection: 'mySessions'
     });
     
