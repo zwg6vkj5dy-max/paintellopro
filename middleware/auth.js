@@ -1,22 +1,28 @@
-function ensureAuth(req, res, next) {
-  if (req.session && req.session.user) return next();
-  req.flash('error', 'Please log in');
-  return res.redirect('/login');
-}
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-function ensureRole(role) {
-  return (req, res, next) => {
-    if (req.session?.user?.role === role) return next();
-    return res.status(403).send('Forbidden');
-  };
-}
+exports.protect = async (req, res, next) => {
+  try {
+    let token;
 
-function ensureAnyRole(roles) {
-  return (req, res, next) => {
-    const userRole = req.session?.user?.role;
-    if (roles.includes(userRole)) return next();
-    return res.status(403).send('Forbidden');
-  };
-}
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
 
-module.exports = { ensureAuth, ensureRole, ensureAnyRole };
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: 'Not authorized to access this route'
+      });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id);
+    next();
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      error: 'Not authorized to access this route'
+    });
+  }
+};
