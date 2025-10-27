@@ -166,7 +166,12 @@ var userRoutes = require("./routes/user");
 //var sportRoutes = require("./routes/sport");
 //var saleRoutes = require("./routes/sale");
 //var electricalsRoutes = require("./routes/electricals");
-
+app.use((req, res, next) => {
+  res.locals.currentUser = req.session.user || null;
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
+  next();
+});
 app.get('/', (req, res) => res.render('public/home'));
 app.get('/join-pro', (req, res) => res.render('public/join-pro'));
 
