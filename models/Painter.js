@@ -1,9 +1,25 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const painterSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  phone: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true
+  },
+  password: {
+    type: String,
     required: true
   },
   experience: {
@@ -11,71 +27,74 @@ const painterSchema = new mongoose.Schema({
     required: true,
     min: 0
   },
-  specialization: [{
-    type: String,
-    enum: ['interior', 'exterior', 'commercial', 'residential', 'decorative']
-  }],
-  wilaya: {
-    type: String,
-    required: true
-  },
-  wilayaNumber: {
-    type: Number,
-    required: true
-  },
-  address: {
-    type: String,
-    required: true
-  },
   pricePerSqm: {
     type: Number,
     required: true,
     min: 0
   },
-  bio: {
+  specialization: [{
     type: String,
-    maxlength: 500
+    enum: ['interior', 'exterior', 'commercial', 'residential']
+  }],
+  location: {
+    wilaya: String,
+    wilayaNumber: Number,
+    address: String
+  },
+  verification: {
+    idCard: {
+      publicId: String, // Cloudinary public_id
+      url: String,      // Cloudinary URL
+      uploadedAt: Date
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'verified', 'rejected'],
+      default: 'pending'
+    },
+    verifiedAt: Date,
+    adminNotes: String
   },
   portfolio: [{
-    image: String,
+    flickrUrl: String,  // Manual Flickr URL
     description: String,
-    createdAt: {
-      type: Date,
-      default: Date.now
-    }
+    uploadedByAdmin: {
+      type: Boolean,
+      default: false
+    },
+    uploadedAt: Date
   }],
-  availability: {
-    type: Boolean,
-    default: true
-  },
   rating: {
     type: Number,
     default: 0,
     min: 0,
     max: 5
   },
-  totalJobs: {
+  completedJobs: {
     type: Number,
     default: 0
   },
-  verification: {
-    idCard: String,
-    isVerified: {
-      type: Boolean,
-      default: false
-    },
-    verifiedAt: Date
+  userType: {
+    type: String,
+    default: 'painter'
   },
-  loyaltyPoints: {
-    type: Number,
-    default: 0
+  isActive: {
+    type: Boolean,
+    default: true
   },
-  commissionRate: {
-    type: Number,
-    default: 0.10
-  }
+  notes: String // For admin internal notes
 }, {
   timestamps: true
+});
+
+painterSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Virtual for formatted verification status
+painterSchema.virtual('verificationStatus').get(function() {
+  return this.verification.status.charAt(0).toUpperCase() + 
+         this.verification.status.slice(1);
 });
 
 module.exports = mongoose.model('Painter', painterSchema);
