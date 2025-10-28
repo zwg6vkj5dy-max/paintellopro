@@ -8,11 +8,15 @@ const { uploadIdCard, deleteFromCloudinary } = require('../utils/cloudinary');
 // Painter Registration Routes
 router.get('/auth/register-painter', (req, res) => {
   res.render('auth/register-painter', {
-    title: 'Join as Painter - Paintello Pro',
+    title: 'Join as Painter',
     wilayas: wilayas,
     oldInput: req.flash('oldInput')[0] || {},
     error: req.flash('error')[0],
-    success: req.flash('success')[0]
+    success: req.flash('success')[0],
+    // Add these variables that your header expects
+    user: req.user || null,
+    painter: req.painter || null,
+    messages: [] // Empty array since you're using flash messages instead
   });
 });
 
