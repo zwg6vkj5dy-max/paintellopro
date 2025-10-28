@@ -13,6 +13,22 @@
                         <p class="text-muted">Become a verified Paintello Pro painter and grow your business</p>
                     </div>
 
+                    <% if (error) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <%= error %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <% } %>
+
+                    <% if (success) { %>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <%= success %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <% } %>
+
                     <form action="/auth/register-painter" method="POST" enctype="multipart/form-data">
                         <!-- Personal Information -->
                         <h5 class="mb-3 text-primary">
@@ -27,7 +43,8 @@
                             <div class="col-md-6 mb-3">
                                 <label for="phone" class="form-label">Phone Number *</label>
                                 <input type="tel" class="form-control" id="phone" name="phone" 
-                                       value="<%= oldInput.phone || '' %>" required>
+                                       value="<%= oldInput.phone || '' %>" pattern="[0]{1}[5-7]{1}[0-9]{8}" required>
+                                <div class="form-text">Format: 05XX XXX XXX, 06XX XXX XXX, or 07XX XXX XXX</div>
                             </div>
                         </div>
 
@@ -41,6 +58,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="password" class="form-label">Password *</label>
                                 <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="form-text">Minimum 6 characters</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="confirmPassword" class="form-label">Confirm Password *</label>
@@ -56,7 +74,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="experience" class="form-label">Years of Experience *</label>
                                 <input type="number" class="form-control" id="experience" name="experience" 
-                                       value="<%= oldInput.experience || '' %>" min="0" required>
+                                       value="<%= oldInput.experience || '' %>" min="0" max="50" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="pricePerSqm" class="form-label">Price per m² (DZD) *</label>
@@ -135,21 +153,29 @@
                         <div class="mb-3">
                             <label for="idCard" class="form-label">ID Card Photo *</label>
                             <input type="file" class="form-control" id="idCard" name="idCard" accept="image/*" required>
-                            <div class="form-text">Upload a clear photo of your national ID card for verification</div>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle text-info me-1"></i>
+                                Upload a clear photo of your national ID card. 
+                                Maximum size: 2MB. Supported formats: JPG, PNG, WebP.
+                            </div>
                         </div>
 
-                        <!-- Portfolio (Optional) -->
+                        <!-- Portfolio (Optional - Manual process) -->
                         <div class="mb-3">
-                            <label for="portfolio" class="form-label">Portfolio Photos (Optional)</label>
-                            <input type="file" class="form-control" id="portfolio" name="portfolio" multiple accept="image/*">
-                            <div class="form-text">Upload photos of your previous work to showcase your skills</div>
+                            <label class="form-label">Portfolio Photos</label>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Portfolio Submission Process:</strong><br>
+                                After registration, you can send your portfolio photos to our admin team. 
+                                We will upload them to our gallery and add them to your profile manually.
+                            </div>
                         </div>
 
                         <div class="form-check mb-4">
                             <input class="form-check-input" type="checkbox" id="terms" required>
                             <label class="form-check-label" for="terms">
-                                I agree to the <a href="#" class="text-decoration-none">Terms of Service</a>, 
-                                <a href="#" class="text-decoration-none">Privacy Policy</a>, and commission structure
+                                I agree to the <a href="/terms" class="text-decoration-none">Terms of Service</a>, 
+                                <a href="/privacy" class="text-decoration-none">Privacy Policy</a>, and commission structure
                             </label>
                         </div>
 
@@ -162,7 +188,7 @@
                         <div class="text-center">
                             <p class="mb-0">
                                 Already have an account? 
-                                <a href="/auth/login" class="text-decoration-none">Sign in</a>
+                                <a href="/auth/login-painter" class="text-decoration-none">Sign in as Painter</a>
                             </p>
                             <p class="mt-2">
                                 Looking to hire a painter? 
@@ -176,16 +202,5 @@
     </div>
 </div>
 
-<script>
-document.getElementById('wilaya').addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    if (selectedOption.value) {
-        const wilayaNumber = selectedOption.text.match(/\((\d+)\)/)[1];
-        document.getElementById('wilayaNumber').value = wilayaNumber;
-    } else {
-        document.getElementById('wilayaNumber').value = '';
-    }
-});
-</script>
-
 <%- include('../partials/footer') %>
+
