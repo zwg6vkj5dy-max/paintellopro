@@ -2,11 +2,11 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
 
-// Configure Cloudinary
+// Configure Cloudinary with environment variables
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'ds5biqvns',
-  api_key: process.env.CLOUDINARY_API_KEY || '236572545687835',
-  api_secret: process.env.CLOUDINARY_API_SECRET || 'SrO-u58-jXBthHGbyq6m8LPI1V4'
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 // Configure storage for ID cards only
@@ -14,10 +14,10 @@ const idCardStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'paintello/id-cards',
-    format: async (req, file) => 'png', // Convert all to png to save space
+    format: async (req, file) => 'jpg',
     transformation: [
-      { width: 800, height: 600, crop: 'limit' }, // Resize to save storage
-      { quality: 'auto:good' } // Optimize quality
+      { width: 800, height: 600, crop: 'limit' },
+      { quality: 'auto:good' }
     ],
     public_id: (req, file) => {
       const timestamp = Date.now();
@@ -27,7 +27,7 @@ const idCardStorage = new CloudinaryStorage({
   },
 });
 
-// File filter for ID cards only (accepts images)
+// File filter for ID cards only
 const fileFilter = (req, file, cb) => {
   if (file.fieldname === 'idCard' && file.mimetype.startsWith('image/')) {
     cb(null, true);
@@ -41,12 +41,12 @@ const uploadIdCard = multer({
   storage: idCardStorage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 2 * 1024 * 1024, // 2MB limit for ID cards
-    files: 1 // Only one file for ID card
+    fileSize: 2 * 1024 * 1024, // 2MB limit
+    files: 1
   }
 });
 
-// Utility function to delete image from Cloudinary (if needed)
+// Utility function to delete image from Cloudinary
 const deleteFromCloudinary = async (publicId) => {
   try {
     const result = await cloudinary.uploader.destroy(publicId);
@@ -57,20 +57,8 @@ const deleteFromCloudinary = async (publicId) => {
   }
 };
 
-// Utility function to get secure URL
-const getOptimizedUrl = (publicId) => {
-  return cloudinary.url(publicId, {
-    secure: true,
-    transformation: [
-      { width: 400, height: 300, crop: 'limit' },
-      { quality: 'auto:good' }
-    ]
-  });
-};
-
 module.exports = {
   cloudinary,
   uploadIdCard,
-  deleteFromCloudinary,
-  getOptimizedUrl
+  deleteFromCloudinary
 };
