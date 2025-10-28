@@ -2,30 +2,43 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
 
-// Configure Cloudinary with environment variables
-cloudinary.config({
+// Cloudinary configuration
+const config = {
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
-});
+};
+
+// Check if all Cloudinary environment variables are present
+const isCloudinaryConfigured = config.cloud_name && config.api_key && config.api_secret;
+
+if (isCloudinaryConfigured) {
+  cloudinary.config(config);
+  console.log('✅ Cloudinary configured for ID card uploads');
+} else {
+  console.warn('⚠️ Cloudinary not fully configured - ID card uploads will fail');
+  console.warn('   Required environment variables: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET');
+}
 
 // Configure storage for ID cards only
-const idCardStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'paintello/id-cards',
-    format: async (req, file) => 'jpg',
-    transformation: [
-      { width: 800, height: 600, crop: 'limit' },
-      { quality: 'auto:good' }
-    ],
-    public_id: (req, file) => {
-      const timestamp = Date.now();
-      const randomString = Math.random().toString(36).substring(2, 8);
-      return `idcard_${timestamp}_${randomString}`;
-    }
-  },
-});
+const idCardStorage = isCloudinaryConfigured 
+  ? new CloudinaryStorage({
+      cloudinary: cloudinary,
+      params: {
+        folder: 'paintello-pro/id-cards',
+        allowed_formats: ['jpg', 'jpeg', 'png'],
+        transformation: [
+          { width: 800, height: 600, crop: 'limit' },
+          { quality: 'auto:good' }
+        ],
+        public_id: (req, file) => {
+          const timestamp = Date.now();
+          const randomString = Math.random().toString(36).substring(2, 8);
+          return `idcard_${timestamp}_${randomString}`;
+        }
+      },
+    })
+  : undefined;
 
 // File filter for ID cards only
 const fileFilter = (req, file, cb) => {
@@ -36,7 +49,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configure multer with limits
+// Configure multer - use memory storage if Cloudinary not configured
 const uploadIdCard = multer({
   storage: idCardStorage,
   fileFilter: fileFilter,
@@ -48,6 +61,10 @@ const uploadIdCard = multer({
 
 // Utility function to delete image from Cloudinary
 const deleteFromCloudinary = async (publicId) => {
+  if (!isCloudinaryConfigured) {
+    throw new Error('Cloudinary not configured');
+  }
+  
   try {
     const result = await cloudinary.uploader.destroy(publicId);
     return result;
@@ -57,8 +74,20 @@ const deleteFromCloudinary = async (publicId) => {
   }
 };
 
+// Check Cloudinary status
+const getCloudinaryStatus = () => {
+  return {
+    configured: isCloudinaryConfigured,
+    cloud_name: config.cloud_name ? 'Set' : 'Not set',
+    api_key: config.api_key ? 'Set' : 'Not set',
+    api_secret: config.api_secret ? 'Set' : 'Not set'
+  };
+};
+
 module.exports = {
   cloudinary,
   uploadIdCard,
-  deleteFromCloudinary
+  deleteFromCloudinary,
+  getCloudinaryStatus,
+  isCloudinaryConfigured
 };
