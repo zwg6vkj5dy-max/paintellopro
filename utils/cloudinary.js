@@ -2,108 +2,92 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
 
-console.log('🔧 Cloudinary Configuration Check:');
-console.log('   CLOUDINARY_CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME ? '✓ Set' : '✗ Missing');
-console.log('   CLOUDINARY_API_KEY:', process.env.CLOUDINARY_API_KEY ? '✓ Set' : '✗ Missing');
-console.log('   CLOUDINARY_API_SECRET:', process.env.CLOUDINARY_API_SECRET ? '✓ Set' : '✗ Missing');
+// Remove the console.log checks or make them more efficient
+if (process.env.NODE_ENV !== 'production') {
+  console.log('🔧 Cloudinary Configuration Check:');
+  console.log('   CLOUDINARY_CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME ? '✓ Set' : '✗ Missing');
+  console.log('   CLOUDINARY_API_KEY:', process.env.CLOUDINARY_API_KEY ? '✓ Set' : '✗ Missing');
+  console.log('   CLOUDINARY_API_SECRET:', process.env.CLOUDINARY_API_SECRET ? '✓ Set' : '✗ Missing');
+}
 
-// Cloudinary configuration
+// Cloudinary configuration - use modern approach
 const config = {
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 };
 
-// Check if all Cloudinary environment variables are present
-const isCloudinaryConfigured = config.cloud_name && config.api_key && config.api_secret;
+const isCloudinaryConfigured = !!(config.cloud_name && config.api_key && config.api_secret);
 
 if (isCloudinaryConfigured) {
   cloudinary.config(config);
-  console.log('✅ Cloudinary configured for ID cards and profile pictures');
-} else {
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('✅ Cloudinary configured for ID cards and profile pictures');
+  }
+} else if (process.env.NODE_ENV !== 'production') {
   console.warn('⚠️ Cloudinary not fully configured - File uploads will fail');
-  console.warn('   Required environment variables: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET');
 }
 
-// Configure storage for ID cards
-const idCardStorage = isCloudinaryConfigured 
-  ? new CloudinaryStorage({
-      cloudinary: cloudinary,
-      params: {
-        folder: 'paintello-pro/id-cards',
-        allowed_formats: ['jpg', 'jpeg', 'png'],
-        transformation: [
-          { width: 800, height: 600, crop: 'limit' },
-          { quality: 'auto:good' }
-        ],
-        public_id: (req, file) => {
-          const timestamp = Date.now();
-          const randomString = Math.random().toString(36).substring(2, 8);
-          return `idcard_${timestamp}_${randomString}`;
-        }
-      },
-    })
-  : undefined;
+// Use Array.isArray instead of util.isArray in any custom code
+const validateSpecialization = (specialization) => {
+  return Array.isArray(specialization) ? specialization : [specialization];
+};
 
-// Configure storage for profile pictures
-const profilePictureStorage = isCloudinaryConfigured
-  ? new CloudinaryStorage({
-      cloudinary: cloudinary,
-      params: {
-        folder: 'paintello-pro/profile-pictures',
-        allowed_formats: ['jpg', 'jpeg', 'png'],
-        transformation: [
-          { width: 400, height: 400, crop: 'fill', gravity: 'face' },
-          { quality: 'auto:good' }
-        ],
-        public_id: (req, file) => {
-          const timestamp = Date.now();
-          const randomString = Math.random().toString(36).substring(2, 8);
-          return `profile_${timestamp}_${randomString}`;
-        }
-      },
-    })
-  : undefined;
+// Configure storage with better error handling
+const createCloudinaryStorage = (folder, transformations) => {
+  if (!isCloudinaryConfigured) return undefined;
+  
+  return new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: `paintello-pro/${folder}`,
+      allowed_formats: ['jpg', 'jpeg', 'png'],
+      transformation: transformations,
+      public_id: (req, file) => {
+        const timestamp = Date.now();
+        const randomString = Math.random().toString(36).substring(2, 8);
+        return `${folder}_${timestamp}_${randomString}`;
+      }
+    },
+  });
+};
 
-// File filter for ID cards
-const idCardFileFilter = (req, file, cb) => {
-  if (file.fieldname === 'idCard' && file.mimetype.startsWith('image/')) {
+// Create storages
+const idCardStorage = createCloudinaryStorage('id-cards', [
+  { width: 800, height: 600, crop: 'limit' },
+  { quality: 'auto:good' }
+]);
+
+const profilePictureStorage = createCloudinaryStorage('profile-pictures', [
+  { width: 400, height: 400, crop: 'fill', gravity: 'face' },
+  { quality: 'auto:good' }
+]);
+
+// Modern file filter functions
+const createFileFilter = (fieldName) => (req, file, cb) => {
+  if (file.fieldname === fieldName && file.mimetype.startsWith('image/')) {
     cb(null, true);
   } else {
-    cb(new Error('Only image files are allowed for ID cards'), false);
+    cb(new Error(`Only image files are allowed for ${fieldName}`), false);
   }
 };
 
-// File filter for profile pictures
-const profilePictureFileFilter = (req, file, cb) => {
-  if (file.fieldname === 'profilePicture' && file.mimetype.startsWith('image/')) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only image files are allowed for profile pictures'), false);
-  }
+// Configure multer instances
+const createMulterUpload = (storage, fieldName) => {
+  return multer({
+    storage: storage,
+    fileFilter: createFileFilter(fieldName),
+    limits: {
+      fileSize: fieldName === 'idCard' ? 2 * 1024 * 1024 : 1 * 1024 * 1024,
+      files: 1
+    }
+  });
 };
 
-// Configure multer for ID cards
-const uploadIdCard = multer({
-  storage: idCardStorage,
-  fileFilter: idCardFileFilter,
-  limits: {
-    fileSize: 2 * 1024 * 1024, // 2MB limit
-    files: 1
-  }
-});
+const uploadIdCard = createMulterUpload(idCardStorage, 'idCard');
+const uploadProfilePicture = createMulterUpload(profilePictureStorage, 'profilePicture');
 
-// Configure multer for profile pictures
-const uploadProfilePicture = multer({
-  storage: profilePictureStorage,
-  fileFilter: profilePictureFileFilter,
-  limits: {
-    fileSize: 1 * 1024 * 1024, // 1MB limit for profile pictures
-    files: 1
-  }
-});
-
-// Utility function to delete image from Cloudinary
+// Utility functions
 const deleteFromCloudinary = async (publicId) => {
   if (!isCloudinaryConfigured) {
     throw new Error('Cloudinary not configured');
@@ -118,7 +102,6 @@ const deleteFromCloudinary = async (publicId) => {
   }
 };
 
-// Function to upload profile picture
 const uploadProfileImage = async (fileBuffer, painterId) => {
   if (!isCloudinaryConfigured) {
     throw new Error('Cloudinary not configured');
@@ -144,15 +127,12 @@ const uploadProfileImage = async (fileBuffer, painterId) => {
   });
 };
 
-// Check Cloudinary status
-const getCloudinaryStatus = () => {
-  return {
-    configured: isCloudinaryConfigured,
-    cloud_name: config.cloud_name ? 'Set' : 'Not set',
-    api_key: config.api_key ? 'Set' : 'Not set',
-    api_secret: config.api_secret ? 'Set' : 'Not set'
-  };
-};
+const getCloudinaryStatus = () => ({
+  configured: isCloudinaryConfigured,
+  cloud_name: !!config.cloud_name,
+  api_key: !!config.api_key,
+  api_secret: !!config.api_secret
+});
 
 module.exports = {
   cloudinary,
@@ -161,5 +141,6 @@ module.exports = {
   deleteFromCloudinary,
   uploadProfileImage,
   getCloudinaryStatus,
-  isCloudinaryConfigured
+  isCloudinaryConfigured,
+  validateSpecialization
 };
