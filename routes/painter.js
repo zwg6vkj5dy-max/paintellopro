@@ -20,7 +20,7 @@ router.use(requirePainterAuth);
 router.get('/dashboard', async (req, res) => {
   try {
     const painter = await Painter.findById(req.session.painter._id);
-    / Update session with latest data
+   
     req.session.painter = {
       _id: painter._id,
       name: painter.name,
