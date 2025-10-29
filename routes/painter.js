@@ -129,6 +129,17 @@ const { uploadProfilePicture, deleteFromCloudinary } = require('../utils/cloudin
 // Update Painter Profile with Profile Picture
 router.post('/profile', uploadProfilePicture.single('profilePicture'), async (req, res) => {
   try {
+    console.log('🔍 Profile update request received');
+    console.log('   File uploaded:', !!req.file);
+    console.log('   Cloudinary configured:', isCloudinaryConfigured);
+    
+    if (req.file) {
+      console.log('   Uploaded file details:', {
+        filename: req.file.filename,
+        path: req.file.path,
+        size: req.file.size
+      });
+    }
     const { name, phone, experience, pricePerSqm, specialization, wilaya, address, bio, availability, businessName, teamSize } = req.body;
     
     const updateData = {
