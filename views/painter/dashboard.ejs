@@ -1,4 +1,8 @@
-<%- include('../partials/header', { title: 'Painter Dashboard - Paintello Pro' }) %>
+<%- include('../partials/header', { 
+    title: 'Painter Dashboard - Paintello Pro',
+    user: painter, // Pass painter as user for header compatibility
+    painter: painter 
+}) %>
 
 <div class="container-fluid py-4">
     <div class="row">
