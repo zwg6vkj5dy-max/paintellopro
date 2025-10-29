@@ -35,7 +35,15 @@ mongoose.connect(MONGODB_URI, {
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
+// Global variables for templates
+app.use((req, res, next) => {
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
+  res.locals.currentUser = req.user;
+  res.locals.currentPainter = req.session.painter;
+  res.locals.messages = []; // Add empty messages array
+  next();
+});
 // Session configuration
 app.use(session({
   secret: process.env.SESSION_SECRET || 'paintello-pro-fallback-secret',
