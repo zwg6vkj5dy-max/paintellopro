@@ -249,6 +249,10 @@ router.post('/admin/painters/:id/portfolio/delete', async (req, res) => {
     res.redirect(`/admin/painters/${req.params.id}`);
   }
 });
+const painterRoutes = require('./painter');
+
+// Mount painter routes
+router.use('/painter', painterRoutes);
 
 module.exports = router;
     
