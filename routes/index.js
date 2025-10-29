@@ -5,25 +5,31 @@ const Painter = require('../models/Painter');
 const bcrypt = require('bcrypt');
 const { uploadIdCard, deleteFromCloudinary } = require('../utils/cloudinary');
 // Painter Login Page - FIXED PATH
+// Painter Login Page - FIXED VERSION
 router.get('/auth/login-painter', (req, res) => {
+  console.log('🔍 Painter login page accessed - Session check:');
+  console.log('   req.session.painter:', req.session.painter);
+  console.log('   req.session.user:', req.session.user);
+  
   // If painter is already logged in, redirect to painter dashboard
   if (req.session.painter) {
+    console.log('✅ Painter already logged in, redirecting to dashboard');
     return res.redirect('/painter/dashboard');
   }
-  if (req.session.user) {
-    return res.redirect('/client/dashboard');
-  }
-
+  
+  // If client is logged in, let them stay on painter login page (don't redirect)
+  // They might want to switch accounts or see painter options
+  
   res.render('auth/login-painter', { 
     title: 'Painter Login - Paintello Pro',
     oldInput: req.flash('oldInput')[0] || {},
     error: req.flash('error')[0],
     success: req.flash('success')[0],
-    user: null,
-    painter: null
+    user: req.session.user || null,  // Use req.session.user instead of req.user
+    painter: req.session.painter || null,
+    messages: [] // Ensure messages is defined
   });
 });
-
 // Painter Login Handler - FIXED PATH
 router.post('/auth/login-painter', async (req, res) => {
   try {
