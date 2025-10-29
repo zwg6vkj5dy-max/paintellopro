@@ -427,5 +427,164 @@ router.get('/logout', (req, res) => {
     res.redirect('/');
   });
 });
+// Painter Availability Management
+router.get('/availability', async (req, res) => {
+  try {
+    const painter = await Painter.findById(req.session.painter._id);
+    
+    // Get current and upcoming jobs for context
+    const currentJobs = await Order.find({
+      'painter.id': req.session.painter._id,
+      status: { $in: ['accepted', 'in_progress'] }
+    }).sort({ createdAt: -1 });
+
+    const upcomingJobs = await Order.find({
+      'painter.id': req.session.painter._id,
+      status: 'scheduled',
+      scheduledDate: { $gte: new Date() }
+    }).sort({ scheduledDate: 1 });
+
+    res.render('painter/availability', {
+      title: 'Manage Availability - Paintello Pro',
+      painter: painter,
+      currentJobs: currentJobs,
+      upcomingJobs: upcomingJobs,
+      success: req.flash('success')[0],
+      error: req.flash('error')[0]
+    });
+  } catch (error) {
+    console.error('Availability page error:', error);
+    req.flash('error', 'Error loading availability page');
+    res.redirect('/painter/dashboard');
+  }
+});
+
+// Update Availability Status
+router.post('/availability/status', async (req, res) => {
+  try {
+    const { status, reason, availableFrom } = req.body;
+    
+    const updateData = {
+      availability: status
+    };
+
+    // Add availability notes if provided
+    if (reason) {
+      updateData.availabilityNotes = reason;
+    }
+
+    // Set available from date if provided
+    if (availableFrom && status === 'unavailable') {
+      updateData.availableFrom = new Date(availableFrom);
+    } else {
+      updateData.availableFrom = null;
+    }
+
+    const updatedPainter = await Painter.findByIdAndUpdate(
+      req.session.painter._id,
+      updateData,
+      { new: true }
+    );
+
+    console.log(`✅ Availability updated to: ${status} for ${updatedPainter.name}`);
+    
+    req.flash('success', `Your availability has been updated to ${status}`);
+    res.redirect('/painter/availability');
+    
+  } catch (error) {
+    console.error('Availability update error:', error);
+    req.flash('error', 'Error updating availability');
+    res.redirect('/painter/availability');
+  }
+});
+
+// Set Custom Availability Schedule
+router.post('/availability/schedule', async (req, res) => {
+  try {
+    const { scheduleType, workingDays, workingHours, maxJobsPerWeek } = req.body;
+    
+    const availabilitySchedule = {
+      scheduleType: scheduleType || 'flexible',
+      workingDays: Array.isArray(workingDays) ? workingDays : [workingDays],
+      workingHours: workingHours || '9:00-17:00',
+      maxJobsPerWeek: parseInt(maxJobsPerWeek) || 3,
+      updatedAt: new Date()
+    };
+
+    await Painter.findByIdAndUpdate(
+      req.session.painter._id,
+      { availabilitySchedule: availabilitySchedule },
+      { new: true }
+    );
+
+    console.log(`✅ Availability schedule updated for painter: ${req.session.painter._id}`);
+    
+    req.flash('success', 'Your availability schedule has been updated');
+    res.redirect('/painter/availability');
+    
+  } catch (error) {
+    console.error('Availability schedule error:', error);
+    req.flash('error', 'Error updating availability schedule');
+    res.redirect('/painter/availability');
+  }
+});
+
+// Add Busy Period
+router.post('/availability/busy-period', async (req, res) => {
+  try {
+    const { startDate, endDate, reason } = req.body;
+    
+    const busyPeriod = {
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      reason: reason || 'Busy period',
+      createdAt: new Date()
+    };
+
+    await Painter.findByIdAndUpdate(
+      req.session.painter._id,
+      { 
+        $push: { busyPeriods: busyPeriod },
+        availability: 'busy' // Automatically set to busy during this period
+      },
+      { new: true }
+    );
+
+    console.log(`✅ Busy period added: ${startDate} to ${endDate}`);
+    
+    req.flash('success', 'Busy period added successfully');
+    res.redirect('/painter/availability');
+    
+  } catch (error) {
+    console.error('Busy period error:', error);
+    req.flash('error', 'Error adding busy period');
+    res.redirect('/painter/availability');
+  }
+});
+
+// Remove Busy Period
+router.post('/availability/busy-period/remove', async (req, res) => {
+  try {
+    const { periodId } = req.body;
+    
+    await Painter.findByIdAndUpdate(
+      req.session.painter._id,
+      { 
+        $pull: { busyPeriods: { _id: periodId } }
+      },
+      { new: true }
+    );
+
+    console.log(`✅ Busy period removed: ${periodId}`);
+    
+    req.flash('success', 'Busy period removed successfully');
+    res.redirect('/painter/availability');
+    
+  } catch (error) {
+    console.error('Remove busy period error:', error);
+    req.flash('error', 'Error removing busy period');
+    res.redirect('/painter/availability');
+  }
+});
 
 module.exports = router;
