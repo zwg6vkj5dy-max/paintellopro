@@ -124,36 +124,100 @@ router.get('/profile', async (req, res) => {
 });
 
 // Update Painter Profile
-router.post('/profile', async (req, res) => {
+const { uploadProfilePicture, deleteFromCloudinary } = require('../utils/cloudinary');
+
+// Update Painter Profile with Profile Picture
+router.post('/profile', uploadProfilePicture.single('profilePicture'), async (req, res) => {
   try {
-    const { name, phone, experience, pricePerSqm, specialization, wilaya, address } = req.body;
+    const { name, phone, experience, pricePerSqm, specialization, wilaya, address, bio, availability, businessName, teamSize } = req.body;
     
+    const updateData = {
+      name,
+      phone,
+      experience: parseInt(experience),
+      pricePerSqm: parseInt(pricePerSqm),
+      specialization: Array.isArray(specialization) ? specialization : [specialization],
+      'location.wilaya': wilaya,
+      'location.address': address,
+      bio,
+      availability,
+      businessName,
+      teamSize: parseInt(teamSize)
+    };
+
+    // Handle profile picture upload
+    if (req.file) {
+      // Delete old profile picture if exists
+      const currentPainter = await Painter.findById(req.session.painter._id);
+      if (currentPainter.profilePicture && currentPainter.profilePicture.publicId) {
+        try {
+          await deleteFromCloudinary(currentPainter.profilePicture.publicId);
+        } catch (deleteError) {
+          console.error('Error deleting old profile picture:', deleteError);
+        }
+      }
+
+      // Add new profile picture data
+      updateData.profilePicture = {
+        publicId: req.file.filename,
+        url: req.file.path,
+        uploadedAt: new Date()
+      };
+    }
+
     const updatedPainter = await Painter.findByIdAndUpdate(
       req.session.painter._id,
-      {
-        name,
-        phone,
-        experience: parseInt(experience),
-        pricePerSqm: parseInt(pricePerSqm),
-        specialization: Array.isArray(specialization) ? specialization : [specialization],
-        'location.wilaya': wilaya,
-        'location.address': address
-      },
+      updateData,
       { new: true, runValidators: true }
     );
 
     // Update session with new data
-    req.session.painter = updatedPainter;
+    req.session.painter.name = updatedPainter.name;
     
     req.flash('success', 'Profile updated successfully');
     res.redirect('/painter/profile');
   } catch (error) {
     console.error('Profile update error:', error);
+    
+    // Delete uploaded file if there was an error
+    if (req.file && req.file.filename) {
+      try {
+        await deleteFromCloudinary(req.file.filename);
+      } catch (deleteError) {
+        console.error('Error deleting uploaded file:', deleteError);
+      }
+    }
+    
     req.flash('error', 'Error updating profile: ' + error.message);
     res.redirect('/painter/profile');
   }
 });
 
+// Remove Profile Picture
+router.post('/profile/remove-picture', async (req, res) => {
+  try {
+    const painter = await Painter.findById(req.session.painter._id);
+    
+    if (painter.profilePicture && painter.profilePicture.publicId) {
+      // Delete from Cloudinary
+      await deleteFromCloudinary(painter.profilePicture.publicId);
+      
+      // Remove from database
+      painter.profilePicture = undefined;
+      await painter.save();
+      
+      req.flash('success', 'Profile picture removed successfully');
+    } else {
+      req.flash('error', 'No profile picture to remove');
+    }
+    
+    res.redirect('/painter/profile');
+  } catch (error) {
+    console.error('Remove profile picture error:', error);
+    req.flash('error', 'Error removing profile picture');
+    res.redirect('/painter/profile');
+  }
+});
 // Painter Orders/Jobs
 router.get('/orders', async (req, res) => {
   try {
