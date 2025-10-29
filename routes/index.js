@@ -412,7 +412,16 @@ router.post('/admin/painters/:id/portfolio/delete', async (req, res) => {
   }
 });
 
+const painterRoutes = require('./painter');
 
+// Mount painter routes
+router.use('/painter', painterRoutes);
+
+// Add this to your routes/index.js
+const clientRoutes = require('./client');
+
+// Mount client routes
+router.use('/client', clientRoutes);
 module.exports = router;
     
 
