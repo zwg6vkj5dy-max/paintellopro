@@ -79,21 +79,13 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
-const painterRoutes = require('./routes/painter');
-// Mount painter routes
-app.use('/painter', painterRoutes);
 
-// Add this to your routes/index.js
-const clientRoutes = require('./routes/client');
-
-// Mount client routes
-app.use('/client', clientRoutes);
 // Routes
 const indexRoutes = require('./routes/index');
 app.use('/', indexRoutes);
 // Mount public routes
 const publicRoutes = require('./routes/public');
-app.use('/public', publicRoutes);
+app.use('/', publicRoutes);
 // Health check endpoint
 app.get('/health', async (req, res) => {
   const dbStatus = mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected';
