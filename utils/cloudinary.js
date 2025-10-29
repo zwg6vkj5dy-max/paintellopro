@@ -1,16 +1,9 @@
+// utils/cloudinary.js - UPDATED VERSION
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
 
-// Remove the console.log checks or make them more efficient
-if (process.env.NODE_ENV !== 'production') {
-  console.log('🔧 Cloudinary Configuration Check:');
-  console.log('   CLOUDINARY_CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME ? '✓ Set' : '✗ Missing');
-  console.log('   CLOUDINARY_API_KEY:', process.env.CLOUDINARY_API_KEY ? '✓ Set' : '✗ Missing');
-  console.log('   CLOUDINARY_API_SECRET:', process.env.CLOUDINARY_API_SECRET ? '✓ Set' : '✗ Missing');
-}
-
-// Cloudinary configuration - use modern approach
+// Cloudinary configuration
 const config = {
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -21,21 +14,22 @@ const isCloudinaryConfigured = !!(config.cloud_name && config.api_key && config.
 
 if (isCloudinaryConfigured) {
   cloudinary.config(config);
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('✅ Cloudinary configured for ID cards and profile pictures');
-  }
-} else if (process.env.NODE_ENV !== 'production') {
-  console.warn('⚠️ Cloudinary not fully configured - File uploads will fail');
+  console.log('✅ Cloudinary configured');
+} else {
+  console.warn('⚠️ Cloudinary not configured - check environment variables');
 }
 
-// Use Array.isArray instead of util.isArray in any custom code
-const validateSpecialization = (specialization) => {
-  return Array.isArray(specialization) ? specialization : [specialization];
+// Helper function to safely check arrays
+const safeArrayCheck = (value) => {
+  return Array.isArray(value) ? value : (value ? [value] : []);
 };
 
-// Configure storage with better error handling
-const createCloudinaryStorage = (folder, transformations) => {
-  if (!isCloudinaryConfigured) return undefined;
+// Storage configurations
+const createStorage = (folder, transformations) => {
+  if (!isCloudinaryConfigured) {
+    // Fallback to memory storage if Cloudinary not configured
+    return multer.memoryStorage();
+  }
   
   return new CloudinaryStorage({
     cloudinary: cloudinary,
@@ -53,17 +47,17 @@ const createCloudinaryStorage = (folder, transformations) => {
 };
 
 // Create storages
-const idCardStorage = createCloudinaryStorage('id-cards', [
+const idCardStorage = createStorage('id-cards', [
   { width: 800, height: 600, crop: 'limit' },
   { quality: 'auto:good' }
 ]);
 
-const profilePictureStorage = createCloudinaryStorage('profile-pictures', [
+const profilePictureStorage = createStorage('profile-pictures', [
   { width: 400, height: 400, crop: 'fill', gravity: 'face' },
   { quality: 'auto:good' }
 ]);
 
-// Modern file filter functions
+// File filters
 const createFileFilter = (fieldName) => (req, file, cb) => {
   if (file.fieldname === fieldName && file.mimetype.startsWith('image/')) {
     cb(null, true);
@@ -72,20 +66,24 @@ const createFileFilter = (fieldName) => (req, file, cb) => {
   }
 };
 
-// Configure multer instances
-const createMulterUpload = (storage, fieldName) => {
-  return multer({
-    storage: storage,
-    fileFilter: createFileFilter(fieldName),
-    limits: {
-      fileSize: fieldName === 'idCard' ? 2 * 1024 * 1024 : 1 * 1024 * 1024,
-      files: 1
-    }
-  });
-};
+// Multer configurations
+const uploadIdCard = multer({
+  storage: idCardStorage,
+  fileFilter: createFileFilter('idCard'),
+  limits: {
+    fileSize: 2 * 1024 * 1024,
+    files: 1
+  }
+});
 
-const uploadIdCard = createMulterUpload(idCardStorage, 'idCard');
-const uploadProfilePicture = createMulterUpload(profilePictureStorage, 'profilePicture');
+const uploadProfilePicture = multer({
+  storage: profilePictureStorage,
+  fileFilter: createFileFilter('profilePicture'),
+  limits: {
+    fileSize: 1 * 1024 * 1024,
+    files: 1
+  }
+});
 
 // Utility functions
 const deleteFromCloudinary = async (publicId) => {
@@ -102,31 +100,6 @@ const deleteFromCloudinary = async (publicId) => {
   }
 };
 
-const uploadProfileImage = async (fileBuffer, painterId) => {
-  if (!isCloudinaryConfigured) {
-    throw new Error('Cloudinary not configured');
-  }
-
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder: 'paintello-pro/profile-pictures',
-        public_id: `profile_${painterId}_${Date.now()}`,
-        transformation: [
-          { width: 400, height: 400, crop: 'fill', gravity: 'face' },
-          { quality: 'auto:good' }
-        ]
-      },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      }
-    );
-
-    uploadStream.end(fileBuffer);
-  });
-};
-
 const getCloudinaryStatus = () => ({
   configured: isCloudinaryConfigured,
   cloud_name: !!config.cloud_name,
@@ -139,8 +112,7 @@ module.exports = {
   uploadIdCard,
   uploadProfilePicture,
   deleteFromCloudinary,
-  uploadProfileImage,
   getCloudinaryStatus,
   isCloudinaryConfigured,
-  validateSpecialization
+  safeArrayCheck
 };
