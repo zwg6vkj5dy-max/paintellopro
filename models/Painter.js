@@ -143,7 +143,34 @@ profilePicture: {
     enum: ['available', 'busy', 'unavailable'],
     default: 'available'
   },
-  
+  // Add to your Painter model
+availabilitySchedule: {
+  scheduleType: {
+    type: String,
+    enum: ['flexible', 'fixed'],
+    default: 'flexible'
+  },
+  workingDays: [String],
+  workingHours: String,
+  maxJobsPerWeek: {
+    type: Number,
+    default: 3
+  },
+  updatedAt: Date
+},
+
+busyPeriods: [{
+  startDate: Date,
+  endDate: Date,
+  reason: String,
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+}],
+
+availabilityNotes: String,
+availableFrom: Date
   // Social media and contact
   website: String,
   facebook: String,
