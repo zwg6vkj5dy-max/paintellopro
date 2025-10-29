@@ -36,6 +36,8 @@ mongoose.connect(MONGODB_URI, {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 // Session configuration for production
+// Trust Heroku proxy
+app.set('trust proxy', 1);
 // Updated Session configuration
 app.use(session({
   secret: process.env.SESSION_SECRET || 'paintello-secret-key-2024',
