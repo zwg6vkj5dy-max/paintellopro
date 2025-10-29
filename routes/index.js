@@ -13,12 +13,12 @@ router.get('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       console.error('Logout error:', err);
-      req.flash('error', 'Error during logout');
+      
       return res.redirect('/');
     }
     
     console.log(`✅ User logged out: ${userName || 'Unknown user'}`);
-    req.flash('success', 'Successfully logged out');
+ 
     res.redirect('/');
   });
 });
