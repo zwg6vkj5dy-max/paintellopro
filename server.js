@@ -36,36 +36,23 @@ mongoose.connect(MONGODB_URI, {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 // Session configuration for production
+// Updated Session configuration
 app.use(session({
   secret: process.env.SESSION_SECRET || 'paintello-secret-key-2024',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: MONGODB_URI,
-    ttl: 14 * 24 * 60 * 60 // 14 days
+    ttl: 14 * 24 * 60 * 60
   }),
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // Should be true in production
+    secure: true, // Force HTTPS in production
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000,
+    sameSite: 'lax' // Important for cross-origin requests
   }
 }));
-// Session configuration
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'paintello-pro-fallback-secret',
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: MONGODB_URI,
-    collectionName: 'sessions',
-    ttl: 14 * 24 * 60 * 60, // 14 days
-  }),
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-}));
+
 
 // Flash messages
 app.use(flash());
