@@ -123,23 +123,22 @@ router.get('/profile', async (req, res) => {
   }
 });
 
-// Update Painter Profile
-const { uploadProfilePicture, deleteFromCloudinary } = require('../utils/cloudinary');
+// In your painter.js route - CORRECTED VERSION
+const { uploadProfilePicture, deleteFromCloudinary, getCloudinaryStatus } = require('../utils/cloudinary');
 
 // Update Painter Profile with Profile Picture
 router.post('/profile', uploadProfilePicture.single('profilePicture'), async (req, res) => {
   try {
     console.log('🔍 Profile update request received');
+    
+    // Check Cloudinary status
+    const cloudinaryStatus = getCloudinaryStatus();
+    const isCloudinaryConfigured = cloudinaryStatus.configured;
+    
     console.log('   File uploaded:', !!req.file);
     console.log('   Cloudinary configured:', isCloudinaryConfigured);
-    
-    if (req.file) {
-      console.log('   Uploaded file details:', {
-        filename: req.file.filename,
-        path: req.file.path,
-        size: req.file.size
-      });
-    }
+    console.log('   Request body fields:', Object.keys(req.body));
+
     const { name, phone, experience, pricePerSqm, specialization, wilaya, address, bio, availability, businessName, teamSize } = req.body;
     
     const updateData = {
@@ -157,14 +156,23 @@ router.post('/profile', uploadProfilePicture.single('profilePicture'), async (re
     };
 
     // Handle profile picture upload
-    if (req.file) {
+    if (req.file && isCloudinaryConfigured) {
+      console.log('🔄 Processing profile picture upload...');
+      console.log('   Uploaded file:', {
+        originalname: req.file.originalname,
+        filename: req.file.filename,
+        path: req.file.path,
+        size: req.file.size
+      });
+      
       // Delete old profile picture if exists
       const currentPainter = await Painter.findById(req.session.painter._id);
       if (currentPainter.profilePicture && currentPainter.profilePicture.publicId) {
         try {
           await deleteFromCloudinary(currentPainter.profilePicture.publicId);
+          console.log('✅ Old profile picture deleted');
         } catch (deleteError) {
-          console.error('Error deleting old profile picture:', deleteError);
+          console.error('❌ Error deleting old profile picture:', deleteError);
         }
       }
 
@@ -174,6 +182,13 @@ router.post('/profile', uploadProfilePicture.single('profilePicture'), async (re
         url: req.file.path,
         uploadedAt: new Date()
       };
+      
+      console.log('✅ New profile picture data saved');
+    } else if (req.file && !isCloudinaryConfigured) {
+      console.log('⚠️ File uploaded but Cloudinary not configured');
+      req.flash('error', 'File upload service not available. Please try again later.');
+    } else {
+      console.log('ℹ️ No file uploaded or Cloudinary not configured');
     }
 
     const updatedPainter = await Painter.findByIdAndUpdate(
@@ -185,17 +200,23 @@ router.post('/profile', uploadProfilePicture.single('profilePicture'), async (re
     // Update session with new data
     req.session.painter.name = updatedPainter.name;
     
+    console.log('✅ Profile updated successfully');
     req.flash('success', 'Profile updated successfully');
     res.redirect('/painter/profile');
+    
   } catch (error) {
-    console.error('Profile update error:', error);
+    console.error('❌ Profile update error:', error);
     
     // Delete uploaded file if there was an error
     if (req.file && req.file.filename) {
       try {
-        await deleteFromCloudinary(req.file.filename);
+        const cloudinaryStatus = getCloudinaryStatus();
+        if (cloudinaryStatus.configured) {
+          await deleteFromCloudinary(req.file.filename);
+          console.log('✅ Uploaded file deleted due to error');
+        }
       } catch (deleteError) {
-        console.error('Error deleting uploaded file:', deleteError);
+        console.error('❌ Error deleting uploaded file:', deleteError);
       }
     }
     
