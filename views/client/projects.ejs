@@ -1,11 +1,127 @@
-<% layout('layouts/main') %>
-<h2>Your projects</h2>
-<ul>
-  <% projects.forEach(p => { %>
-    <li>
-      <strong><%= p.details.description %></strong>
-      — Status: <%= p.status %>
-      — Painter: <%= p.painter ? p.painter.name : 'Not matched yet' %>
-    </li>
-  <% }) %>
-</ul>
+<%- include('../partials/header', { 
+    title: 'Profile - Paintello Pro',
+    user: user
+}) %>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-edit me-2"></i>Client Profile
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form action="/client/profile" method="POST" enctype="multipart/form-data">
+                        <!-- Personal Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-user me-2"></i>Personal Information
+                                </h5>
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Full Name *</label>
+                                    <input type="text" class="form-control" id="name" name="name" 
+                                           value="<%= user.name %>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone Number *</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" 
+                                           value="<%= user.phone %>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email Address *</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="<%= user.email %>" readonly>
+                                    <div class="form-text">Email cannot be changed</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <div class="avatar-upload mb-3">
+                                        <% if (user.profilePicture && user.profilePicture.url) { %>
+                                            <div class="avatar-preview mx-auto mb-3" style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden;">
+                                                <img src="<%= user.profilePicture.url %>" alt="Profile Picture" 
+                                                     style="width: 100%; height: 100%; object-fit: cover;">
+                                            </div>
+                                        <% } else { %>
+                                            <div class="avatar-preview mx-auto mb-3"
+                                                 style="width: 120px; height: 120px; border-radius: 50%; background: #f8f9fa; border: 3px solid #dee2e6; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-user fa-3x text-muted"></i>
+                                            </div>
+                                        <% } %>
+                                        <input type="file" class="form-control" id="profilePicture" name="profilePicture" accept="image/*">
+                                        <div class="form-text">Upload a profile photo (max 1MB)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location Information -->
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-map-marker-alt me-2"></i>Location Information
+                        </h5>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label for="wilaya" class="form-label">Wilaya *</label>
+                                <select class="form-select" id="wilaya" name="wilaya" required>
+                                    <option value="">Select Wilaya</option>
+                                    <% wilayas.forEach(w => { %>
+                                    <option value="<%= w.name %>" 
+                                            <%= user.location && user.location.wilaya === w.name ? 'selected' : '' %>>
+                                        <%= w.name %> (<%= w.number %>)
+                                    </option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="address" class="form-label">Full Address *</label>
+                                <input type="text" class="form-control" id="address" name="address" 
+                                       value="<%= user.location && user.location.address %>" required>
+                            </div>
+                        </div>
+
+                        <!-- Preferences -->
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-cog me-2"></i>Preferences
+                        </h5>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Preferred Contact Method</label>
+                                <select class="form-select" name="contactMethod">
+                                    <option value="both" <%= user.preferences && user.preferences.contactMethod === 'both' ? 'selected' : '' %>>Phone and Email</option>
+                                    <option value="phone" <%= user.preferences && user.preferences.contactMethod === 'phone' ? 'selected' : '' %>>Phone Only</option>
+                                    <option value="email" <%= user.preferences && user.preferences.contactMethod === 'email' ? 'selected' : '' %>>Email Only</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Notifications</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="emailNotifications" 
+                                           id="emailNotifications" <%= user.preferences && user.preferences.notifications.email ? 'checked' : '' %>>
+                                    <label class="form-check-label" for="emailNotifications">Email Notifications</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="smsNotifications" 
+                                           id="smsNotifications" <%= user.preferences && user.preferences.notifications.sms ? 'checked' : '' %>>
+                                    <label class="form-check-label" for="smsNotifications">SMS Notifications</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="/client/dashboard" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
