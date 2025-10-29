@@ -54,8 +54,8 @@
                     <p class="text-muted mb-0">&copy; 2024 Paintello Pro. All rights reserved.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <a href="#" class="text-muted text-decoration-none me-3">Privacy Policy</a>
-                    <a href="#" class="text-muted text-decoration-none">Terms of Service</a>
+                    <a href="/privacy" class="text-muted text-decoration-none me-3">Privacy Policy</a>
+                    <a href="/terms" class="text-muted text-decoration-none">Terms of Service</a>
                 </div>
             </div>
         </div>
@@ -65,5 +65,134 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script src="/js/main.js"></script>
+
+    <!-- Painter Registration Form Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wilaya selection functionality
+            const wilayaSelect = document.getElementById('wilaya');
+            const wilayaNumberInput = document.getElementById('wilayaNumber');
+            
+            if (wilayaSelect && wilayaNumberInput) {
+                console.log('Wilaya elements found, setting up event listener...');
+                
+                wilayaSelect.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    console.log('Wilaya selected:', selectedOption.text);
+                    
+                    if (selectedOption.value) {
+                        // Extract number from text like "Algiers (16)"
+                        const match = selectedOption.text.match(/\((\d+)\)/);
+                        if (match && match[1]) {
+                            const wilayaNumber = parseInt(match[1]);
+                            wilayaNumberInput.value = wilayaNumber;
+                            console.log('Wilaya number set to:', wilayaNumber);
+                        } else {
+                            console.error('Could not extract wilaya number from:', selectedOption.text);
+                            wilayaNumberInput.value = '';
+                        }
+                    } else {
+                        wilayaNumberInput.value = '';
+                    }
+                });
+
+                // Initialize if there's a preselected value
+                if (wilayaSelect.value) {
+                    wilayaSelect.dispatchEvent(new Event('change'));
+                }
+            } else {
+                console.log('Wilaya elements not found on this page');
+            }
+
+            // Phone number validation
+            const phoneInput = document.getElementById('phone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    // Remove any non-digit characters
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    
+                    // Ensure it starts with 0 and has 10 digits
+                    if (this.value.length > 10) {
+                        this.value = this.value.slice(0, 10);
+                    }
+                });
+            }
+
+            // Enhanced form validation
+            const form = document.querySelector('form');
+            if (form && form.action.includes('/auth/register-painter')) {
+                form.addEventListener('submit', function(e) {
+                    let isValid = true;
+                    const errorMessages = [];
+
+                    // Check wilaya selection
+                    const wilayaSelect = document.getElementById('wilaya');
+                    const wilayaNumber = document.getElementById('wilayaNumber');
+                    if (wilayaSelect && (!wilayaSelect.value || wilayaSelect.value === '')) {
+                        isValid = false;
+                        errorMessages.push('Please select a wilaya');
+                    }
+                    if (wilayaNumber && (!wilayaNumber.value || isNaN(wilayaNumber.value))) {
+                        isValid = false;
+                        errorMessages.push('Please select a valid wilaya');
+                    }
+
+                    // Check passwords
+                    const password = document.getElementById('password');
+                    const confirmPassword = document.getElementById('confirmPassword');
+                    if (password && confirmPassword) {
+                        if (password.value !== confirmPassword.value) {
+                            isValid = false;
+                            errorMessages.push('Passwords do not match');
+                        }
+                        if (password.value.length < 6) {
+                            isValid = false;
+                            errorMessages.push('Password must be at least 6 characters long');
+                        }
+                    }
+
+                    // Check terms acceptance
+                    const termsCheckbox = document.getElementById('terms');
+                    if (termsCheckbox && !termsCheckbox.checked) {
+                        isValid = false;
+                        errorMessages.push('Please accept the Terms of Service and Privacy Policy');
+                    }
+
+                    // Check ID card upload
+                    const idCardInput = document.getElementById('idCard');
+                    if (idCardInput && !idCardInput.files.length) {
+                        isValid = false;
+                        errorMessages.push('ID card photo is required');
+                    }
+
+                    if (!isValid) {
+                        e.preventDefault();
+                        alert('Please fix the following errors:\n\n• ' + errorMessages.join('\n• '));
+                        return false;
+                    }
+
+                    // Show loading state
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+                    }
+                });
+            }
+
+            // Add real-time validation feedback
+            const inputs = document.querySelectorAll('input[required], select[required]');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
