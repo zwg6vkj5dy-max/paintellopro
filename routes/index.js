@@ -6,6 +6,22 @@ const bcrypt = require('bcrypt');
 const { uploadIdCard, deleteFromCloudinary } = require('../utils/cloudinary');
 // Painter Login Page - FIXED PATH
 // Painter Login Page - FIXED VERSION
+// Universal Logout
+router.get('/logout', (req, res) => {
+  const userName = req.session.user?.name || req.session.painter?.name;
+  
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Logout error:', err);
+      req.flash('error', 'Error during logout');
+      return res.redirect('/');
+    }
+    
+    console.log(`✅ User logged out: ${userName || 'Unknown user'}`);
+    req.flash('success', 'Successfully logged out');
+    res.redirect('/');
+  });
+});
 // Painter Login Page - FIXED VERSION
 router.get('/auth/login-painter', (req, res) => {
   console.log('🔍 Painter login page accessed - Session check:');
