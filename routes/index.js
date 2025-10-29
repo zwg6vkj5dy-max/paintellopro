@@ -4,8 +4,8 @@ const wilayas = require('../utils/wilayas');
 const Painter = require('../models/Painter');
 const bcrypt = require('bcrypt');
 const { uploadIdCard, deleteFromCloudinary } = require('../utils/cloudinary');
-// Painter Login Page
-router.get('/login-painter', (req, res) => {
+// Painter Login Page - FIXED PATH
+router.get('/auth/login-painter', (req, res) => {
   // If painter is already logged in, redirect to painter dashboard
   if (req.session.painter) {
     return res.redirect('/painter/dashboard');
@@ -24,8 +24,8 @@ router.get('/login-painter', (req, res) => {
   });
 });
 
-// Painter Login Handler
-router.post('/login-painter', async (req, res) => {
+// Painter Login Handler - FIXED PATH
+router.post('/auth/login-painter', async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -90,7 +90,8 @@ router.post('/login-painter', async (req, res) => {
   }
 });
 
-router.get('/login', (req, res) => {
+// Client Login Page - FIXED PATH
+router.get('/auth/login', (req, res) => {
   res.render('auth/login', { 
     title: 'Login - Paintello Pro',
     oldInput: req.flash('oldInput')[0] || {},
