@@ -20,7 +20,15 @@ router.use(requirePainterAuth);
 router.get('/dashboard', async (req, res) => {
   try {
     const painter = await Painter.findById(req.session.painter._id);
-    
+    / Update session with latest data
+    req.session.painter = {
+      _id: painter._id,
+      name: painter.name,
+      email: painter.email,
+      phone: painter.phone,
+      role: 'painter',
+      profilePicture: painter.profilePicture // Ensure this is included
+    };
     // Get recent orders for this painter
     const recentOrders = await Order.find({ 
       'painter.id': req.session.painter._id 
