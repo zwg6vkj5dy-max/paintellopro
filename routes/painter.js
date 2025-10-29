@@ -16,7 +16,7 @@ const requirePainterAuth = (req, res, next) => {
 // Apply authentication to all painter routes
 router.use(requirePainterAuth);
 
-// Painter Dashboard - UPDATED VERSION
+// In your painter.js route file - update the dashboard function
 router.get('/dashboard', async (req, res) => {
   try {
     const painter = await Painter.findById(req.session.painter._id);
@@ -93,10 +93,6 @@ router.get('/dashboard', async (req, res) => {
     res.render('painter/dashboard', {
       title: 'Painter Dashboard - Paintello Pro',
       painter: painter,
-      user: { // Create user object for template compatibility
-        name: painter.name,
-        email: painter.email
-      },
       recentJobs: recentOrders,
       stats: stats,
       success: req.flash('success')[0],
@@ -108,7 +104,6 @@ router.get('/dashboard', async (req, res) => {
     res.redirect('/painter/dashboard');
   }
 });
-
 // Painter Profile
 router.get('/profile', async (req, res) => {
   try {
