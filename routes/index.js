@@ -5,6 +5,59 @@ const Painter = require('../models/Painter');
 const bcrypt = require('bcrypt');
 const { uploadIdCard, deleteFromCloudinary } = require('../utils/cloudinary');
 // Painter Login Page - FIXED PATH
+// Home page route
+router.get('/', async (req, res) => {
+  try {
+    // Get featured painters for the home page
+    const featuredPainters = await Painter.find({
+      'verification.status': 'verified',
+      'isActive': true
+    })
+    .sort({ rating: -1, completedJobs: -1 })
+    .limit(6)
+    .select('name experience pricePerSqm specialization rating completedJobs profilePicture location');
+
+    res.render('index', {
+      title: 'Paintello Pro - Find Professional Painters in Algeria',
+      featuredPainters: featuredPainters,
+      user: req.session.user || null
+    });
+  } catch (error) {
+    console.error('Home page error:', error);
+    res.render('index', {
+      title: 'Paintello Pro - Find Professional Painters in Algeria',
+      featuredPainters: [],
+      user: req.session.user || null
+    });
+  }
+});
+
+// Arabic home page route
+router.get('/ar', async (req, res) => {
+  try {
+    // Get featured painters for the home page
+    const featuredPainters = await Painter.find({
+      'verification.status': 'verified',
+      'isActive': true
+    })
+    .sort({ rating: -1, completedJobs: -1 })
+    .limit(6)
+    .select('name experience pricePerSqm specialization rating completedJobs profilePicture location');
+
+    res.render('ar/index', {
+      title: 'بينتيلو برو - Find Professional Painters in Algeria',
+      featuredPainters: featuredPainters,
+      user: req.session.user || null
+    });
+  } catch (error) {
+    console.error('Arabic home page error:', error);
+    res.render('ar/index', {
+      title: 'بينتيلو برو - Find Professional Painters in Algeria',
+      featuredPainters: [],
+      user: req.session.user || null
+    });
+  }
+});
 // Utility function to check if Cloudinary URL is accessible
 const checkCloudinaryUrl = async (url) => {
   try {
