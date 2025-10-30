@@ -653,5 +653,146 @@ router.post('/availability/busy-period/remove', async (req, res) => {
     res.redirect('/painter/availability');
   }
 });
+// Order Acceptance Route - FIXED
+router.post('/orders/:id/accept', async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const painterId = req.session.painter._id;
 
+    console.log('🎯 Accepting order:', orderId, 'for painter:', painterId);
+
+    // Find the order and verify it belongs to this painter
+    const order = await Order.findOne({
+      _id: orderId,
+      painter: painterId,
+      status: 'pending'
+    });
+
+    if (!order) {
+      console.log('❌ Order not found or not pending');
+      req.flash('error', 'Order not found or already processed');
+      return res.redirect('/painter/dashboard');
+    }
+
+    // Update order status to accepted
+    order.status = 'accepted';
+    order.respondedAt = new Date();
+    order.acceptedAt = new Date();
+
+    await order.save();
+
+    console.log('✅ Order accepted successfully:', orderId);
+
+    req.flash('success', 'Order accepted successfully! It will now appear in In Progress.');
+    res.redirect('/painter/dashboard');
+
+  } catch (error) {
+    console.error('❌ Order acceptance error:', error);
+    req.flash('error', 'Error accepting order: ' + error.message);
+    res.redirect('/painter/dashboard');
+  }
+});
+
+// Order Decline Route
+router.post('/orders/:id/decline', async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const painterId = req.session.painter._id;
+
+    const order = await Order.findOne({
+      _id: orderId,
+      painter: painterId,
+      status: 'pending'
+    });
+
+    if (!order) {
+      req.flash('error', 'Order not found or already processed');
+      return res.redirect('/painter/dashboard');
+    }
+
+    order.status = 'cancelled';
+    order.respondedAt = new Date();
+    order.cancelledAt = new Date();
+    order.cancellationReason = 'declined_by_painter';
+
+    await order.save();
+
+    req.flash('success', 'Order declined successfully');
+    res.redirect('/painter/dashboard');
+
+  } catch (error) {
+    console.error('Order decline error:', error);
+    req.flash('error', 'Error declining order');
+    res.redirect('/painter/dashboard');
+  }
+});
+
+// Start Order (Move to in_progress)
+router.post('/orders/:id/start', async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const painterId = req.session.painter._id;
+
+    const order = await Order.findOne({
+      _id: orderId,
+      painter: painterId,
+      status: 'accepted'
+    });
+
+    if (!order) {
+      req.flash('error', 'Order not found or not accepted');
+      return res.redirect('/painter/dashboard');
+    }
+
+    order.status = 'in_progress';
+    order.startedAt = new Date();
+
+    await order.save();
+
+    req.flash('success', 'Job started! Marked as in progress.');
+    res.redirect('/painter/dashboard');
+
+  } catch (error) {
+    console.error('Order start error:', error);
+    req.flash('error', 'Error starting order');
+    res.redirect('/painter/dashboard');
+  }
+});
+
+// Complete Order
+router.post('/orders/:id/complete', async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const painterId = req.session.painter._id;
+
+    const order = await Order.findOne({
+      _id: orderId,
+      painter: painterId,
+      status: 'in_progress'
+    });
+
+    if (!order) {
+      req.flash('error', 'Order not found or not in progress');
+      return res.redirect('/painter/dashboard');
+    }
+
+    order.status = 'completed';
+    order.completedAt = new Date();
+
+    await order.save();
+
+    // Update painter's completed jobs count
+    await Painter.findByIdAndUpdate(painterId, {
+      $inc: { completedJobs: 1 }
+    });
+
+    req.flash('success', 'Job completed successfully!');
+    res.redirect('/painter/dashboard');
+
+  } catch (error) {
+    console.error('Order completion error:', error);
+    req.flash('error', 'Error completing order');
+    res.redirect('/painter/dashboard');
+  }
+});
 module.exports = router;
