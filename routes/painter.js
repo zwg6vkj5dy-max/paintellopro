@@ -17,7 +17,7 @@ const requirePainterAuth = (req, res, next) => {
 router.use(requirePainterAuth);
 
 // In your painter.js route file - update the dashboard function with commission
-// Updated dashboard route with commission tracking
+// Updated dashboard route with real-time commission calculation
 router.get('/dashboard', async (req, res) => {
   try {
     const painter = await Painter.findById(req.session.painter._id);
@@ -39,16 +39,29 @@ router.get('/dashboard', async (req, res) => {
     .limit(5)
     .populate('client', 'name email phone');
 
-    // Calculate stats with commission
-    const totalJobs = await Order.countDocuments({ 
-      painter: req.session.painter._id 
-    });
-    
-    const completedJobs = await Order.countDocuments({ 
+    // Calculate ONLY ACCEPTED/COMPLETED orders for financial stats
+    const financialOrders = await Order.find({
       painter: req.session.painter._id,
-      status: 'completed'
+      status: { $in: ['accepted', 'in_progress', 'completed'] }
     });
-    
+
+    // Calculate financials only for accepted orders
+    const totalEarnings = financialOrders.reduce((total, order) => {
+      const orderAmount = order.totalAmount || order.budget || 0;
+      const commission = order.commission || Math.round(orderAmount * 0.10);
+      return total + (orderAmount - commission);
+    }, 0);
+
+    const totalCommission = financialOrders.reduce((total, order) => {
+      const orderAmount = order.totalAmount || order.budget || 0;
+      return total + (order.commission || Math.round(orderAmount * 0.10));
+    }, 0);
+
+    const totalRevenue = financialOrders.reduce((total, order) => {
+      return total + (order.totalAmount || order.budget || 0);
+    }, 0);
+
+    // Count only pending orders for active jobs
     const pendingJobs = await Order.countDocuments({ 
       painter: req.session.painter._id,
       status: 'pending'
@@ -64,47 +77,16 @@ router.get('/dashboard', async (req, res) => {
       status: 'in_progress'
     });
 
-    const activeJobs = pendingJobs + acceptedJobs + inProgressJobs;
-
-    // Calculate financials with commission
-    const allCompletedOrders = await Order.find({
+    const completedJobs = await Order.countDocuments({ 
       painter: req.session.painter._id,
       status: 'completed'
     });
 
-    const totalEarnings = allCompletedOrders.reduce((total, order) => {
-      const orderAmount = order.totalAmount || 0;
-      const commission = order.commission || 0;
-      return total + (orderAmount - commission);
-    }, 0);
-
-    const totalCommission = allCompletedOrders.reduce((total, order) => {
-      return total + (order.commission || 0);
-    }, 0);
-
-    const totalRevenue = allCompletedOrders.reduce((total, order) => {
-      return total + (order.totalAmount || 0);
-    }, 0);
-
-    // Monthly earnings (last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
-    const monthlyOrders = await Order.find({
-      painter: req.session.painter._id,
-      status: 'completed',
-      updatedAt: { $gte: thirtyDaysAgo }
+    const totalJobs = await Order.countDocuments({ 
+      painter: req.session.painter._id 
     });
 
-    const monthlyEarnings = monthlyOrders.reduce((total, order) => {
-      const orderAmount = order.totalAmount || 0;
-      const commission = order.commission || 0;
-      return total + (orderAmount - commission);
-    }, 0);
-
-    const monthlyCommission = monthlyOrders.reduce((total, order) => {
-      return total + (order.commission || 0);
-    }, 0);
+    const activeJobs = pendingJobs + acceptedJobs + inProgressJobs;
 
     const stats = {
       totalJobs,
@@ -113,17 +95,17 @@ router.get('/dashboard', async (req, res) => {
       acceptedJobs,
       inProgressJobs,
       activeJobs,
-      monthlyEarnings,
       totalEarnings,
-      monthlyCommission,
       totalCommission,
       totalRevenue,
       completionRate: totalJobs > 0 ? Math.round((completedJobs / totalJobs) * 100) : 0
     };
 
-    console.log('📊 Dashboard loaded - Financials:', {
-      totalEarnings: stats.totalEarnings,
-      totalCommission: stats.totalCommission
+    console.log('💰 Real-time Financials:', {
+      acceptedOrders: financialOrders.length,
+      totalRevenue: stats.totalRevenue,
+      totalCommission: stats.totalCommission,
+      painterEarnings: stats.totalEarnings
     });
 
     res.render('painter/dashboard', {
@@ -644,6 +626,7 @@ router.post('/availability/busy-period/remove', async (req, res) => {
   }
 });
 // Order Acceptance Route - FIXED
+// Order Acceptance Route - WITH IMMEDIATE COMMISSION CALCULATION
 router.post('/orders/:id/accept', async (req, res) => {
   try {
     const orderId = req.params.id;
@@ -664,6 +647,15 @@ router.post('/orders/:id/accept', async (req, res) => {
       return res.redirect('/painter/dashboard');
     }
 
+    // Calculate commission (10%) if not already calculated
+    if (!order.commission && order.totalAmount) {
+      order.commission = Math.round(order.totalAmount * 0.10);
+    } else if (!order.commission && order.budget) {
+      // If no totalAmount, use budget to calculate commission
+      order.commission = Math.round(order.budget * 0.10);
+      order.totalAmount = order.budget; // Set totalAmount equal to budget
+    }
+
     // Update order status to accepted
     order.status = 'accepted';
     order.respondedAt = new Date();
@@ -671,9 +663,14 @@ router.post('/orders/:id/accept', async (req, res) => {
 
     await order.save();
 
-    console.log('✅ Order accepted successfully:', orderId);
+    console.log('✅ Order accepted with commission:', {
+      orderId: orderId,
+      totalAmount: order.totalAmount,
+      commission: order.commission,
+      painterEarnings: order.totalAmount - order.commission
+    });
 
-    req.flash('success', 'Order accepted successfully! It will now appear in In Progress.');
+    req.flash('success', `Order accepted! Commission: ${order.commission} DZD, Your Earnings: ${order.totalAmount - order.commission} DZD`);
     res.redirect('/painter/dashboard');
 
   } catch (error) {
@@ -683,7 +680,7 @@ router.post('/orders/:id/accept', async (req, res) => {
   }
 });
 
-// Order Decline Route
+// Order Decline Route - NO CALCULATION
 router.post('/orders/:id/decline', async (req, res) => {
   try {
     const orderId = req.params.id;
@@ -700,6 +697,7 @@ router.post('/orders/:id/decline', async (req, res) => {
       return res.redirect('/painter/dashboard');
     }
 
+    // Simply decline without any financial calculation
     order.status = 'cancelled';
     order.respondedAt = new Date();
     order.cancelledAt = new Date();
@@ -707,81 +705,12 @@ router.post('/orders/:id/decline', async (req, res) => {
 
     await order.save();
 
-    req.flash('success', 'Order declined successfully');
+    req.flash('info', 'Order declined successfully. No financial impact.');
     res.redirect('/painter/dashboard');
 
   } catch (error) {
     console.error('Order decline error:', error);
     req.flash('error', 'Error declining order');
-    res.redirect('/painter/dashboard');
-  }
-});
-
-// Start Order (Move to in_progress)
-router.post('/orders/:id/start', async (req, res) => {
-  try {
-    const orderId = req.params.id;
-    const painterId = req.session.painter._id;
-
-    const order = await Order.findOne({
-      _id: orderId,
-      painter: painterId,
-      status: 'accepted'
-    });
-
-    if (!order) {
-      req.flash('error', 'Order not found or not accepted');
-      return res.redirect('/painter/dashboard');
-    }
-
-    order.status = 'in_progress';
-    order.startedAt = new Date();
-
-    await order.save();
-
-    req.flash('success', 'Job started! Marked as in progress.');
-    res.redirect('/painter/dashboard');
-
-  } catch (error) {
-    console.error('Order start error:', error);
-    req.flash('error', 'Error starting order');
-    res.redirect('/painter/dashboard');
-  }
-});
-
-// Complete Order
-router.post('/orders/:id/complete', async (req, res) => {
-  try {
-    const orderId = req.params.id;
-    const painterId = req.session.painter._id;
-
-    const order = await Order.findOne({
-      _id: orderId,
-      painter: painterId,
-      status: 'in_progress'
-    });
-
-    if (!order) {
-      req.flash('error', 'Order not found or not in progress');
-      return res.redirect('/painter/dashboard');
-    }
-
-    order.status = 'completed';
-    order.completedAt = new Date();
-
-    await order.save();
-
-    // Update painter's completed jobs count
-    await Painter.findByIdAndUpdate(painterId, {
-      $inc: { completedJobs: 1 }
-    });
-
-    req.flash('success', 'Job completed successfully!');
-    res.redirect('/painter/dashboard');
-
-  } catch (error) {
-    console.error('Order completion error:', error);
-    req.flash('error', 'Error completing order');
     res.redirect('/painter/dashboard');
   }
 });
