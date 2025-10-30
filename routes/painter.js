@@ -17,6 +17,7 @@ const requirePainterAuth = (req, res, next) => {
 router.use(requirePainterAuth);
 
 // In your painter.js route file - update the dashboard function with commission
+// Updated dashboard route with commission tracking
 router.get('/dashboard', async (req, res) => {
   try {
     const painter = await Painter.findById(req.session.painter._id);
@@ -27,10 +28,10 @@ router.get('/dashboard', async (req, res) => {
       email: painter.email,
       phone: painter.phone,
       role: 'painter',
-      profilePicture: painter.profilePicture // Ensure this is included
+      profilePicture: painter.profilePicture
     };
 
-    // Get recent orders for this painter - UPDATED FOR NEW SCHEMA
+    // Get recent orders for this painter
     const recentOrders = await Order.find({ 
       painter: req.session.painter._id 
     })
@@ -38,7 +39,7 @@ router.get('/dashboard', async (req, res) => {
     .limit(5)
     .populate('client', 'name email phone');
 
-    // Calculate comprehensive stats with commission
+    // Calculate stats with commission
     const totalJobs = await Order.countDocuments({ 
       painter: req.session.painter._id 
     });
@@ -53,9 +54,9 @@ router.get('/dashboard', async (req, res) => {
       status: 'pending'
     });
 
-    const activeJobs = await Order.countDocuments({
+    const acceptedJobs = await Order.countDocuments({
       painter: req.session.painter._id,
-      status: { $in: ['pending', 'accepted', 'in_progress'] }
+      status: 'accepted'
     });
 
     const inProgressJobs = await Order.countDocuments({
@@ -63,77 +64,66 @@ router.get('/dashboard', async (req, res) => {
       status: 'in_progress'
     });
 
-    // Calculate earnings with commission (last 30 days)
+    const activeJobs = pendingJobs + acceptedJobs + inProgressJobs;
+
+    // Calculate financials with commission
+    const allCompletedOrders = await Order.find({
+      painter: req.session.painter._id,
+      status: 'completed'
+    });
+
+    const totalEarnings = allCompletedOrders.reduce((total, order) => {
+      const orderAmount = order.totalAmount || 0;
+      const commission = order.commission || 0;
+      return total + (orderAmount - commission);
+    }, 0);
+
+    const totalCommission = allCompletedOrders.reduce((total, order) => {
+      return total + (order.commission || 0);
+    }, 0);
+
+    const totalRevenue = allCompletedOrders.reduce((total, order) => {
+      return total + (order.totalAmount || 0);
+    }, 0);
+
+    // Monthly earnings (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
-    const monthlyEarningsData = await Order.find({
+    const monthlyOrders = await Order.find({
       painter: req.session.painter._id,
       status: 'completed',
       updatedAt: { $gte: thirtyDaysAgo }
     });
 
-    // Calculate painter's earnings after 10% commission
-    const monthlyEarnings = monthlyEarningsData.reduce((total, order) => {
+    const monthlyEarnings = monthlyOrders.reduce((total, order) => {
       const orderAmount = order.totalAmount || 0;
       const commission = order.commission || 0;
-      const painterEarnings = orderAmount - commission;
-      return total + painterEarnings;
+      return total + (orderAmount - commission);
     }, 0);
 
-    // Calculate total earnings after commission
-    const totalEarningsData = await Order.find({
-      painter: req.session.painter._id,
-      status: 'completed'
-    });
-
-    const totalEarnings = totalEarningsData.reduce((total, order) => {
-      const orderAmount = order.totalAmount || 0;
-      const commission = order.commission || 0;
-      const painterEarnings = orderAmount - commission;
-      return total + painterEarnings;
-    }, 0);
-
-    // Calculate total commission paid
-    const totalCommission = totalEarningsData.reduce((total, order) => {
+    const monthlyCommission = monthlyOrders.reduce((total, order) => {
       return total + (order.commission || 0);
     }, 0);
-
-    // Calculate monthly commission
-    const monthlyCommission = monthlyEarningsData.reduce((total, order) => {
-      return total + (order.commission || 0);
-    }, 0);
-
-    // Calculate response rate (orders responded to within 24 hours)
-    const respondedOrders = await Order.countDocuments({
-      painter: req.session.painter._id,
-      respondedAt: { $exists: true }
-    });
-
-    const responseRate = totalJobs > 0 ? Math.round((respondedOrders / totalJobs) * 100) : 0;
 
     const stats = {
       totalJobs,
       completedJobs,
       pendingJobs,
-      activeJobs,
+      acceptedJobs,
       inProgressJobs,
-      monthlyEarnings,        // Painter's earnings after commission
-      totalEarnings,          // Painter's total earnings after commission
-      monthlyCommission,      // Commission paid this month
-      totalCommission,        // Total commission paid
-      responseRate,
-      completionRate: totalJobs > 0 ? Math.round((completedJobs / totalJobs) * 100) : 0,
-      // Additional financial stats
-      totalRevenue: totalEarningsData.reduce((total, order) => total + (order.totalAmount || 0), 0), // Total before commission
-      monthlyRevenue: monthlyEarningsData.reduce((total, order) => total + (order.totalAmount || 0), 0) // Monthly before commission
+      activeJobs,
+      monthlyEarnings,
+      totalEarnings,
+      monthlyCommission,
+      totalCommission,
+      totalRevenue,
+      completionRate: totalJobs > 0 ? Math.round((completedJobs / totalJobs) * 100) : 0
     };
 
-    console.log('📊 Dashboard loaded - Profile picture:', !!painter.profilePicture);
-    console.log('💰 Financial Stats:', {
-      totalRevenue: stats.totalRevenue,
-      totalCommission: stats.totalCommission,
-      painterEarnings: stats.totalEarnings
+    console.log('📊 Dashboard loaded - Financials:', {
+      totalEarnings: stats.totalEarnings,
+      totalCommission: stats.totalCommission
     });
 
     res.render('painter/dashboard', {
