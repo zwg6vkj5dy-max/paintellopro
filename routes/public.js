@@ -4,7 +4,31 @@ const router = express.Router();
 const Painter = require('../models/Painter');
 const Order = require('../models/Order');
 const wilayas = require('../utils/wilayas');
+// Temporary home route in public.js (remove later)
+router.get('/', async (req, res) => {
+  try {
+    const featuredPainters = await Painter.find({
+      'verification.status': 'verified',
+      'isActive': true
+    })
+    .sort({ rating: -1, completedJobs: -1 })
+    .limit(6)
+    .select('name experience pricePerSqm specialization rating completedJobs profilePicture location');
 
+    res.render('index', {
+      title: 'Paintello Pro - Find Professional Painters in Algeria',
+      featuredPainters: featuredPainters,
+      user: req.session.user || null
+    });
+  } catch (error) {
+    console.error('Home page error:', error);
+    res.render('index', {
+      title: 'Paintello Pro - Find Professional Painters in Algeria',
+      featuredPainters: [],
+      user: req.session.user || null
+    });
+  }
+});
 // Public painter search page
 router.get('/painters', async (req, res) => {
   try {
