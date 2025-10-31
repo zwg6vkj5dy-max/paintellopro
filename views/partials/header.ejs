@@ -111,8 +111,15 @@
                 
                 
                 
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                   <li><hr class="dropdown-divider"></li>
+    <!-- Use POST method for logout for better security -->
+    <li>
+        <form action="/auth/logout" method="POST" class="d-inline">
+            <button type="submit" class="dropdown-item">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </button>
+        </form>
+    </li>
             </ul>
         </li>
     <% } else { %>
