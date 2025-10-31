@@ -146,7 +146,7 @@ router.post('/auth/login-painter', async (req, res) => {
     if (!email || !password) {
       req.flash('error', 'Email and password are required');
       req.flash('oldInput', formData);
-      return res.redirect('/auth/login-painter');
+      return res.redirect('/painter/dashboard');
     }
 
     // Find painter by email
@@ -176,7 +176,7 @@ router.post('/auth/login-painter', async (req, res) => {
     if (!painter.isActive) {
       req.flash('error', 'Your account has been deactivated. Please contact support.');
       req.flash('oldInput', formData);
-      return res.redirect('/auth/login-painter');
+      return res.redirect('/painter/dashboard');
     }
 
     // Set painter session
