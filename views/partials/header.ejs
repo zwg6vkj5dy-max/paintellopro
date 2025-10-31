@@ -86,14 +86,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/painters">Find Painters</a>
                     </li>
-                    <% if (user && user.role === 'painter') { %>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/painter/store">
-                            <i class="fas fa-store me-1"></i> Team Store
-                            <span class="badge bg-warning">PRO</span>
-                        </a>
-                    </li>
-                    <% } %>
+                   
                     <li class="nav-item">
                         <a class="nav-link" href="/about">About</a>
                     </li>
@@ -115,11 +108,11 @@
             </a>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="/painter/dashboard">Dashboard</a></li>
-                <li><a class="dropdown-item" href="/painter/profile">Profile</a></li>
-                <li><a class="dropdown-item" href="/painter/orders">My Jobs</a></li>
-                <li><a class="dropdown-item" href="/painter/store">Team Store</a></li>
+                
+                
+                
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+                <li><a class="dropdown-item" href="/logout">Logout</a></li>
             </ul>
         </li>
     <% } else { %>
