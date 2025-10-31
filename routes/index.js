@@ -93,22 +93,7 @@ router.get('/validate-profile-picture', async (req, res) => {
   }
 });
 // Painter Login Page - FIXED VERSION
-// Universal Logout
-router.get('/logout', (req, res) => {
-  const userName = req.session.user?.name || req.session.painter?.name;
-  
-  req.session.destroy((err) => {
-    if (err) {
-      console.error('Logout error:', err);
-      
-      return res.redirect('/');
-    }
-    
-    console.log(`✅ User logged out: ${userName || 'Unknown user'}`);
- 
-    res.redirect('/');
-  });
-});
+
 // Painter Login Page - FIXED VERSION
 router.get('/auth/login-painter', (req, res) => {
   console.log('🔍 Painter login page accessed - Session check:');
@@ -125,13 +110,13 @@ router.get('/auth/login-painter', (req, res) => {
   }
   
   res.render('auth/login-painter', { 
-    title: 'Painter Login - Paintello Pro',
-    oldInput: req.flash('oldInput')[0] || {},
-    error: req.flash('error')[0],
-    success: req.flash('success')[0],
+       title: 'Painter Login - Paintello Pro',
     user: req.session.user || null,
-    painter: req.session.painter || null,
-    messages: []
+    success: req.flash('success')[0],
+    error: req.flash('error')[0],
+    warning: req.flash('warning')[0],
+    info: req.flash('info')[0],
+    oldInput: req.flash('oldInput')[0] || {}
   });
 });
 // Painter Login Handler - FIXED PATH
@@ -236,122 +221,106 @@ router.get('/auth/register-painter', (req, res) => {
 });
 
 // Handle painter registration with Cloudinary ID card upload
-router.post('/auth/register-painter', uploadIdCard.single('idCard'), async (req, res) => {
+router.post('/auth/login-painter', async (req, res) => {
   try {
-    const {
-      name, phone, email, password, confirmPassword,
-      experience, pricePerSqm, specialization, wilaya,
-      wilayaNumber, address
-    } = req.body;
+    const { email, password } = req.body;
 
     // Store form data in case of error
-    const formData = {
-      name, phone, email, experience, pricePerSqm,
-      specialization, wilaya, wilayaNumber, address
+    const formData = { email };
+
+    // Basic validation
+    if (!email || !password) {
+      req.flash('error', 'Email and password are required');
+      req.flash('oldInput', formData);
+      return res.redirect('/auth/login-painter');
+    }
+
+    // Find painter by email
+    const painter = await Painter.findOne({ email });
+    
+    // Case 1: No account found - redirect to register
+    if (!painter) {
+      req.flash('info', 'No account found with this email. Please register as a painter.');
+      req.flash('oldInput', formData);
+      return res.redirect('/auth/register-painter');
+    }
+
+    // Check password
+    const isMatch = await painter.comparePassword(password);
+    
+    // Case 2: Wrong password - redirect to register (since they might not remember they have an account)
+    if (!isMatch) {
+      req.flash('error', 'Invalid password. If you forgot your password, please contact support or register a new account.');
+      req.flash('oldInput', formData);
+      return res.redirect('/auth/register-painter');
+    }
+
+    // Case 3: Account not verified - show message on login page
+    if (painter.verification.status !== 'verified') {
+      let message = '';
+      switch (painter.verification.status) {
+        case 'pending':
+          message = 'Your account is pending verification. We will contact you once verified.';
+          break;
+        case 'rejected':
+          message = 'Your verification was rejected. Please contact support for more information.';
+          break;
+        default:
+          message = 'Your account requires verification before you can login.';
+      }
+      req.flash('warning', message);
+      req.flash('oldInput', formData);
+      return res.redirect('/auth/login-painter');
+    }
+
+    // Case 4: Account not active - show message on login page
+    if (!painter.isActive) {
+      req.flash('error', 'Your account has been deactivated. Please contact support to reactivate your account.');
+      req.flash('oldInput', formData);
+      return res.redirect('/auth/login-painter');
+    }
+
+    // Case 5: Everything is good - set session and redirect to dashboard
+    req.session.painter = {
+      _id: painter._id,
+      name: painter.name,
+      email: painter.email,
+      phone: painter.phone,
+      role: 'painter',
+      profilePicture: painter.profilePicture,
+      verification: painter.verification
     };
 
-    // Validation
-    if (password !== confirmPassword) {
-      req.flash('error', 'Passwords do not match');
-      req.flash('oldInput', formData);
-      return res.redirect('/auth/register-painter');
-    }
+    // Also set user session for header compatibility
+    req.session.user = {
+      _id: painter._id,
+      name: painter.name,
+      email: painter.email,
+      phone: painter.phone,
+      role: 'painter'
+    };
 
-    if (password.length < 6) {
-      req.flash('error', 'Password must be at least 6 characters long');
-      req.flash('oldInput', formData);
-      return res.redirect('/auth/register-painter');
-    }
-
-    // Validate wilaya number
-    const wilayaNum = parseInt(wilayaNumber);
-    if (!wilayaNum || isNaN(wilayaNum) || wilayaNum < 1 || wilayaNum > 48) {
-      req.flash('error', 'Please select a valid wilaya');
-      req.flash('oldInput', formData);
-      return res.redirect('/auth/register-painter');
-    }
-
-    // Check if ID card was uploaded
-    if (!req.file) {
-      req.flash('error', 'ID card photo is required');
-      req.flash('oldInput', formData);
-      return res.redirect('/auth/register-painter');
-    }
-
-    // Check if user already exists
-    const existingUser = await Painter.findOne({ 
-      $or: [{ email }, { phone }] 
-    });
-
-    if (existingUser) {
-      // If user exists but registration failed, delete the uploaded ID card
-      if (req.file && req.file.filename) {
-        await deleteFromCloudinary(req.file.filename);
+    // Force session save before redirect
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        req.flash('error', 'Login failed due to session error');
+        return res.redirect('/auth/login-painter');
       }
-      req.flash('error', 'User with this email or phone already exists');
-      req.flash('oldInput', formData);
-      return res.redirect('/auth/register-painter');
-    }
-
-    // Create new painter user
-    const hashedPassword = await bcrypt.hash(password, 12);
-    
-    const newPainter = new Painter({
-      name,
-      phone,
-      email,
-      password: hashedPassword,
-      experience: parseInt(experience),
-      pricePerSqm: parseInt(pricePerSqm),
-      specialization: Array.isArray(specialization) ? specialization : [specialization],
-      location: {
-        wilaya,
-        wilayaNumber: wilayaNum, // Use the validated number
-        address
-      },
-      verification: {
-        idCard: {
-          publicId: req.file.filename,
-          url: req.file.path,
-          uploadedAt: new Date()
-        },
-        status: 'pending'
-      },
-      portfolio: [], // Empty portfolio - to be added manually by admin
-      userType: 'painter'
+      
+      console.log(`✅ Painter logged in: ${painter.name} (${painter.email})`);
+      console.log('🔍 Session after login:', req.session.painter);
+      req.flash('success', `Welcome back, ${painter.name}!`);
+      res.redirect('/painter/dashboard');
     });
-
-    await newPainter.save();
-
-    console.log(`✅ New painter registered: ${name} (${email}) from ${wilaya}`);
-    req.flash('success', 'Your application has been submitted successfully! We will review your ID card and contact you soon.');
-    res.redirect('/auth/register-painter');
 
   } catch (error) {
-    console.error('Painter registration error:', error);
-    
-    // Delete uploaded file if there was an error
-    if (req.file && req.file.filename) {
-      try {
-        await deleteFromCloudinary(req.file.filename);
-      } catch (deleteError) {
-        console.error('Error deleting uploaded file:', deleteError);
-      }
-    }
-
-    // Handle specific validation errors
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
-      req.flash('error', messages.join(', '));
-    } else {
-      req.flash('error', 'An error occurred during registration. Please try again.');
-    }
-    
+    console.error('Painter login error:', error);
+    req.flash('error', 'An error occurred during login. Please try again.');
     req.flash('oldInput', req.body);
-    res.redirect('/auth/register-painter');
+    res.redirect('/auth/login-painter');
   }
 });
-
 // Admin route to view painter applications
 router.get('/admin/painters', async (req, res) => {
   try {
@@ -475,6 +444,45 @@ const clientRoutes = require('./client');
 
 // Mount client routes
 router.use('/client', clientRoutes);
+
+// Logout route
+router.get('/logout', (req, res) => {
+  console.log('🚪 Logging out user:', req.session.user ? req.session.user.name : 'No user');
+  console.log('🚪 Logging out painter:', req.session.painter ? req.session.painter.name : 'No painter');
+  
+  // Destroy the session
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Logout error:', err);
+      return res.redirect('/painter/dashboard');
+    }
+    
+    // Clear the session cookie
+    res.clearCookie('connect.sid');
+    
+    console.log('✅ User logged out successfully');
+    res.redirect('/');
+  });
+});
+
+// Alternative logout with flash message
+router.post('/logout', (req, res) => {
+  const userName = req.session.user ? req.session.user.name : 
+                   req.session.painter ? req.session.painter.name : 'User';
+  
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Logout error:', err);
+      req.flash('error', 'Error during logout');
+      return res.redirect('/painter/dashboard');
+    }
+    
+    res.clearCookie('connect.sid');
+    req.flash('success', `Goodbye, ${userName}! You have been logged out successfully.`);
+    res.redirect('/');
+  });
+});
+
 module.exports = router;
     
 
