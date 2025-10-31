@@ -49,29 +49,31 @@ app.use(session({
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: MONGODB_URI,
-    ttl: 14 * 24 * 60 * 60
+    ttl: 14 * 24 * 60 * 60 // 14 days
   }),
   cookie: {
-    secure: true, // Force HTTPS in production
+    secure: process.env.NODE_ENV === 'production', // Only HTTPS in production
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-    sameSite: 'lax' // Important for cross-origin requests
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: 'lax'
   }
 }));
 
 
 // Flash messages
+// Flash messages
 app.use(flash());
 
-// Global variables for templates
+// Global variables for templates - FIXED VERSION
 app.use((req, res, next) => {
-  res.locals.success = req.flash('success');
-  res.locals.error = req.flash('error');
+  // req.flash() returns an array, we need the first element
+  res.locals.success = req.flash('success')[0];
+  res.locals.error = req.flash('error')[0];
+  res.locals.warning = req.flash('warning')[0];
+  res.locals.info = req.flash('info')[0];
   res.locals.currentUser = req.user;
   res.locals.currentPainter = req.session.painter;
   res.locals.isProduction = process.env.NODE_ENV === 'production';
-    res.locals.warning = req.flash('warning');
-  res.locals.info = req.flash('info');
   next();
 });
 
