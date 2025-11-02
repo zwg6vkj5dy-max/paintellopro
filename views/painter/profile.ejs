@@ -234,5 +234,14 @@ document.getElementById('profileForm')?.addEventListener('submit', function(e) {
     }
 });
 </script>
+<script>
+document.getElementById('profilePicture')?.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file && file.size > 1024 * 1024) {
+    alert('⚠️ The selected image is larger than 1 MB. Please choose a smaller one.');
+    e.target.value = ''; // Reset file input
+  }
+});
+</script>
 
 <%- include('../partials/footer') %>
