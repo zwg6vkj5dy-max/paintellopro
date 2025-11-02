@@ -207,7 +207,17 @@ router.post('/profile', uploadProfilePicture.single('profilePicture'), async (re
         path: req.file.path,
         size: req.file.size
       });
-      
+      // ✅ Add file size validation (1MB max)
+  if (req.file.size > 1 * 1024 * 1024) {
+    console.warn('❌ Uploaded image too large:', req.file.size);
+    try {
+      await deleteFromCloudinary(req.file.filename);
+    } catch (err) {
+      console.error('⚠️ Error cleaning up large file from Cloudinary:', err);
+    }
+    req.flash('error', 'Image too large. Please upload a file under 1 MB.');
+    return res.redirect('/painter/profile');
+  }
       // Delete old profile picture if exists
       const currentPainter = await Painter.findById(req.session.painter._id);
       if (currentPainter.profilePicture && currentPainter.profilePicture.publicId) {
