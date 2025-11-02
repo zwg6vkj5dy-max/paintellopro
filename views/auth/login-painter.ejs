@@ -6,7 +6,7 @@
             <div class="card shadow">
                 <div class="card-body p-4">
                     <h2 class="text-center mb-4">Painter Login</h2>
-                  <!-- 🔔 Flash Messages Section -->
+                  <!-- 🔔 Flash Messages -->
 <% if (success && success.length) { %>
   <% success.forEach(msg => { %>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -42,7 +42,6 @@
     </div>
   <% }) %>
 <% } %>
-
 
                     <form action="/auth/login-painter" method="POST">
                         <div class="mb-3">
