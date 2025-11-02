@@ -13,7 +13,7 @@
                         <p class="text-muted">Become a verified Paintello Pro painter and grow your business</p>
                     </div>
 
-                    <!-- 🔔 Flash Messages -->
+                   <!-- 🔔 Flash Messages -->
 <% if (success && success.length) { %>
   <% success.forEach(msg => { %>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -26,7 +26,7 @@
 <% if (error && error.length) { %>
   <% error.forEach(msg => { %>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      <i class="fas fa-exclamation-triangle me-2"></i><%= msg %>
+      <i class="fas fa-times-circle me-2"></i><%= msg %>
       <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
   <% }) %>
@@ -49,7 +49,6 @@
     </div>
   <% }) %>
 <% } %>
-
 
                     <form action="/auth/register-painter" method="POST" enctype="multipart/form-data">
                         <!-- Personal Information -->
@@ -223,6 +222,14 @@
         </div>
     </div>
 </div>
+<script>
+  setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(alert => {
+      const bsAlert = new bootstrap.Alert(alert);
+      bsAlert.close();
+    });
+  }, 4000);
+</script>
 
 <%- include('../partials/footer') %>
 
