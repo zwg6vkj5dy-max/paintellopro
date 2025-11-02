@@ -6,33 +6,30 @@
             <div class="card shadow">
                 <div class="card-body p-4">
                     <h2 class="text-center mb-4">Painter Login</h2>
-                    
-                    <!-- Debug: Check if flash messages are working -->
-                   <% if (success && success.length > 0) { %>
-  <div class="alert alert-success"><%= success[0] %></div>
+                  <% if (success && success.length) { %>
+  <% success.forEach(msg => { %>
+    <div class="alert alert-success"><%= msg %></div>
+  <% }) %>
 <% } %>
 
-                    
-                    <% if (error && error.length > 0) { %>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i><%= error %>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                    <% } %>
-                    
-                    <% if (warning && warning.length > 0) { %>
-                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-triangle me-2"></i><%= warning %>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                    <% } %>
-                    
-                    <% if (info && info.length > 0) { %>
-                    <div class="alert alert-info alert-dismissible fade show" role="alert">
-                        <i class="fas fa-info-circle me-2"></i><%= info %>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                    <% } %>
+<% if (error && error.length) { %>
+  <% error.forEach(msg => { %>
+    <div class="alert alert-danger"><%= msg %></div>
+  <% }) %>
+<% } %>
+
+<% if (warning && warning.length) { %>
+  <% warning.forEach(msg => { %>
+    <div class="alert alert-warning"><%= msg %></div>
+  <% }) %>
+<% } %>
+
+<% if (info && info.length) { %>
+  <% info.forEach(msg => { %>
+    <div class="alert alert-info"><%= msg %></div>
+  <% }) %>
+<% } %>
+
 
                     <form action="/auth/login-painter" method="POST">
                         <div class="mb-3">
