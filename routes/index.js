@@ -109,15 +109,16 @@ router.get('/auth/login-painter', (req, res) => {
     return res.redirect('/painter/dashboard');
   }
   
-  res.render('auth/login-painter', { 
-       title: 'Painter Login - Paintello Pro',
-    user: req.session.user || null,
-    success: req.flash('success')[0],
-    error: req.flash('error')[0],
-    warning: req.flash('warning')[0],
-    info: req.flash('info')[0],
-    oldInput: req.flash('oldInput')[0] || {}
-  });
+res.render('auth/login-painter', { 
+  title: 'Painter Login - Paintello Pro',
+  user: req.session.user || null,
+  success: req.flash('success'),
+  error: req.flash('error'),
+  warning: req.flash('warning'),
+  info: req.flash('info'),
+  oldInput: req.flash('oldInput')[0] || {}
+});
+
 });
 // Painter Login Handler - FIXED PATH
 router.post('/auth/login-painter', async (req, res) => {
