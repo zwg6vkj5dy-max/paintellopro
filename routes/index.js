@@ -135,79 +135,171 @@ router.get('/auth/login', (req, res) => {
 // Painter Registration Routes
 router.get('/auth/register-painter', (req, res) => {
   res.render('auth/register-painter', {
-    title: 'Join as Painter',
+    title: 'Join as Painter - Paintello Pro',
     wilayas: wilayas,
     oldInput: req.flash('oldInput')[0] || {},
-    error: req.flash('error')[0],
-    success: req.flash('success')[0],
-    // Add these variables that your header expects
-    user: req.user || null,
-    painter: req.painter || null,
-    messages: [] // Empty array since you're using flash messages instead
+    success: req.flash('success'),
+    error: req.flash('error'),
+    warning: req.flash('warning'),
+    info: req.flash('info'),
+    user: req.session.user || null,
+    painter: req.session.painter || null
   });
 });
+// 🎨 Painter Registration (with flash messages)
+router.post('/auth/register-painter', uploadIdCard.single('idCard'), async (req, res) => {
+  try {
+    const {
+      name,
+      phone,
+      email,
+      password,
+      confirmPassword,
+      experience,
+      pricePerSqm,
+      specialization,
+      wilaya,
+      wilayaNumber,
+      address
+    } = req.body;
+
+    // Store old input for re-rendering form
+    const oldInput = req.body;
+
+    // 🟠 1. Validate required fields
+    if (!name || !phone || !email || !password || !confirmPassword || !experience || !pricePerSqm || !specialization || !wilaya || !address) {
+      req.flash('error', '⚠️ Please fill in all required fields.');
+      req.flash('oldInput', oldInput);
+      return res.redirect('/auth/register-painter');
+    }
+
+    // 🟠 2. Validate password match
+    if (password !== confirmPassword) {
+      req.flash('error', '❌ Passwords do not match. Please try again.');
+      req.flash('oldInput', oldInput);
+      return res.redirect('/auth/register-painter');
+    }
+
+    // 🟠 3. Check if painter already exists
+    const existingPainter = await Painter.findOne({ $or: [{ email }, { phone }] });
+    if (existingPainter) {
+      req.flash('warning', '⚠️ An account with this email or phone number already exists. Please log in instead.');
+      req.flash('oldInput', oldInput);
+      return res.redirect('/auth/login-painter');
+    }
+
+    // 🟠 4. Validate ID card upload
+    if (!req.file || !req.file.path) {
+      req.flash('error', '🪪 Please upload a valid photo of your ID card.');
+      req.flash('oldInput', oldInput);
+      return res.redirect('/auth/register-painter');
+    }
+
+    // 🟠 5. Upload success – Create painter record
+    const painter = new Painter({
+      name,
+      phone,
+      email,
+      password,
+      experience,
+      pricePerSqm,
+      specialization: Array.isArray(specialization) ? specialization : [specialization],
+      location: {
+        wilaya,
+        wilayaNumber,
+        address
+      },
+      profilePicture: { url: '', public_id: '' },
+      idCard: {
+        url: req.file.path,
+        public_id: req.file.filename
+      },
+      verification: {
+        status: 'pending',
+        adminNotes: 'Awaiting verification',
+        verifiedAt: null
+      },
+      isActive: false
+    });
+
+    await painter.save();
+
+    // ✅ 6. Registration success
+    console.log(`🆕 New painter registered: ${name} (${email})`);
+    req.flash('success', '🎉 Registration successful! Your account is pending verification. We will contact you soon.');
+    return res.redirect('/auth/login-painter');
+
+  } catch (error) {
+    console.error('Painter registration error:', error);
+
+    // 🟥 Cloudinary file cleanup (optional)
+    if (req.file && req.file.filename) {
+      await deleteFromCloudinary(req.file.filename);
+    }
+
+    req.flash('error', '❗ An unexpected error occurred during registration. Please try again.');
+    req.flash('oldInput', req.body);
+    return res.redirect('/auth/register-painter');
+  }
+});
+
 
 // Handle painter registration with Cloudinary ID card upload
+// 🎨 Painter Login Route (Final Flash Version)
 router.post('/auth/login-painter', async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Store form data in case of error
     const formData = { email };
 
-    // Basic validation
+    // 🟠 Case 0: Missing fields
     if (!email || !password) {
-      req.flash('error', 'Email and password are required');
+      req.flash('error', '⚠️ Please enter both your email and password.');
       req.flash('oldInput', formData);
       return res.redirect('/auth/login-painter');
     }
 
-    // Find painter by email
+    // 🔍 Case 1: Painter not found
     const painter = await Painter.findOne({ email });
-    
-    // Case 1: No account found - redirect to register
     if (!painter) {
-      req.flash('info', 'No account found with this email. Please register as a painter.');
+      req.flash('info', 'ℹ️ No account found with this email. You can register as a painter below.');
       req.flash('oldInput', formData);
       return res.redirect('/auth/register-painter');
     }
 
-    // Check password
+    // 🔐 Case 2: Incorrect password
     const isMatch = await painter.comparePassword(password);
-    
-    // Case 2: Wrong password - redirect to register (since they might not remember they have an account)
     if (!isMatch) {
-      req.flash('error', 'Invalid password. If you forgot your password, please contact support or register a new account.');
+      req.flash('error', '❌ Incorrect password. Please try again or contact support if forgotten.');
       req.flash('oldInput', formData);
-      return res.redirect('/auth/register-painter');
+      return res.redirect('/auth/login-painter');
     }
 
-    // Case 3: Account not verified - show message on login page
+    // 🕓 Case 3: Account not verified
     if (painter.verification.status !== 'verified') {
       let message = '';
       switch (painter.verification.status) {
         case 'pending':
-          message = 'Your account is pending verification. We will contact you once verified.';
+          message = '🕒 Your account is still pending verification. We will contact you once approved.';
           break;
         case 'rejected':
-          message = 'Your verification was rejected. Please contact support for more information.';
+          message = '🚫 Your verification was rejected. Please contact support for more details.';
           break;
         default:
-          message = 'Your account requires verification before you can login.';
+          message = '⚠️ Your account must be verified before logging in.';
       }
       req.flash('warning', message);
       req.flash('oldInput', formData);
       return res.redirect('/auth/login-painter');
     }
 
-    // Case 4: Account not active - show message on login page
+    // 🚫 Case 4: Account inactive
     if (!painter.isActive) {
-      req.flash('error', 'Your account has been deactivated. Please contact support to reactivate your account.');
+      req.flash('error', '🚫 Your account has been deactivated. Please contact support to reactivate it.');
       req.flash('oldInput', formData);
       return res.redirect('/auth/login-painter');
     }
 
-    // Case 5: Everything is good - set session and redirect to dashboard
+    // ✅ Case 5: Successful login
     req.session.painter = {
       _id: painter._id,
       name: painter.name,
@@ -218,7 +310,6 @@ router.post('/auth/login-painter', async (req, res) => {
       verification: painter.verification
     };
 
-    // Also set user session for header compatibility
     req.session.user = {
       _id: painter._id,
       name: painter.name,
@@ -227,27 +318,26 @@ router.post('/auth/login-painter', async (req, res) => {
       role: 'painter'
     };
 
-    // Force session save before redirect
     req.session.save((err) => {
       if (err) {
         console.error('Session save error:', err);
-        req.flash('error', 'Login failed due to session error');
+        req.flash('error', '⚠️ Login failed due to session issue. Please try again.');
         return res.redirect('/auth/login-painter');
       }
-      
-      console.log(`✅ Painter logged in: ${painter.name} (${painter.email})`);
-      console.log('🔍 Session after login:', req.session.painter);
-      req.flash('success', `Welcome back, ${painter.name}!`);
+
+      console.log(`✅ Painter logged in successfully: ${painter.name} (${painter.email})`);
+      req.flash('success', `🎉 Welcome back, ${painter.name}!`);
       res.redirect('/painter/dashboard');
     });
 
   } catch (error) {
     console.error('Painter login error:', error);
-    req.flash('error', 'An error occurred during login. Please try again.');
+    req.flash('error', '❗ An unexpected error occurred during login. Please try again later.');
     req.flash('oldInput', req.body);
     res.redirect('/auth/login-painter');
   }
 });
+
 // Admin route to view painter applications
 router.get('/admin/painters', async (req, res) => {
   try {
