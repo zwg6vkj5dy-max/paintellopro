@@ -8,12 +8,10 @@
                     <h2 class="text-center mb-4">Painter Login</h2>
                     
                     <!-- Debug: Check if flash messages are working -->
-                    <% if (success && success.length > 0) { %>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="fas fa-check-circle me-2"></i><%= success %>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                    <% } %>
+                   <% if (success && success.length > 0) { %>
+  <div class="alert alert-success"><%= success[0] %></div>
+<% } %>
+
                     
                     <% if (error && error.length > 0) { %>
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
