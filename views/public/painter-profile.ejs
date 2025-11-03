@@ -4,13 +4,12 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
 <style>
-/* VOTRE CSS EXISTANT RESTE IDENTIQUE */
 .swiper {
     width: 100%;
-    height: 400px;
-    border-radius: 12px;
+    height: 500px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
 }
 
 .swiper-slide {
@@ -21,11 +20,12 @@
     align-items: center;
     position: relative;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: all 0.4s ease;
 }
 
 .swiper-slide:hover {
-    transform: scale(1.02);
+    transform: scale(1.05);
+    z-index: 10;
 }
 
 .swiper-slide img {
@@ -33,53 +33,49 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.swiper-slide:hover img {
+    transform: scale(1.1);
 }
 
 .swiper-button-next,
 .swiper-button-prev {
     color: white;
-    background: rgba(0,0,0,0.5);
-    width: 50px;
-    height: 50px;
+    background: rgba(0,0,0,0.7);
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255,255,255,0.3);
+    transition: all 0.3s ease;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    background: #007bff;
+    transform: scale(1.1);
 }
 
 .swiper-button-next:after,
 .swiper-button-prev:after {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: bold;
 }
 
 .swiper-pagination-bullet {
     background: white;
     opacity: 0.6;
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
+    transition: all 0.3s ease;
 }
 
 .swiper-pagination-bullet-active {
     background: #007bff;
     opacity: 1;
-}
-
-/* Lightbox Styles */
-.portfolio-lightbox .swiper-slide {
-    cursor: zoom-in;
-}
-
-.portfolio-lightbox .swiper-slide:hover::after {
-    content: '🔍 Click to enlarge';
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.7);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    backdrop-filter: blur(10px);
+    transform: scale(1.2);
 }
 
 /* Project Info Overlay */
@@ -88,11 +84,12 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    background: linear-gradient(transparent, rgba(0,0,0,0.9));
     color: white;
-    padding: 60px 20px 20px 20px;
+    padding: 80px 30px 30px 30px;
     transform: translateY(100%);
-    transition: transform 0.3s ease;
+    transition: transform 0.4s ease;
+    backdrop-filter: blur(10px);
 }
 
 .swiper-slide:hover .project-info-overlay {
@@ -100,34 +97,54 @@
 }
 
 .project-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .project-description {
+    font-size: 1rem;
+    opacity: 0.95;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.project-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: 0.9rem;
     opacity: 0.9;
-    margin-bottom: 0;
 }
 
 /* Thumbnail Navigation */
 .thumbnail-swiper {
-    height: 100px;
-    margin-top: 15px;
+    height: 120px;
+    margin-top: 20px;
+    padding: 10px 0;
 }
 
 .thumbnail-swiper .swiper-slide {
-    opacity: 0.4;
-    transition: opacity 0.3s ease;
-    border-radius: 8px;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+    border-radius: 12px;
     overflow: hidden;
     cursor: pointer;
+    border: 3px solid transparent;
+    transform: scale(0.9);
+}
+
+.thumbnail-swiper .swiper-slide:hover {
+    opacity: 0.8;
+    transform: scale(0.95);
 }
 
 .thumbnail-swiper .swiper-slide-thumb-active {
     opacity: 1;
     border: 3px solid #007bff;
+    transform: scale(1);
+    box-shadow: 0 8px 25px rgba(0,123,255,0.3);
 }
 
 .thumbnail-swiper .swiper-slide img {
@@ -144,16 +161,22 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.95);
-    backdrop-filter: blur(10px);
+    background: rgba(0,0,0,0.98);
+    backdrop-filter: blur(20px);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .lightbox-content {
     position: relative;
-    margin: 2% auto;
+    margin: 1% auto;
     padding: 20px;
-    width: 90%;
-    height: 90%;
+    width: 95%;
+    height: 95%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -161,37 +184,55 @@
 }
 
 .lightbox-image {
-    max-width: 100%;
+    max-width: 90%;
     max-height: 80vh;
     object-fit: contain;
-    border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: zoomIn 0.4s ease;
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
 .lightbox-info {
     color: white;
     text-align: center;
-    margin-top: 20px;
-    max-width: 600px;
+    margin-top: 30px;
+    max-width: 700px;
+    background: rgba(255,255,255,0.1);
+    padding: 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
 .lightbox-close {
     position: absolute;
-    top: 20px;
-    right: 30px;
+    top: 30px;
+    right: 40px;
     color: white;
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: bold;
     cursor: pointer;
-    background: rgba(0,0,0,0.5);
-    width: 50px;
-    height: 50px;
+    background: rgba(0,0,0,0.6);
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255,255,255,0.3);
+    transition: all 0.3s ease;
+    z-index: 10000;
+}
+
+.lightbox-close:hover {
+    background: #dc3545;
+    transform: scale(1.1);
 }
 
 .lightbox-nav {
@@ -200,32 +241,69 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 0 30px;
     transform: translateY(-50%);
+    z-index: 10000;
 }
 
 .lightbox-nav button {
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.7);
     color: white;
-    border: 2px solid rgba(255,255,255,0.2);
-    width: 60px;
-    height: 60px;
+    border: 2px solid rgba(255,255,255,0.3);
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     cursor: pointer;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
     transition: all 0.3s ease;
 }
 
 .lightbox-nav button:hover {
     background: #007bff;
     border-color: #007bff;
+    transform: scale(1.1);
+}
+
+/* Image Counter */
+.image-counter {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.2);
+    z-index: 10;
+}
+
+/* Zoom Indicator */
+.zoom-indicator {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(20px);
+}
+
+.swiper-slide:hover .zoom-indicator {
+    opacity: 1;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .swiper {
-        height: 300px;
+        height: 350px;
     }
     
     .thumbnail-swiper {
@@ -233,20 +311,32 @@
     }
     
     .lightbox-content {
-        width: 95%;
-        height: 95%;
+        width: 98%;
+        height: 98%;
+        padding: 10px;
     }
     
     .lightbox-nav button {
         width: 50px;
         height: 50px;
+        font-size: 1.3rem;
+    }
+    
+    .lightbox-close {
+        top: 15px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.8rem;
+    }
+    
+    .project-info-overlay {
+        padding: 60px 20px 20px 20px;
+    }
+    
+    .project-title {
         font-size: 1.2rem;
     }
-}
-
-/* Loading Animation */
-.swiper-lazy-preloader {
-    border-color: #007bff transparent transparent transparent;
 }
 
 .project-count {
@@ -258,24 +348,10 @@
     font-weight: 600;
     margin-left: 10px;
 }
-
-/* Image Counter */
-.image-counter {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: rgba(0,0,0,0.7);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    backdrop-filter: blur(10px);
-    z-index: 10;
-}
 </style>
 
 <div class="container py-4">
-    <!-- Profile Header (identique) -->
+    <!-- Profile Header -->
     <div class="row mb-5">
         <div class="col-md-4 text-center">
             <div class="avatar-large mb-3 mx-auto" style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden; background: #f8f9fa;">
@@ -370,23 +446,14 @@
                 </div>
                 <div class="card-body p-4">
                     <% 
-                    // DEBUG: Vérifions ce que nous recevons
-                    console.log('=== DEBUG PORTFOLIO DATA ===');
-                    console.log('Portfolio exists:', !!painter.portfolio);
-                    console.log('Portfolio length:', painter.portfolio ? painter.portfolio.length : 0);
-                    
                     const portfolio = painter.portfolio || [];
                     const allImages = [];
                     let totalImages = 0;
                     
-                    // CORRECTION: Collecter TOUTES les images de TOUS les projets
+                    // CORRECTION: Collecter TOUTES les images
                     portfolio.forEach((project, projectIndex) => {
-                        console.log(`Project ${projectIndex}:`, project.title);
-                        console.log('Project images:', project.images);
-                        
                         if (project.images && Array.isArray(project.images)) {
                             project.images.forEach((img, imgIndex) => {
-                                console.log(`  Image ${imgIndex}:`, img.url);
                                 allImages.push({
                                     url: img.url,
                                     projectTitle: project.title || `Project ${projectIndex + 1}`,
@@ -401,18 +468,7 @@
                             });
                         }
                     });
-                    
-                    console.log('Total images collected:', totalImages);
-                    console.log('All images array:', allImages);
                     %>
-                    
-                    <!-- Debug Info (à supprimer après test) -->
-                    <div class="alert alert-info d-none">
-                        <strong>Debug Info:</strong><br>
-                        Portfolio Projects: <%= portfolio.length %><br>
-                        Total Images: <%= totalImages %><br>
-                        All Images Array Length: <%= allImages.length %>
-                    </div>
                     
                     <% if (allImages.length === 0) { %>
                     <div class="text-center py-5">
@@ -424,11 +480,11 @@
                     
                     <!-- Image Counter -->
                     <div class="image-counter">
-                        <i class="fas fa-images me-1"></i>
-                        <%= totalImages %> images
+                        <i class="fas fa-images me-2"></i>
+                        <%= totalImages %> images in <%= portfolio.length %> projects
                     </div>
 
-                    <!-- Main Slider -->
+                    <!-- Main Slider - CORRECTION: TOUTES les images sont ajoutées -->
                     <div class="swiper portfolio-lightbox mb-3">
                         <div class="swiper-wrapper">
                             <% allImages.forEach((image, index) => { %>
@@ -436,33 +492,44 @@
                                  data-image-index="<%= index %>"
                                  onclick="openLightbox(<%= index %>)">
                                  
+                                <!-- Zoom Indicator -->
+                                <div class="zoom-indicator">
+                                    <i class="fas fa-search-plus me-1"></i>Click to view full size
+                                </div>
+                                
                                 <img src="<%= image.url %>" 
                                      alt="<%= image.projectTitle %>"
-                                     onerror="this.src='https://via.placeholder.com/800x400/f8f9fa/6c757d?text=Project+Image'">
+                                     loading="lazy"
+                                     onerror="this.src='https://via.placeholder.com/800x500/f8f9fa/6c757d?text=Project+Image'">
                                 
                                 <div class="project-info-overlay">
                                     <div class="project-title">
                                         <%= image.projectTitle %>
                                         <% if (image.totalInProject > 1) { %>
                                         <span class="badge bg-info ms-2">
-                                            Image <%= image.imageIndex + 1 %> of <%= image.totalInProject %>
+                                            <%= image.imageIndex + 1 %>/<%= image.totalInProject %>
                                         </span>
                                         <% } %>
                                     </div>
+                                    
                                     <% if (image.description) { %>
                                     <div class="project-description">
-                                        <%= image.description.length > 100 ? image.description.substring(0, 100) + '...' : image.description %>
+                                        <%= image.description %>
                                     </div>
                                     <% } %>
-                                    <div class="project-meta mt-2">
+                                    
+                                    <div class="project-meta">
                                         <% if (image.category) { %>
-                                        <span class="badge bg-primary me-2"><%= image.category %></span>
+                                        <span class="badge bg-primary">
+                                            <i class="fas fa-tag me-1"></i><%= image.category %>
+                                        </span>
                                         <% } %>
+                                        
                                         <% if (image.uploadedAt) { %>
-                                        <small>
+                                        <span>
                                             <i class="fas fa-calendar me-1"></i>
                                             <%= new Date(image.uploadedAt).toLocaleDateString() %>
-                                        </small>
+                                        </span>
                                         <% } %>
                                     </div>
                                 </div>
@@ -478,13 +545,14 @@
                         <div class="swiper-pagination"></div>
                     </div>
 
-                    <!-- Thumbnail Slider -->
+                    <!-- Thumbnail Slider - CORRECTION: TOUTES les miniatures -->
                     <div class="swiper thumbnail-swiper">
                         <div class="swiper-wrapper">
                             <% allImages.forEach((image, index) => { %>
                             <div class="swiper-slide" data-index="<%= index %>">
                                 <img src="<%= image.url %>" 
                                      alt="Thumbnail <%= index + 1 %>"
+                                     loading="lazy"
                                      onerror="this.src='https://via.placeholder.com/100x60/f8f9fa/6c757d?text=Thumb'">
                             </div>
                             <% }); %>
@@ -514,45 +582,36 @@
         <div class="lightbox-content">
             <img id="lightboxImage" class="lightbox-image" src="" alt="">
             <div class="lightbox-info">
-                <h4 id="lightboxTitle" class="mb-3"></h4>
+                <h3 id="lightboxTitle" class="mb-3"></h3>
                 <p id="lightboxDescription" class="mb-3"></p>
-                <div class="d-flex justify-content-center gap-3 align-items-center">
+                <div class="d-flex justify-content-center gap-3">
                     <span id="lightboxCategory" class="badge bg-primary"></span>
-                    <span id="lightboxProjectInfo" class="text-muted small"></span>
-                    <span id="lightboxDate" class="text-muted small"></span>
+                    <span id="lightboxDate" class="text-muted"></span>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Recent Jobs Section -->
-    <% if (recentJobs && recentJobs.length > 0) { %>
-    <div class="row mt-4">
-        <div class="col-12">
-            <!-- Votre section recent jobs -->
-        </div>
-    </div>
-    <% } %>
 </div>
 
 <!-- Add Swiper JS -->
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
 <script>
+// DEBUG: Vérifier les données
+console.log('=== SWIPER DEBUG ===');
+console.log('Total images:', <%= allImages.length %>);
+console.log('All images:', <%= JSON.stringify(allImages) %>);
+
 // Global variables
 let currentLightboxIndex = 0;
 const allImages = <%= JSON.stringify(allImages) %>;
 
-// DEBUG: Vérifier les données dans la console
-console.log('=== CLIENT-SIDE DEBUG ===');
-console.log('All images loaded:', allImages.length);
-console.log('All images data:', allImages);
-
-// Initialize Swiper
+// CORRECTION: Initialisation correcte du Swiper
 const swiper = new Swiper('.portfolio-lightbox', {
-    loop: true,
+    // DÉSACTIVER le loop si peu d'images
+    loop: <%= allImages.length > 2 %>, // Loop seulement si plus de 2 images
     lazy: true,
-    spaceBetween: 10,
+    spaceBetween: 0,
     navigation: {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
@@ -560,42 +619,83 @@ const swiper = new Swiper('.portfolio-lightbox', {
     pagination: {
         el: '.swiper-pagination',
         clickable: true,
+        dynamicBullets: true,
     },
     autoplay: {
         delay: 5000,
         disableOnInteraction: false,
+        pauseOnMouseEnter: true,
     },
     effect: 'slide',
     speed: 600,
+    grabCursor: true,
+    // CORRECTION: Important pour le chargement des slides
+    preloadImages: false,
+    lazy: {
+        loadPrevNext: true,
+        loadPrevNextAmount: 2,
+    },
+    // CORRECTION: S'assurer que toutes les slides sont visibles
+    watchSlidesProgress: true,
+    watchSlidesVisibility: true,
+    // CORRECTION: Slides par vue
+    slidesPerView: 1,
+    slidesPerGroup: 1,
 });
 
-// Initialize Thumbnail Swiper
+// CORRECTION: Initialisation du thumbnail Swiper
 const thumbnailSwiper = new Swiper('.thumbnail-swiper', {
-    loop: true,
+    loop: <%= allImages.length > 6 %>,
     spaceBetween: 10,
-    slidesPerView: 6,
+    slidesPerView: 'auto',
     freeMode: true,
     watchSlidesProgress: true,
+    centerInsufficientSlides: true,
     breakpoints: {
         320: {
             slidesPerView: 3,
         },
-        768: {
+        576: {
             slidesPerView: 4,
         },
-        1024: {
+        768: {
+            slidesPerView: 5,
+        },
+        992: {
             slidesPerView: 6,
+        },
+        1200: {
+            slidesPerView: 8,
         },
     },
 });
 
-// Connect main slider with thumbnails
+// CORRECTION: Connexion entre les deux sliders
 swiper.controller.control = thumbnailSwiper;
 thumbnailSwiper.controller.control = swiper;
 
+// CORRECTION: Mettre à jour les thumbnails actifs
+swiper.on('slideChange', function () {
+    const activeIndex = swiper.realIndex;
+    thumbnailSwiper.slides.forEach((slide, index) => {
+        if (index === activeIndex) {
+            slide.classList.add('swiper-slide-thumb-active');
+        } else {
+            slide.classList.remove('swiper-slide-thumb-active');
+        }
+    });
+});
+
+// CORRECTION: Cliquer sur les thumbnails pour changer la slide principale
+thumbnailSwiper.slides.forEach((slide, index) => {
+    slide.addEventListener('click', function () {
+        swiper.slideTo(index);
+    });
+});
+
 // Lightbox Functions
 function openLightbox(index) {
-    console.log('Opening lightbox for image:', index);
+    console.log('Opening lightbox for image:', index, allImages[index]);
     currentLightboxIndex = index;
     updateLightboxContent();
     document.getElementById('lightboxModal').style.display = 'block';
@@ -621,15 +721,26 @@ function changeLightboxImage(direction) {
 
 function updateLightboxContent() {
     const image = allImages[currentLightboxIndex];
-    console.log('Updating lightbox with image:', image);
+    const lightboxImage = document.getElementById('lightboxImage');
     
-    document.getElementById('lightboxImage').src = image.url;
+    // Preload image for smooth transition
+    lightboxImage.style.opacity = '0';
+    
+    const img = new Image();
+    img.onload = function() {
+        lightboxImage.src = image.url;
+        lightboxImage.style.opacity = '1';
+    };
+    img.src = image.url;
+    
     document.getElementById('lightboxTitle').textContent = image.projectTitle;
     document.getElementById('lightboxDescription').textContent = image.description || '';
     document.getElementById('lightboxCounter').textContent = `${currentLightboxIndex + 1}/${allImages.length}`;
     
-    // Update category
+    // Update category and date
     const categoryEl = document.getElementById('lightboxCategory');
+    const dateEl = document.getElementById('lightboxDate');
+    
     if (image.category) {
         categoryEl.textContent = image.category;
         categoryEl.style.display = 'inline-block';
@@ -637,17 +748,6 @@ function updateLightboxContent() {
         categoryEl.style.display = 'none';
     }
     
-    // Update project info
-    const projectInfoEl = document.getElementById('lightboxProjectInfo');
-    if (image.totalInProject > 1) {
-        projectInfoEl.textContent = `Image ${image.imageIndex + 1} of ${image.totalInProject}`;
-        projectInfoEl.style.display = 'inline-block';
-    } else {
-        projectInfoEl.style.display = 'none';
-    }
-    
-    // Update date
-    const dateEl = document.getElementById('lightboxDate');
     if (image.uploadedAt) {
         dateEl.textContent = new Date(image.uploadedAt).toLocaleDateString();
         dateEl.style.display = 'inline-block';
@@ -690,12 +790,20 @@ function handleSwipe() {
     
     if (Math.abs(diff) > swipeThreshold) {
         if (diff > 0) {
-            changeLightboxImage(1); // Swipe left - next
+            changeLightboxImage(1);
         } else {
-            changeLightboxImage(-1); // Swipe right - previous
+            changeLightboxImage(-1);
         }
     }
 }
+
+// CORRECTION: Initialiser les thumbnails actifs au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    // Activer le premier thumbnail
+    if (thumbnailSwiper.slides[0]) {
+        thumbnailSwiper.slides[0].classList.add('swiper-slide-thumb-active');
+    }
+});
 </script>
 
 <%- include('../partials/footer') %>
