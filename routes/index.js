@@ -6,16 +6,66 @@ const bcrypt = require('bcrypt');
 const { uploadIdCard, deleteFromCloudinary } = require('../utils/cloudinary');
 // Painter Login Page - FIXED PATH
 // Route pour la recherche des peintres en arabe
-app.get('/ar/painters', async (req, res) => {
+/ Route pour la recherche des peintres en arabe
+router.get('/ar/painters', async (req, res) => {
   try {
     const { wilaya, specialization, minRating, maxPrice, minExperience, availability, sort = 'rating' } = req.query;
     
-    // Logique de recherche identique mais avec lang='ar'
+    // Build query - only show verified and active painters
+    let query = { 
+      'verification.status': 'verified',
+      'isActive': true
+    };
+
+    // Apply filters
+    if (wilaya && wilaya !== 'all') {
+      query['location.wilaya'] = wilaya;
+    }
+
+    if (specialization) {
+      query['specialization'] = Array.isArray(specialization) ? { $in: specialization } : specialization;
+    }
+
+    if (minRating) {
+      query['rating'] = { $gte: parseFloat(minRating) };
+    }
+
+    if (maxPrice) {
+      query['pricePerSqm'] = { $lte: parseInt(maxPrice) };
+    }
+
+    if (minExperience) {
+      query['experience'] = { $gte: parseInt(minExperience) };
+    }
+
+    if (availability === 'true') {
+      query['availability'] = 'available';
+    }
+
+    // Build sort object
+    let sortOptions = {};
+    switch (sort) {
+      case 'rating':
+        sortOptions = { rating: -1, completedJobs: -1 };
+        break;
+      case 'experience':
+        sortOptions = { experience: -1, rating: -1 };
+        break;
+      case 'price_low':
+        sortOptions = { pricePerSqm: 1 };
+        break;
+      case 'price_high':
+        sortOptions = { pricePerSqm: -1 };
+        break;
+      default:
+        sortOptions = { rating: -1 };
+    }
+
     const painters = await Painter.find(query)
       .select('name experience pricePerSqm specialization rating completedJobs profilePicture location portfolio verification availability')
       .sort(sortOptions);
 
-    res.render('painters-ar', {
+    res.render('painters', {
       title: 'ابحث عن دهانين - بينتيلو برو',
       painters: painters,
       wilayas: wilayas,
@@ -25,12 +75,84 @@ app.get('/ar/painters', async (req, res) => {
     });
   } catch (error) {
     console.error('Public painters search error:', error);
-    res.render('painters-ar', {
+    res.render('painters', {
       title: 'ابحث عن دهانين - بينتيلو برو',
       painters: [],
       wilayas: wilayas,
       query: {},
       error: 'خطأ في تحميل الدهانين',
+      lang: 'ar'
+    });
+  }
+});
+
+// Route pour le profil public en arabe
+router.get('/ar/painters/:id', async (req, res) => {
+  try {
+    console.log('🔍 Loading painter profile for ID:', req.params.id);
+    
+    // First, check if the ID is valid
+    if (!req.params.id || req.params.id.length !== 24) {
+      console.log('❌ Invalid painter ID format');
+      return res.status(404).render('error', {
+        title: 'الدهان غير موجود',
+        message: 'صيغة معرف الدهان غير صالحة.',
+        lang: 'ar'
+      });
+    }
+
+    // Find the painter without verification check first
+    const painter = await Painter.findById(req.params.id)
+      .select('name experience pricePerSqm specialization rating completedJobs profilePicture location portfolio bio verification availability teamSize businessName');
+
+    console.log('✅ Database query result:', painter ? `Found: ${painter.name}` : 'Not found');
+
+    if (!painter) {
+      console.log('❌ Painter not found in database');
+      return res.status(404).render('error', {
+        title: 'الدهان غير موجود',
+        message: 'الدهان الذي تبحث عنه غير موجود.',
+        lang: 'ar'
+      });
+    }
+
+    // Get painter's recent completed jobs
+    const recentJobs = await Order.find({
+      'painter.id': painter._id,
+      status: 'completed'
+    })
+    .sort({ completedAt: -1 })
+    .limit(5)
+    .select('serviceType budget completedAt')
+    .populate('client', 'name');
+
+    console.log('🎨 Rendering painter profile for:', painter.name);
+
+    res.render('painter-profile', {
+      title: `${painter.name} - دهان محترف - بينتيلو برو`,
+      painter: painter,
+      recentJobs: recentJobs,
+      user: req.session.user || null,
+      isVerified: painter.verification.status === 'verified',
+      isActive: painter.isActive,
+      lang: 'ar'
+    });
+
+  } catch (error) {
+    console.error('❌ Public painter profile error:', error);
+    
+    // Check if it's a CastError (invalid ID format)
+    if (error.name === 'CastError') {
+      return res.status(404).render('error', {
+        title: 'معرف دهان غير صالح',
+        message: 'صيغة معرف الدهان غير صالحة.',
+        lang: 'ar'
+      });
+    }
+    
+    res.status(500).render('error', {
+      title: 'خطأ',
+      message: 'حدث خطأ أثناء تحميل ملف الدهان.',
       lang: 'ar'
     });
   }
