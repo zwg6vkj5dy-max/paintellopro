@@ -1,4 +1,3 @@
-
 <%- include('../partials/header', { 
     title: 'Portfolio - Paintello Pro',
     user: painter,
@@ -29,7 +28,7 @@
                         </div>
                     </div>
 
-                    <% if (painter.portfolio.length === 0) { %>
+                    <% if (painter.portfolio && painter.portfolio.length === 0) { %>
                     <div class="text-center py-5">
                         <i class="fas fa-images fa-3x text-muted mb-3"></i>
                         <h4 class="text-muted">No portfolio items yet</h4>
@@ -42,92 +41,129 @@
                         </div>
                     </div>
                     <% } else { %>
-                   <div class="row">
-  <% painter.portfolio.forEach((project, index) => { %>
-    <div class="col-lg-6 mb-4">
-      <div class="card shadow-sm border-0 card-hover">
-        <div id="carousel<%= index %>" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner rounded">
-            <% if (project.images && project.images.length > 0) { %>
-              <% project.images.forEach((img, i) => { %>
-                <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
-                  <img src="<%= img.url %>" class="d-block w-100"
-                       style="height: 300px; object-fit: cover;"
-                       alt="Project Image">
-                </div>
-              <% }) %>
-            <% } else { %>
-              <div class="carousel-item active">
-                <img src="https://via.placeholder.com/600x400?text=No+Images"
-                     class="d-block w-100" style="height: 300px; object-fit: cover;">
-              </div>
-            <% } %>
-          </div>
-          <button class="carousel-control-prev" type="button" data-bs-target="#carousel<%= index %>" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#carousel<%= index %>" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          </button>
-        </div>
+                    <div class="row">
+                        <% painter.portfolio.forEach((project, index) => { %>
+                        <div class="col-lg-6 mb-4">
+                            <div class="card shadow-sm border-0 card-hover">
+                                <% if (project.images && project.images.length > 0) { %>
+                                    <% if (project.images.length > 1) { %>
+                                        <!-- Carousel for multiple images -->
+                                        <div id="carousel<%= index %>" class="carousel slide" data-bs-ride="carousel">
+                                            <div class="carousel-inner rounded-top">
+                                                <% project.images.forEach((img, i) => { %>
+                                                <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+                                                    <img src="<%= img.url %>" 
+                                                         class="d-block w-100 portfolio-image"
+                                                         alt="<%= project.title || 'Project Image' %>"
+                                                         style="height: 300px; object-fit: cover;">
+                                                </div>
+                                                <% }) %>
+                                            </div>
+                                            <button class="carousel-control-prev" type="button" data-bs-target="#carousel<%= index %>" data-bs-slide="prev">
+                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                <span class="visually-hidden">Previous</span>
+                                            </button>
+                                            <button class="carousel-control-next" type="button" data-bs-target="#carousel<%= index %>" data-bs-slide="next">
+                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                <span class="visually-hidden">Next</span>
+                                            </button>
+                                        </div>
+                                    <% } else { %>
+                                        <!-- Single image (no carousel) -->
+                                        <div class="portfolio-image-container">
+                                            <img src="<%= project.images[0].url %>" 
+                                                 class="card-img-top portfolio-image"
+                                                 alt="<%= project.title || 'Project Image' %>"
+                                                 style="height: 300px; object-fit: cover;">
+                                        </div>
+                                    <% } %>
+                                <% } else { %>
+                                    <!-- No images available -->
+                                    <div class="portfolio-image-container text-center bg-light">
+                                        <img src="https://via.placeholder.com/600x400/f8f9fa/6c757d?text=No+Image+Available" 
+                                             class="card-img-top"
+                                             style="height: 300px; object-fit: cover;">
+                                    </div>
+                                <% } %>
 
-        <div class="card-body">
-          <h5 class="text-primary mb-1"><%= project.title || 'Project' %></h5>
-          <p class="text-muted small mb-2"><%= project.description || 'No description provided' %></p>
-          <div class="d-flex justify-content-between align-items-center">
-            <small class="text-muted">
-              <i class="fas fa-calendar me-1"></i>
-              <%= new Date(project.uploadedAt).toLocaleDateString() %>
-            </small>
-            <% if (project.uploadedByAdmin) { %>
-              <span class="badge bg-info">By Admin</span>
-            <% } %>
-          </div>
-        </div>
-      </div>
-    </div>
-  <% }) %>
-</div>
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary mb-2">
+                                        <%= project.title || 'Untitled Project' %>
+                                    </h5>
+                                    <p class="card-text text-muted small mb-3">
+                                        <%= project.description || 'No description available' %>
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar-alt me-1"></i>
+                                            <%= project.uploadedAt ? new Date(project.uploadedAt).toLocaleDateString() : 'Unknown date' %>
+                                        </small>
+                                        <div>
+                                            <% if (project.category) { %>
+                                                <span class="badge bg-secondary me-1"><%= project.category %></span>
+                                            <% } %>
+                                            <% if (project.uploadedByAdmin) { %>
+                                                <span class="badge bg-success">Verified</span>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                    </div>
+                    <% } %>
 
-
-            <!-- Portfolio Statistics -->
-            <% if (painter.portfolio.length > 0) { %>
-            <div class="row mt-4">
-                <div class="col-md-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h3 class="text-primary"><%= painter.portfolio.length %></h3>
-                            <p class="text-muted mb-0">Total Projects</p>
+                    <!-- Portfolio Statistics -->
+                    <% if (painter.portfolio && painter.portfolio.length > 0) { %>
+                    <div class="row mt-5">
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center border-0 shadow-sm">
+                                <div class="card-body py-4">
+                                    <h2 class="text-primary mb-1"><%= painter.portfolio.length %></h2>
+                                    <p class="text-muted mb-0 small">Total Projects</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center border-0 shadow-sm">
+                                <div class="card-body py-4">
+                                    <h2 class="text-success mb-1">
+                                        <%= painter.portfolio.filter(p => p.uploadedByAdmin).length %>
+                                    </h2>
+                                    <p class="text-muted mb-0 small">Verified Photos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center border-0 shadow-sm">
+                                <div class="card-body py-4">
+                                    <h2 class="text-warning mb-1">
+                                        <%= painter.portfolio.filter(p => p.category === 'interior').length %>
+                                    </h2>
+                                    <p class="text-muted mb-0 small">Interior Projects</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center border-0 shadow-sm">
+                                <div class="card-body py-4">
+                                    <h2 class="text-info mb-1">
+                                        <%= new Date().getFullYear() %>
+                                    </h2>
+                                    <p class="text-muted mb-0 small">Current Year</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h3 class="text-success">
-                                <%= painter.portfolio.filter(p => p.uploadedByAdmin).length %>
-                            </h3>
-                            <p class="text-muted mb-0">Verified Photos</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h3 class="text-warning">
-                                <%= new Date().getFullYear() %>
-                            </h3>
-                            <p class="text-muted mb-0">Active Year</p>
-                        </div>
-                    </div>
+                    <% } %>
                 </div>
             </div>
-            <% } %>
         </div>
     </div>
 </div>
 
-<!-- Contact Information Card -->
+<!-- Contact Information -->
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -139,11 +175,11 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-3">
                             <h6 class="text-primary">
                                 <i class="fab fa-whatsapp me-2"></i>Via WhatsApp
                             </h6>
-                            <p class="small text-muted">
+                            <p class="small text-muted mb-3">
                                 Send your best work photos with project descriptions. 
                                 We'll professionally upload and add them within 24 hours.
                             </p>
@@ -152,11 +188,11 @@
                                 <i class="fab fa-whatsapp me-1"></i>Send Photos
                             </a>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-3">
                             <h6 class="text-primary">
                                 <i class="fas fa-phone me-2"></i>Via Phone
                             </h6>
-                            <p class="small text-muted">
+                            <p class="small text-muted mb-3">
                                 Call us to discuss your portfolio and we'll guide you 
                                 through the process of showcasing your work.
                             </p>
@@ -172,27 +208,37 @@
 </div>
 
 <style>
-.portfolio-image-container {
-    position: relative;
-    background: #f8f9fa;
-}
-
-.portfolio-image-container img {
+.portfolio-image {
     transition: transform 0.3s ease;
 }
 
-.card-hover:hover .portfolio-image-container img {
+.card-hover:hover .portfolio-image {
     transform: scale(1.05);
 }
 
 .card-hover {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
 }
 
 .card-hover:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 40px;
+    height: 40px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0 10px;
+}
 </style>
+
+<!-- Bootstrap 5 JavaScript for Carousel -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <%- include('../partials/footer') %>
