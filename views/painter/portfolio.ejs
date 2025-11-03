@@ -42,36 +42,53 @@
                         </div>
                     </div>
                     <% } else { %>
-                    <div class="row">
-                        <% painter.portfolio.forEach((work, index) => { %>
-                        <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-                            <div class="card card-hover shadow-sm">
-                                <div class="portfolio-image-container" style="height: 200px; overflow: hidden;">
-                                    <img src="<%= work.flickrUrl %>" class="card-img-top" alt="Portfolio work"
-                                         style="width: 100%; height: 100%; object-fit: cover;"
-                                         onerror="this.src='https://via.placeholder.com/300x200/f8f9fa/6c757d?text=Image+Not+Found'">
-                                </div>
-                                <div class="card-body">
-                                    <% if (work.description) { %>
-                                    <p class="card-text small text-muted"><%= work.description %></p>
-                                    <% } %>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted">
-                                            <i class="fas fa-calendar me-1"></i>
-                                            <%= work.uploadedAt ? new Date(work.uploadedAt).toLocaleDateString() : 'Recently added' %>
-                                        </small>
-                                        <% if (work.uploadedByAdmin) { %>
-                                        <span class="badge bg-info small">By Admin</span>
-                                        <% } %>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <% }); %>
-                    </div>
-                    <% } %>
+                   <div class="row">
+  <% painter.portfolio.forEach((project, index) => { %>
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm border-0 card-hover">
+        <div id="carousel<%= index %>" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner rounded">
+            <% if (project.images && project.images.length > 0) { %>
+              <% project.images.forEach((img, i) => { %>
+                <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+                  <img src="<%= img.url %>" class="d-block w-100"
+                       style="height: 300px; object-fit: cover;"
+                       alt="Project Image">
                 </div>
-            </div>
+              <% }) %>
+            <% } else { %>
+              <div class="carousel-item active">
+                <img src="https://via.placeholder.com/600x400?text=No+Images"
+                     class="d-block w-100" style="height: 300px; object-fit: cover;">
+              </div>
+            <% } %>
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carousel<%= index %>" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carousel<%= index %>" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <div class="card-body">
+          <h5 class="text-primary mb-1"><%= project.title || 'Project' %></h5>
+          <p class="text-muted small mb-2"><%= project.description || 'No description provided' %></p>
+          <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+              <i class="fas fa-calendar me-1"></i>
+              <%= new Date(project.uploadedAt).toLocaleDateString() %>
+            </small>
+            <% if (project.uploadedByAdmin) { %>
+              <span class="badge bg-info">By Admin</span>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
 
             <!-- Portfolio Statistics -->
             <% if (painter.portfolio.length > 0) { %>
