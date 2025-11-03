@@ -1,0 +1,29 @@
+/* RTL Styles for Arabic version */
+[dir="rtl"] {
+    text-align: right;
+}
+
+[dir="rtl"] .me-1 { margin-right: 0 !important; margin-left: 0.25rem !important; }
+[dir="rtl"] .me-2 { margin-right: 0 !important; margin-left: 0.5rem !important; }
+[dir="rtl"] .me-3 { margin-right: 0 !important; margin-left: 1rem !important; }
+[dir="rtl"] .ms-1 { margin-left: 0 !important; margin-right: 0.25rem !important; }
+[dir="rtl"] .ms-2 { margin-left: 0 !important; margin-right: 0.5rem !important; }
+
+[dir="rtl"] .text-start { text-align: right !important; }
+[dir="rtl"] .text-end { text-align: left !important; }
+
+[dir="rtl"] .float-start { float: right !important; }
+[dir="rtl"] .float-end { float: left !important; }
+
+/* Adjust card layouts for RTL */
+[dir="rtl"] .card-hover {
+    transition: all 0.3s ease;
+}
+
+[dir="rtl"] .btn-group .btn:not(:last-child) {
+    border-radius: 0 0.375rem 0.375rem 0;
+}
+
+[dir="rtl"] .btn-group .btn:not(:first-child) {
+    border-radius: 0.375rem 0 0 0.375rem;
+}
