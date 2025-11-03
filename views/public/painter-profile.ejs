@@ -20,12 +20,6 @@
     align-items: center;
     position: relative;
     cursor: pointer;
-    transition: all 0.4s ease;
-}
-
-.swiper-slide:hover {
-    transform: scale(1.05);
-    z-index: 10;
 }
 
 .swiper-slide img {
@@ -33,11 +27,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s ease;
-}
-
-.swiper-slide:hover img {
-    transform: scale(1.1);
 }
 
 .swiper-button-next,
@@ -49,13 +38,6 @@
     border-radius: 50%;
     backdrop-filter: blur(20px);
     border: 2px solid rgba(255,255,255,0.3);
-    transition: all 0.3s ease;
-}
-
-.swiper-button-next:hover,
-.swiper-button-prev:hover {
-    background: #007bff;
-    transform: scale(1.1);
 }
 
 .swiper-button-next:after,
@@ -69,13 +51,11 @@
     opacity: 0.6;
     width: 14px;
     height: 14px;
-    transition: all 0.3s ease;
 }
 
 .swiper-pagination-bullet-active {
     background: #007bff;
     opacity: 1;
-    transform: scale(1.2);
 }
 
 /* Project Info Overlay */
@@ -86,21 +66,13 @@
     right: 0;
     background: linear-gradient(transparent, rgba(0,0,0,0.9));
     color: white;
-    padding: 80px 30px 30px 30px;
-    transform: translateY(100%);
-    transition: transform 0.4s ease;
-    backdrop-filter: blur(10px);
-}
-
-.swiper-slide:hover .project-info-overlay {
-    transform: translateY(0);
+    padding: 60px 20px 20px 20px;
 }
 
 .project-title {
     font-size: 1.4rem;
     font-weight: 700;
     margin-bottom: 12px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .project-description {
@@ -118,40 +90,6 @@
     opacity: 0.9;
 }
 
-/* Thumbnail Navigation */
-.thumbnail-swiper {
-    height: 120px;
-    margin-top: 20px;
-    padding: 10px 0;
-}
-
-.thumbnail-swiper .swiper-slide {
-    opacity: 0.5;
-    transition: all 0.3s ease;
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: pointer;
-    border: 3px solid transparent;
-    transform: scale(0.9);
-}
-
-.thumbnail-swiper .swiper-slide:hover {
-    opacity: 0.8;
-    transform: scale(0.95);
-}
-
-.thumbnail-swiper .swiper-slide-thumb-active {
-    opacity: 1;
-    border: 3px solid #007bff;
-    transform: scale(1);
-    box-shadow: 0 8px 25px rgba(0,123,255,0.3);
-}
-
-.thumbnail-swiper .swiper-slide img {
-    height: 100%;
-    object-fit: cover;
-}
-
 /* Lightbox Modal */
 .lightbox-modal {
     display: none;
@@ -162,21 +100,14 @@
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.98);
-    backdrop-filter: blur(20px);
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
 }
 
 .lightbox-content {
     position: relative;
-    margin: 1% auto;
+    margin: 2% auto;
     padding: 20px;
-    width: 95%;
-    height: 95%;
+    width: 90%;
+    height: 90%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -188,13 +119,6 @@
     max-height: 80vh;
     object-fit: contain;
     border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    animation: zoomIn 0.4s ease;
-}
-
-@keyframes zoomIn {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
 }
 
 .lightbox-info {
@@ -202,11 +126,6 @@
     text-align: center;
     margin-top: 30px;
     max-width: 700px;
-    background: rgba(255,255,255,0.1);
-    padding: 20px;
-    border-radius: 12px;
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.2);
 }
 
 .lightbox-close {
@@ -224,15 +143,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(20px);
-    border: 2px solid rgba(255,255,255,0.3);
-    transition: all 0.3s ease;
-    z-index: 10000;
-}
-
-.lightbox-close:hover {
-    background: #dc3545;
-    transform: scale(1.1);
 }
 
 .lightbox-nav {
@@ -243,7 +153,6 @@
     justify-content: space-between;
     padding: 0 30px;
     transform: translateY(-50%);
-    z-index: 10000;
 }
 
 .lightbox-nav button {
@@ -255,17 +164,8 @@
     border-radius: 50%;
     font-size: 1.8rem;
     cursor: pointer;
-    backdrop-filter: blur(20px);
-    transition: all 0.3s ease;
 }
 
-.lightbox-nav button:hover {
-    background: #007bff;
-    border-color: #007bff;
-    transform: scale(1.1);
-}
-
-/* Image Counter */
 .image-counter {
     position: absolute;
     top: 30px;
@@ -275,68 +175,7 @@
     padding: 10px 20px;
     border-radius: 25px;
     font-size: 0.9rem;
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.2);
     z-index: 10;
-}
-
-/* Zoom Indicator */
-.zoom-indicator {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    backdrop-filter: blur(20px);
-}
-
-.swiper-slide:hover .zoom-indicator {
-    opacity: 1;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .swiper {
-        height: 350px;
-    }
-    
-    .thumbnail-swiper {
-        height: 80px;
-    }
-    
-    .lightbox-content {
-        width: 98%;
-        height: 98%;
-        padding: 10px;
-    }
-    
-    .lightbox-nav button {
-        width: 50px;
-        height: 50px;
-        font-size: 1.3rem;
-    }
-    
-    .lightbox-close {
-        top: 15px;
-        right: 20px;
-        width: 45px;
-        height: 45px;
-        font-size: 1.8rem;
-    }
-    
-    .project-info-overlay {
-        padding: 60px 20px 20px 20px;
-    }
-    
-    .project-title {
-        font-size: 1.2rem;
-    }
 }
 
 .project-count {
@@ -430,7 +269,7 @@
         </div>
     </div>
 
-    <!-- Portfolio Section CORRIGÉE -->
+    <!-- Portfolio Section - VERSION SIMPLIFIÉE -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm border-0">
@@ -450,7 +289,7 @@
                     const allImages = [];
                     let totalImages = 0;
                     
-                    // CORRECTION: Collecter TOUTES les images
+                    // Collecter TOUTES les images
                     portfolio.forEach((project, projectIndex) => {
                         if (project.images && Array.isArray(project.images)) {
                             project.images.forEach((img, imgIndex) => {
@@ -470,6 +309,14 @@
                     });
                     %>
                     
+                    <!-- DEBUG: Afficher les informations -->
+                    <div class="alert alert-info mb-4">
+                        <strong>Debug Info:</strong><br>
+                        Total Projects: <span class="badge bg-primary"><%= portfolio.length %></span><br>
+                        Total Images: <span class="badge bg-success"><%= totalImages %></span><br>
+                        Images Array: <span class="badge bg-warning"><%= allImages.length %></span>
+                    </div>
+                    
                     <% if (allImages.length === 0) { %>
                     <div class="text-center py-5">
                         <i class="fas fa-images fa-3x text-muted mb-3"></i>
@@ -481,10 +328,10 @@
                     <!-- Image Counter -->
                     <div class="image-counter">
                         <i class="fas fa-images me-2"></i>
-                        <%= totalImages %> images in <%= portfolio.length %> projects
+                        Image <span id="currentSlide">1</span> of <%= allImages.length %>
                     </div>
 
-                    <!-- Main Slider - CORRECTION: TOUTES les images sont ajoutées -->
+                    <!-- Main Slider - VERSION SIMPLIFIÉE -->
                     <div class="swiper portfolio-lightbox mb-3">
                         <div class="swiper-wrapper">
                             <% allImages.forEach((image, index) => { %>
@@ -492,14 +339,8 @@
                                  data-image-index="<%= index %>"
                                  onclick="openLightbox(<%= index %>)">
                                  
-                                <!-- Zoom Indicator -->
-                                <div class="zoom-indicator">
-                                    <i class="fas fa-search-plus me-1"></i>Click to view full size
-                                </div>
-                                
                                 <img src="<%= image.url %>" 
                                      alt="<%= image.projectTitle %>"
-                                     loading="lazy"
                                      onerror="this.src='https://via.placeholder.com/800x500/f8f9fa/6c757d?text=Project+Image'">
                                 
                                 <div class="project-info-overlay">
@@ -507,7 +348,7 @@
                                         <%= image.projectTitle %>
                                         <% if (image.totalInProject > 1) { %>
                                         <span class="badge bg-info ms-2">
-                                            <%= image.imageIndex + 1 %>/<%= image.totalInProject %>
+                                            Image <%= image.imageIndex + 1 %> of <%= image.totalInProject %>
                                         </span>
                                         <% } %>
                                     </div>
@@ -544,17 +385,16 @@
                         <!-- Pagination -->
                         <div class="swiper-pagination"></div>
                     </div>
-
-                    <!-- Thumbnail Slider - CORRECTION: TOUTES les miniatures -->
-                    <div class="swiper thumbnail-swiper">
-                        <div class="swiper-wrapper">
+                    
+                    <!-- Simple Image Counter -->
+                    <div class="text-center mt-3">
+                        <div class="btn-group" role="group">
                             <% allImages.forEach((image, index) => { %>
-                            <div class="swiper-slide" data-index="<%= index %>">
-                                <img src="<%= image.url %>" 
-                                     alt="Thumbnail <%= index + 1 %>"
-                                     loading="lazy"
-                                     onerror="this.src='https://via.placeholder.com/100x60/f8f9fa/6c757d?text=Thumb'">
-                            </div>
+                            <button type="button" 
+                                    class="btn btn-outline-primary btn-sm slide-indicator <%= index === 0 ? 'active' : '' %>"
+                                    onclick="goToSlide(<%= index %>)">
+                                <%= index + 1 %>
+                            </button>
                             <% }); %>
                         </div>
                     </div>
@@ -568,11 +408,6 @@
     <!-- Lightbox Modal -->
     <div id="lightboxModal" class="lightbox-modal">
         <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
-        
-        <!-- Image Counter in Lightbox -->
-        <div class="image-counter">
-            <span id="lightboxCounter">1/<%= allImages.length %></span>
-        </div>
         
         <div class="lightbox-nav">
             <button onclick="changeLightboxImage(-1)">❮</button>
@@ -597,105 +432,85 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
 <script>
-// DEBUG: Vérifier les données
+// DEBUG
 console.log('=== SWIPER DEBUG ===');
-console.log('Total images:', <%= allImages.length %>);
-console.log('All images:', <%= JSON.stringify(allImages) %>);
+console.log('Total images in array:', <%= allImages.length %>);
+console.log('Images data:', <%= JSON.stringify(allImages.map(img => ({url: img.url, title: img.projectTitle}))) %>);
 
-// Global variables
-let currentLightboxIndex = 0;
 const allImages = <%= JSON.stringify(allImages) %>;
+let currentLightboxIndex = 0;
 
-// CORRECTION: Initialisation correcte du Swiper
+// SIMPLE SWIPER INITIALIZATION
 const swiper = new Swiper('.portfolio-lightbox', {
-    // DÉSACTIVER le loop si peu d'images
-    loop: <%= allImages.length > 2 %>, // Loop seulement si plus de 2 images
-    lazy: true,
+    // BASIC CONFIGURATION
+    direction: 'horizontal',
+    loop: false, // NO LOOP for few images
+    slidesPerView: 1,
     spaceBetween: 0,
+    
+    // Navigation
     navigation: {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
     },
+    
+    // Pagination
     pagination: {
         el: '.swiper-pagination',
         clickable: true,
-        dynamicBullets: true,
     },
-    autoplay: {
-        delay: 5000,
-        disableOnInteraction: false,
-        pauseOnMouseEnter: true,
-    },
+    
+    // Basic effects
     effect: 'slide',
-    speed: 600,
-    grabCursor: true,
-    // CORRECTION: Important pour le chargement des slides
-    preloadImages: false,
-    lazy: {
-        loadPrevNext: true,
-        loadPrevNextAmount: 2,
-    },
-    // CORRECTION: S'assurer que toutes les slides sont visibles
-    watchSlidesProgress: true,
-    watchSlidesVisibility: true,
-    // CORRECTION: Slides par vue
-    slidesPerView: 1,
-    slidesPerGroup: 1,
+    speed: 400,
+    
+    // Events
+    on: {
+        init: function () {
+            console.log('Swiper initialized with slides:', this.slides.length);
+            updateSlideCounter();
+        },
+        slideChange: function () {
+            console.log('Slide changed to:', this.activeIndex);
+            updateSlideCounter();
+            updateSlideIndicators();
+        }
+    }
 });
 
-// CORRECTION: Initialisation du thumbnail Swiper
-const thumbnailSwiper = new Swiper('.thumbnail-swiper', {
-    loop: <%= allImages.length > 6 %>,
-    spaceBetween: 10,
-    slidesPerView: 'auto',
-    freeMode: true,
-    watchSlidesProgress: true,
-    centerInsufficientSlides: true,
-    breakpoints: {
-        320: {
-            slidesPerView: 3,
-        },
-        576: {
-            slidesPerView: 4,
-        },
-        768: {
-            slidesPerView: 5,
-        },
-        992: {
-            slidesPerView: 6,
-        },
-        1200: {
-            slidesPerView: 8,
-        },
-    },
-});
+// Update slide counter
+function updateSlideCounter() {
+    const current = swiper.activeIndex + 1;
+    const total = allImages.length;
+    document.getElementById('currentSlide').textContent = current;
+    console.log('Current slide:', current, 'of', total);
+}
 
-// CORRECTION: Connexion entre les deux sliders
-swiper.controller.control = thumbnailSwiper;
-thumbnailSwiper.controller.control = swiper;
-
-// CORRECTION: Mettre à jour les thumbnails actifs
-swiper.on('slideChange', function () {
-    const activeIndex = swiper.realIndex;
-    thumbnailSwiper.slides.forEach((slide, index) => {
-        if (index === activeIndex) {
-            slide.classList.add('swiper-slide-thumb-active');
+// Update slide indicators
+function updateSlideIndicators() {
+    const indicators = document.querySelectorAll('.slide-indicator');
+    indicators.forEach((indicator, index) => {
+        if (index === swiper.activeIndex) {
+            indicator.classList.add('active');
+            indicator.classList.remove('btn-outline-primary');
+            indicator.classList.add('btn-primary');
         } else {
-            slide.classList.remove('swiper-slide-thumb-active');
+            indicator.classList.remove('active');
+            indicator.classList.remove('btn-primary');
+            indicator.classList.add('btn-outline-primary');
         }
     });
-});
+}
 
-// CORRECTION: Cliquer sur les thumbnails pour changer la slide principale
-thumbnailSwiper.slides.forEach((slide, index) => {
-    slide.addEventListener('click', function () {
-        swiper.slideTo(index);
-    });
-});
+// Go to specific slide
+function goToSlide(index) {
+    console.log('Going to slide:', index);
+    swiper.slideTo(index);
+}
 
 // Lightbox Functions
 function openLightbox(index) {
-    console.log('Opening lightbox for image:', index, allImages[index]);
+    console.log('Opening lightbox for image:', index);
     currentLightboxIndex = index;
     updateLightboxContent();
     document.getElementById('lightboxModal').style.display = 'block';
@@ -721,21 +536,9 @@ function changeLightboxImage(direction) {
 
 function updateLightboxContent() {
     const image = allImages[currentLightboxIndex];
-    const lightboxImage = document.getElementById('lightboxImage');
-    
-    // Preload image for smooth transition
-    lightboxImage.style.opacity = '0';
-    
-    const img = new Image();
-    img.onload = function() {
-        lightboxImage.src = image.url;
-        lightboxImage.style.opacity = '1';
-    };
-    img.src = image.url;
-    
+    document.getElementById('lightboxImage').src = image.url;
     document.getElementById('lightboxTitle').textContent = image.projectTitle;
     document.getElementById('lightboxDescription').textContent = image.description || '';
-    document.getElementById('lightboxCounter').textContent = `${currentLightboxIndex + 1}/${allImages.length}`;
     
     // Update category and date
     const categoryEl = document.getElementById('lightboxCategory');
@@ -771,38 +574,10 @@ document.getElementById('lightboxModal').addEventListener('click', function(e) {
     if (e.target === this) closeLightbox();
 });
 
-// Swipe gestures for mobile
-let touchStartX = 0;
-let touchEndX = 0;
-
-document.getElementById('lightboxModal').addEventListener('touchstart', e => {
-    touchStartX = e.changedTouches[0].screenX;
-});
-
-document.getElementById('lightboxModal').addEventListener('touchend', e => {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-});
-
-function handleSwipe() {
-    const swipeThreshold = 50;
-    const diff = touchStartX - touchEndX;
-    
-    if (Math.abs(diff) > swipeThreshold) {
-        if (diff > 0) {
-            changeLightboxImage(1);
-        } else {
-            changeLightboxImage(-1);
-        }
-    }
-}
-
-// CORRECTION: Initialiser les thumbnails actifs au chargement
+// Initialize
 document.addEventListener('DOMContentLoaded', function() {
-    // Activer le premier thumbnail
-    if (thumbnailSwiper.slides[0]) {
-        thumbnailSwiper.slides[0].classList.add('swiper-slide-thumb-active');
-    }
+    console.log('DOM loaded, swiper should be working');
+    updateSlideIndicators();
 });
 </script>
 
