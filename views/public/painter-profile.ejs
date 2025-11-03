@@ -4,206 +4,188 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
 <style>
+body {
+  background: #f6f8fa;
+}
+.container {
+  max-width: 1100px;
+}
+
+/* Profile Header */
+.avatar-large {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  margin: 0 auto;
+}
+.card {
+  border-radius: 20px;
+  border: none;
+}
 .swiper {
   width: 100%;
-  height: 500px;
+  height: 480px;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
 }
 .swiper-slide img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.swiper-button-next, .swiper-button-prev {
-  color: white;
-  background: rgba(0,0,0,0.6);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255,255,255,0.3);
-}
-.swiper-button-next:hover, .swiper-button-prev:hover {
-  background: #007bff;
-}
-.swiper-pagination-bullet-active {
-  background: #007bff;
-}
 .thumbnail-swiper {
   height: 100px;
   margin-top: 20px;
 }
 .thumbnail-swiper .swiper-slide {
-  opacity: 0.5;
-  transition: all 0.3s ease;
+  opacity: 0.6;
   cursor: pointer;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 .thumbnail-swiper .swiper-slide-thumb-active {
   opacity: 1;
-  border: 2px solid #007bff;
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
+
+/* Lightbox */
 .lightbox {
   display: none;
   position: fixed;
-  z-index: 9999;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.95);
-  backdrop-filter: blur(10px);
+  z-index: 10000;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.9);
   justify-content: center;
   align-items: center;
-  flex-direction: column;
 }
 .lightbox img {
   max-width: 90%;
-  max-height: 85vh;
+  max-height: 80vh;
   border-radius: 10px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
 }
 .lightbox-close {
   position: absolute;
-  top: 25px;
-  right: 35px;
+  top: 20px; right: 30px;
   color: white;
   font-size: 2rem;
   cursor: pointer;
-  background: rgba(0,0,0,0.6);
-  padding: 8px 15px;
-  border-radius: 50%;
-}
-.project-count {
-  background: #007bff;
-  color: white;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-left: 10px;
 }
 </style>
 
-<div class="container py-4">
-  <!-- Painter Header -->
-  <div class="row mb-5">
+<div class="container py-5">
+
+  <!-- Header -->
+  <div class="row mb-5 align-items-center">
     <div class="col-md-4 text-center">
-      <div class="avatar-large mb-3 mx-auto" style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden;">
+      <div class="avatar-large mb-3">
         <% if (painter.profilePicture && painter.profilePicture.url) { %>
-          <img src="<%= painter.profilePicture.url %>" alt="<%= painter.name %>"
-            style="width:100%;height:100%;object-fit:cover;"
-            onerror="this.src='https://via.placeholder.com/150/007bff/ffffff?text=P'">
+          <img src="<%= painter.profilePicture.url %>" alt="<%= painter.name %>" style="width:100%; height:100%; object-fit:cover;">
         <% } else { %>
-          <div class="d-flex align-items-center justify-content-center h-100 bg-primary text-white">
-            <i class="fas fa-paint-roller fa-2x"></i>
+          <div class="bg-primary w-100 h-100 d-flex align-items-center justify-content-center text-white">
+            <i class="fas fa-brush fa-2x"></i>
           </div>
         <% } %>
       </div>
-
-      <% if (painter.verification && painter.verification.status === 'verified') { %>
-      <div class="mb-3">
-        <span class="badge bg-success fs-6">
-          <i class="fas fa-check-circle me-1"></i>Verified Pro Painter
-        </span>
+      <div class="mb-2">
+        <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Verified Pro Painter</span>
       </div>
-      <% } %>
-
-      <h4 class="text-primary mb-1"><%= painter.pricePerSqm %> DZD</h4>
+      <h5 class="text-primary mb-1"><%= painter.pricePerSqm %> DZD</h5>
       <small class="text-muted">Price per m²</small>
       <a href="/painters/<%= painter._id %>/order" class="btn btn-primary btn-lg w-100 mt-3">
-        <i class="fas fa-paint-brush me-2"></i>Hire This Painter
+        <i class="fas fa-paint-roller me-1"></i>Hire This Painter
       </a>
     </div>
 
     <div class="col-md-8">
-      <h1 class="h3 mb-1"><%= painter.name %></h1>
-      <p class="text-muted mb-3">
-        <i class="fas fa-map-marker-alt me-1"></i>
-        <%= painter.location?.wilaya || 'Algeria' %>
-      </p>
+      <h2 class="fw-bold"><%= painter.name %></h2>
+      <p class="text-muted mb-1"><i class="fas fa-map-marker-alt me-1"></i><%= painter.location.wilaya %>, Algeria</p>
 
-      <div class="d-flex align-items-center mb-2">
+      <div class="d-flex align-items-center mb-3">
         <% for (let i = 1; i <= 5; i++) { %>
-          <i class="fas fa-star <%= i <= (painter.rating || 0) ? 'text-warning' : 'text-muted' %> fs-5"></i>
+          <i class="fas fa-star <%= i <= (painter.rating || 0) ? 'text-warning' : 'text-muted' %>"></i>
         <% } %>
-        <span class="fw-bold ms-2"><%= (painter.rating || 0).toFixed(1) %></span>
+        <span class="ms-2 fw-bold"><%= (painter.rating || 0).toFixed(1) %></span>
         <span class="text-muted ms-1">(<%= painter.completedJobs || 0 %> jobs)</span>
       </div>
 
       <% if (painter.availability === 'available') { %>
-        <span class="badge bg-success p-2"><i class="fas fa-check-circle me-1"></i>Available</span>
+        <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Available</span>
       <% } else if (painter.availability === 'busy') { %>
-        <span class="badge bg-warning p-2"><i class="fas fa-clock me-1"></i>Busy</span>
+        <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>Busy</span>
       <% } else { %>
-        <span class="badge bg-secondary p-2"><i class="fas fa-times-circle me-1"></i>Unavailable</span>
+        <span class="badge bg-secondary"><i class="fas fa-times-circle me-1"></i>Unavailable</span>
       <% } %>
     </div>
   </div>
 
-  <!-- Portfolio Section -->
-  <% 
-    const portfolio = painter.portfolio || [];
-    const allImages = [];
-    portfolio.forEach((p) => {
-      if (Array.isArray(p.images)) {
-        p.images.forEach(i => i.url && allImages.push(i.url));
-      } else if (p.flickrUrl) {
-        allImages.push(p.flickrUrl);
-      }
-    });
-  %>
-
-  <div class="card border-0 shadow-sm">
-    <div class="card-header bg-light border-0">
-      <h4 class="mb-0 d-flex align-items-center">
-        <i class="fas fa-images me-2"></i>Portfolio Gallery
-        <% if (allImages.length > 0) { %>
-        <span class="project-count"><%= allImages.length %> Images</span>
-        <% } %>
-      </h4>
-    </div>
-    <div class="card-body">
-      <% if (allImages.length === 0) { %>
-        <div class="text-center py-5">
-          <i class="fas fa-images fa-3x text-muted mb-3"></i>
-          <h5 class="text-muted">No portfolio images yet</h5>
-        </div>
-      <% } else { %>
-        <!-- Main Swiper -->
-        <div class="swiper portfolio-swiper">
-          <div class="swiper-wrapper">
-            <% allImages.forEach((url, i) => { %>
-              <div class="swiper-slide">
-                <img src="<%= url %>" alt="Project <%= i + 1 %>" onclick="openLightbox(<%= i %>)">
-              </div>
-            <% }) %>
-          </div>
-          <div class="swiper-button-next"></div>
-          <div class="swiper-button-prev"></div>
-          <div class="swiper-pagination"></div>
-        </div>
-
-        <!-- Thumbnail Swiper -->
-        <div class="swiper thumbnail-swiper mt-3">
-          <div class="swiper-wrapper">
-            <% allImages.forEach((url) => { %>
-              <div class="swiper-slide">
-                <img src="<%= url %>" alt="Thumbnail" />
-              </div>
-            <% }) %>
-          </div>
-        </div>
+  <!-- Portfolio -->
+  <div class="card shadow-sm p-4">
+    <div class="d-flex align-items-center mb-3">
+      <i class="fas fa-images text-primary me-2"></i>
+      <h4 class="mb-0">Portfolio Gallery</h4>
+      <% if (painter.portfolio && painter.portfolio.length > 0) { %>
+        <span class="badge bg-primary ms-2"><%= painter.portfolio.length %> images</span>
       <% } %>
     </div>
+
+    <% 
+      const allImages = [];
+      (painter.portfolio || []).forEach(project => {
+        if (project.images && Array.isArray(project.images)) {
+          project.images.forEach(img => allImages.push(img.url));
+        } else if (project.flickrUrl) {
+          allImages.push(project.flickrUrl);
+        }
+      });
+    %>
+
+    <% if (allImages.length === 0) { %>
+      <div class="text-center py-5 text-muted">
+        <i class="fas fa-image fa-3x mb-3"></i>
+        <p>No images available yet</p>
+      </div>
+    <% } else { %>
+
+      <!-- Main Swiper -->
+      <div class="swiper portfolio-swiper mb-3">
+        <div class="swiper-wrapper">
+          <% allImages.forEach((url, i) => { %>
+            <div class="swiper-slide">
+              <img src="<%= url %>" alt="Project <%= i+1 %>" onclick="openLightbox(<%= i %>)" loading="lazy">
+            </div>
+          <% }) %>
+        </div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-pagination"></div>
+      </div>
+
+      <!-- Thumbnails -->
+      <div class="swiper thumbnail-swiper">
+        <div class="swiper-wrapper">
+          <% allImages.forEach((url, i) => { %>
+            <div class="swiper-slide">
+              <img src="<%= url %>" alt="thumb <%= i+1 %>">
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
+    <% } %>
   </div>
 
   <!-- Lightbox -->
   <div id="lightbox" class="lightbox">
     <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
-    <img id="lightbox-img" src="">
+    <img id="lightbox-img" src="" alt="">
   </div>
+
 </div>
 
 <!-- Swiper JS -->
@@ -211,20 +193,38 @@
 
 <script>
 const allImages = <%= JSON.stringify(allImages) %>;
-let currentLightboxIndex = 0;
+let currentIndex = 0;
 
-document.addEventListener('DOMContentLoaded', () => {
-  if (allImages.length === 0) return;
+function openLightbox(i) {
+  currentIndex = i;
+  const img = document.getElementById('lightbox-img');
+  img.src = allImages[i];
+  document.getElementById('lightbox').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
 
+// Initialize Swiper AFTER page load
+window.addEventListener('load', () => {
   const thumbs = new Swiper('.thumbnail-swiper', {
+    slidesPerView: 5,
     spaceBetween: 10,
-    slidesPerView: 'auto',
     freeMode: true,
     watchSlidesProgress: true,
+    breakpoints: {
+      320: { slidesPerView: 3 },
+      768: { slidesPerView: 4 },
+      992: { slidesPerView: 5 }
+    }
   });
 
   const swiper = new Swiper('.portfolio-swiper', {
     loop: allImages.length > 1,
+    preventClicks: false,
+    preventClicksPropagation: false,
     navigation: {
       nextEl: '.swiper-button-next',
       prevEl: '.swiper-button-prev',
@@ -236,38 +236,9 @@ document.addEventListener('DOMContentLoaded', () => {
     thumbs: { swiper: thumbs },
   });
 });
-
-function openLightbox(index) {
-  const lightbox = document.getElementById('lightbox');
-  const img = document.getElementById('lightbox-img');
-  currentLightboxIndex = index;
-  img.src = allImages[index];
-  lightbox.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-
-function closeLightbox() {
-  document.getElementById('lightbox').style.display = 'none';
-  document.body.style.overflow = 'auto';
-}
-
-document.addEventListener('keydown', e => {
-  const lb = document.getElementById('lightbox');
-  if (lb.style.display === 'flex') {
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowRight') changeImage(1);
-    if (e.key === 'ArrowLeft') changeImage(-1);
-  }
-});
-
-function changeImage(dir) {
-  currentLightboxIndex += dir;
-  if (currentLightboxIndex < 0) currentLightboxIndex = allImages.length - 1;
-  if (currentLightboxIndex >= allImages.length) currentLightboxIndex = 0;
-  document.getElementById('lightbox-img').src = allImages[currentLightboxIndex];
-}
 </script>
 
 <%- include('../partials/footer') %>
+
 
 
