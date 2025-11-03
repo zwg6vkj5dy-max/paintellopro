@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
 <style>
+/* --- Layout --- */
 .swiper {
   width: 100%;
   height: 500px;
@@ -26,6 +27,8 @@
 .swiper-slide:hover img {
   transform: scale(1.05);
 }
+
+/* --- Navigation --- */
 .swiper-button-next,
 .swiper-button-prev {
   color: white;
@@ -41,6 +44,8 @@
   background: #007bff;
   transform: scale(1.1);
 }
+
+/* --- Thumbnails --- */
 .thumbnail-swiper {
   height: 100px;
   margin-top: 15px;
@@ -61,7 +66,7 @@
   object-fit: cover;
 }
 
-/* Lightbox */
+/* --- Lightbox --- */
 .lightbox {
   display: none;
   position: fixed;
@@ -91,6 +96,8 @@
 .lightbox-close:hover {
   background: #dc3545;
 }
+
+/* --- Responsive --- */
 @media (max-width: 768px) {
   .swiper { height: 350px; }
   .thumbnail-swiper { height: 70px; }
@@ -98,9 +105,9 @@
 </style>
 
 <div class="container py-5">
-  <div class="row mb-5">
-    <!-- Painter Info -->
-    <div class="col-md-4 text-center">
+  <div class="row mb-5 align-items-start">
+    <!-- LEFT: Painter Info -->
+    <div class="col-md-4 text-center mb-4">
       <div class="avatar-large mb-3 mx-auto" style="width:150px;height:150px;border-radius:50%;overflow:hidden;">
         <% if (painter.profilePicture && painter.profilePicture.url) { %>
           <img src="<%= painter.profilePicture.url %>" alt="<%= painter.name %>" style="width:100%;height:100%;object-fit:cover;">
@@ -116,16 +123,38 @@
         <i class="fas fa-map-marker-alt me-1"></i>
         <%= painter.location.wilaya %>, Algeria
       </p>
-      <p class="fw-semibold text-primary"><%= painter.pricePerSqm %> DZD/m²</p>
+
+      <!-- Rating -->
+      <div class="d-flex justify-content-center align-items-center mb-2">
+        <% for (let i = 1; i <= 5; i++) { %>
+          <i class="fas fa-star <%= i <= (painter.rating || 0) ? 'text-warning' : 'text-muted' %>"></i>
+        <% } %>
+        <span class="fw-bold ms-2"><%= (painter.rating || 0).toFixed(1) %></span>
+      </div>
+
+      <p class="text-muted mb-1"><%= painter.completedJobs || 0 %> jobs completed</p>
+
+      <!-- Availability -->
+      <% if (painter.availability === 'available') { %>
+        <span class="badge bg-success mb-2"><i class="fas fa-check-circle me-1"></i>Available</span>
+      <% } else if (painter.availability === 'busy') { %>
+        <span class="badge bg-warning mb-2"><i class="fas fa-clock me-1"></i>Busy</span>
+      <% } else { %>
+        <span class="badge bg-secondary mb-2"><i class="fas fa-times-circle me-1"></i>Unavailable</span>
+      <% } %>
+
+      <p class="fw-semibold text-primary mt-2"><%= painter.pricePerSqm %> DZD/m²</p>
+
       <a href="/painters/<%= painter._id %>/order" class="btn btn-primary w-100 mb-2">
         <i class="fas fa-paint-roller me-2"></i>Hire This Painter
       </a>
+
       <% if (!user) { %><small class="text-muted">No account needed - order as guest</small><% } %>
     </div>
 
-    <!-- Portfolio -->
+    <!-- RIGHT: Portfolio -->
     <div class="col-md-8">
-      <h2 class="mb-4"><i class="fas fa-images me-2"></i>Portfolio Gallery</h2>
+      <h2 class="mb-4"><i class="fas fa-images me-2"></i>Portfolio</h2>
 
       <% 
       const portfolio = painter.portfolio || [];
@@ -146,35 +175,38 @@
         </div>
       <% } else { %>
 
-        <!-- Swiper Main -->
-        <div class="swiper portfolio-swiper">
-          <div class="swiper-wrapper">
-            <% allImages.forEach((url, i) => { %>
-              <div class="swiper-slide" onclick="openLightbox(<%= i %>)">
-                <img src="<%= url %>" alt="Image <%= i+1 %>" onerror="this.src='https://via.placeholder.com/800x500?text=Image+Not+Found'">
-              </div>
-            <% }) %>
-          </div>
-          <div class="swiper-button-next"></div>
-          <div class="swiper-button-prev"></div>
+      <!-- MAIN SLIDER -->
+      <div class="swiper portfolio-swiper">
+        <div class="swiper-wrapper">
+          <% allImages.forEach((url, i) => { %>
+            <div class="swiper-slide" onclick="openLightbox(<%= i %>)">
+              <img src="<%= url %>" alt="Image <%= i+1 %>" loading="lazy" 
+                   onerror="this.src='https://via.placeholder.com/800x500?text=No+Image'">
+            </div>
+          <% }) %>
         </div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+      </div>
 
-        <!-- Thumbnails -->
-        <div class="swiper thumbnail-swiper mt-3">
-          <div class="swiper-wrapper">
-            <% allImages.forEach((url, i) => { %>
-              <div class="swiper-slide">
-                <img src="<%= url %>" alt="Thumb <%= i+1 %>">
-              </div>
-            <% }) %>
-          </div>
+      <!-- THUMBNAILS -->
+      <div class="swiper thumbnail-swiper mt-3">
+        <div class="swiper-wrapper">
+          <% allImages.forEach((url, i) => { %>
+            <div class="swiper-slide">
+              <img src="<%= url %>" alt="Thumb <%= i+1 %>" 
+                   onerror="this.src='https://via.placeholder.com/100x60?text=No+Image'">
+            </div>
+          <% }) %>
         </div>
+      </div>
+
       <% } %>
     </div>
   </div>
 </div>
 
-<!-- Lightbox -->
+<!-- LIGHTBOX -->
 <div id="lightbox" class="lightbox" onclick="closeLightbox()">
   <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
   <img id="lightbox-img" src="">
@@ -187,25 +219,21 @@ const allImages = <%= JSON.stringify(allImages) %>;
 let lightbox = document.getElementById('lightbox');
 let lightboxImg = document.getElementById('lightbox-img');
 
-// Swiper setup
+// Swiper main gallery
 const swiper = new Swiper('.portfolio-swiper', {
   loop: allImages.length > 2,
   slidesPerView: 1,
   spaceBetween: 0,
-  navigation: {
-    nextEl: '.swiper-button-next',
-    prevEl: '.swiper-button-prev',
-  },
-  autoplay: {
-    delay: 4000,
-    disableOnInteraction: false,
-  },
+  navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+  autoplay: { delay: 4000, disableOnInteraction: false },
 });
 
+// Swiper thumbnails
 const thumbs = new Swiper('.thumbnail-swiper', {
   slidesPerView: 'auto',
   freeMode: true,
   watchSlidesProgress: true,
+  spaceBetween: 10,
 });
 swiper.controller.control = thumbs;
 thumbs.controller.control = swiper;
