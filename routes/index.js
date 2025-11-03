@@ -5,6 +5,36 @@ const Painter = require('../models/Painter');
 const bcrypt = require('bcrypt');
 const { uploadIdCard, deleteFromCloudinary } = require('../utils/cloudinary');
 // Painter Login Page - FIXED PATH
+// Route pour la recherche des peintres en arabe
+app.get('/ar/painters', async (req, res) => {
+  try {
+    const { wilaya, specialization, minRating, maxPrice, minExperience, availability, sort = 'rating' } = req.query;
+    
+    // Logique de recherche identique mais avec lang='ar'
+    const painters = await Painter.find(query)
+      .select('name experience pricePerSqm specialization rating completedJobs profilePicture location portfolio verification availability')
+      .sort(sortOptions);
+
+    res.render('painters-ar', {
+      title: 'ابحث عن دهانين - بينتيلو برو',
+      painters: painters,
+      wilayas: wilayas,
+      query: req.query,
+      user: req.session.user || null,
+      lang: 'ar'
+    });
+  } catch (error) {
+    console.error('Public painters search error:', error);
+    res.render('painters-ar', {
+      title: 'ابحث عن دهانين - بينتيلو برو',
+      painters: [],
+      wilayas: wilayas,
+      query: {},
+      error: 'خطأ في تحميل الدهانين',
+      lang: 'ar'
+    });
+  }
+});
 // Home page route
 router.get('/', async (req, res) => {
   try {
