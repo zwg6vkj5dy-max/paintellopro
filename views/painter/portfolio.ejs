@@ -3,21 +3,7 @@
     user: painter,
     painter: painter 
 }) %>
-<!-- DEBUG SECTION - À ajouter temporairement -->
-<div class="container mt-3">
-    <div class="card border-danger">
-        <div class="card-header bg-danger text-white">
-            <h6>Debug Data (À supprimer après)</h6>
-        </div>
-        <div class="card-body">
-            <pre><code>
-Portfolio exists: <%= !!painter.portfolio %>
-Portfolio length: <%= painter.portfolio ? painter.portfolio.length : 0 %>
-Portfolio data: <%= JSON.stringify(painter.portfolio, null, 2) %>
-            </code></pre>
-        </div>
-    </div>
-</div>
+
 <div class="container py-4">
     <div class="row">
         <div class="col-12">
