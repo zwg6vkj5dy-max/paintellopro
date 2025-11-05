@@ -4,33 +4,96 @@
 /* Page layout */
 .container { max-width: 1100px; }
 
-/* Profile block */
-.profile-card { display: flex; gap: 20px; align-items: center; margin-bottom: 24px; }
+/* Profile wrapper for centering */
+.profile-card-wrapper {
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+/* Profile block - centered layout */
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* For medium screens and up, switch to horizontal layout */
+@media (min-width: 768px) {
+  .profile-card {
+    flex-direction: row;
+    text-align: left;
+    align-items: flex-start;
+  }
+  
+  .avatar {
+    flex-shrink: 0;
+  }
+}
+
 .avatar {
-  width: 120px; height: 120px; border-radius: 50%; overflow: hidden;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
   box-shadow: 0 8px 30px rgba(0,0,0,0.08);
 }
-.avatar img { width:100%; height:100%; object-fit:cover; }
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 /* Availability badge */
-.badge-availability { padding: 6px 10px; border-radius: 12px; font-weight:600; }
+.badge-availability { 
+  padding: 6px 10px; 
+  border-radius: 12px; 
+  font-weight:600; 
+}
 
 /* Project card */
-.card-hover { transition: transform .18s ease, box-shadow .18s ease; }
-.card-hover:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+.card-hover { 
+  transition: transform .18s ease, box-shadow .18s ease; 
+}
+.card-hover:hover { 
+  transform: translateY(-6px); 
+  box-shadow: 0 12px 40px rgba(0,0,0,0.08); 
+}
 
 /* Bootstrap carousel image */
-.carousel-item img { width: 100%; height: 420px; object-fit: cover; border-radius: 8px; cursor: zoom-in; }
+.carousel-item img { 
+  width: 100%; 
+  height: 420px; 
+  object-fit: cover; 
+  border-radius: 8px; 
+  cursor: zoom-in; 
+}
 
 /* Lightbox overlay */
 #lightboxOverlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none;
-  z-index: 10500; justify-content: center; align-items: center; overflow: hidden;
+  position: fixed; 
+  inset: 0; 
+  background: rgba(0,0,0,0.95); 
+  display: none;
+  z-index: 10500; 
+  justify-content: center; 
+  align-items: center; 
+  overflow: hidden;
 }
-#lightboxOverlay.active { display: flex; }
+#lightboxOverlay.active { 
+  display: flex; 
+}
 
 #lightboxBox {
-  position: relative; max-width: 95%; max-height: 95%; display:flex; align-items:center; justify-content:center;
+  position: relative; 
+  max-width: 95%; 
+  max-height: 95%; 
+  display:flex; 
+  align-items:center; 
+  justify-content:center;
 }
 
 #lightboxImg {
@@ -46,66 +109,105 @@
 
 /* lightbox controls */
 .lightbox-close {
-  position: absolute; top: 18px; right: 22px; font-size: 28px; color: #fff; cursor: pointer;
-  background: rgba(0,0,0,0.4); border-radius: 50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center;
+  position: absolute; 
+  top: 18px; 
+  right: 22px; 
+  font-size: 28px; 
+  color: #fff; 
+  cursor: pointer;
+  background: rgba(0,0,0,0.4); 
+  border-radius: 50%; 
+  width:44px; 
+  height:44px; 
+  display:flex; 
+  align-items:center; 
+  justify-content:center;
 }
 .lightbox-nav {
-  position: absolute; top:50%; left:0; right:0; display:flex; justify-content:space-between; transform:translateY(-50%);
+  position: absolute; 
+  top:50%; 
+  left:0; 
+  right:0; 
+  display:flex; 
+  justify-content:space-between; 
+  transform:translateY(-50%);
   pointer-events: none;
 }
-.lightbox-nav button { pointer-events: auto; background: rgba(0,0,0,0.45); border:none; color:#fff; font-size:24px; width:52px; height:52px; border-radius:999px; }
+.lightbox-nav button { 
+  pointer-events: auto; 
+  background: rgba(0,0,0,0.45); 
+  border:none; 
+  color:#fff; 
+  font-size:24px; 
+  width:52px; 
+  height:52px; 
+  border-radius:999px; 
+}
 
-/* mobile adjustments */
+/* Mobile adjustments */
 @media (max-width: 768px) {
-  .carousel-item img { height: 280px; }
-  .avatar { width: 96px; height: 96px; }
+  .carousel-item img { 
+    height: 280px; 
+  }
+  .avatar { 
+    width: 96px; 
+    height: 96px; 
+  }
+  .profile-card {
+    gap: 15px;
+  }
+  .profile-card h2 {
+    font-size: 1.5rem;
+  }
 }
 </style>
 
 <div class="container py-4">
   <!-- Profile -->
-  <div class="profile-card">
-    <div class="avatar">
-      <% if (painter.profilePicture && painter.profilePicture.url) { %>
-        <img src="<%= painter.profilePicture.url %>" alt="<%= painter.name %>">
-      <% } else { %>
-        <img src="https://via.placeholder.com/300x300?text=Painter" alt="No profile">
-      <% } %>
-    </div>
-
-    <div class="flex-grow-1">
-      <h2 class="mb-1"><%= painter.name %></h2>
-      <div class="mb-2 text-muted">
-        <i class="fas fa-map-marker-alt me-1"></i> <%= painter.location?.wilaya || 'Unknown Wilaya' %>
+  <div class="profile-card-wrapper">
+    <div class="profile-card">
+      <div class="avatar">
+        <% if (painter.profilePicture && painter.profilePicture.url) { %>
+          <img src="<%= painter.profilePicture.url %>" alt="<%= painter.name %>">
+        <% } else { %>
+          <img src="https://via.placeholder.com/300x300?text=Painter" alt="No profile">
+        <% } %>
       </div>
 
-      <div class="d-flex align-items-center gap-3 mb-2">
-        <div>
-          <% for (let i=1;i<=5;i++) { %>
-            <i class="fas fa-star <%= i <= (painter.rating||0) ? 'text-warning' : 'text-muted' %>"></i>
-          <% } %>
-          <span class="fw-bold ms-2"><%= (painter.rating||0).toFixed(1) %></span>
-          <small class="text-muted ms-2">(<%= painter.completedJobs||0 %> jobs)</small>
+      <div class="flex-grow-1">
+        <h2 class="mb-1"><%= painter.name %></h2>
+        <div class="mb-2 text-muted">
+          <i class="fas fa-map-marker-alt me-1"></i> <%= painter.location?.wilaya || 'Unknown Wilaya' %>
         </div>
 
-        <div>
-          <span class="badge badge-availability
-            <% if (painter.availability === 'available') { %> bg-success text-white <% }
-               else if (painter.availability === 'busy') { %> bg-warning text-dark <% }
-               else { %> bg-secondary text-white <% } %>">
-            <i class="fas <%= painter.availability === 'available' ? 'fa-check-circle' : (painter.availability === 'busy' ? 'fa-clock' : 'fa-times-circle') %> me-1"></i>
-            <%= (painter.availability || 'unavailable').charAt(0).toUpperCase() + (painter.availability || 'unavailable').slice(1) %>
-          </span>
+        <div class="d-flex flex-column flex-md-row align-items-center gap-3 mb-2 justify-content-center justify-content-md-start">
+          <div class="text-center text-md-start">
+            <% for (let i=1;i<=5;i++) { %>
+              <i class="fas fa-star <%= i <= (painter.rating||0) ? 'text-warning' : 'text-muted' %>"></i>
+            <% } %>
+            <span class="fw-bold ms-2"><%= (painter.rating||0).toFixed(1) %></span>
+            <small class="text-muted ms-2">(<%= painter.completedJobs||0 %> jobs)</small>
+          </div>
+
+          <div>
+            <span class="badge badge-availability
+              <% if (painter.availability === 'available') { %> bg-success text-white <% }
+                 else if (painter.availability === 'busy') { %> bg-warning text-dark <% }
+                 else { %> bg-secondary text-white <% } %>">
+              <i class="fas <%= painter.availability === 'available' ? 'fa-check-circle' : (painter.availability === 'busy' ? 'fa-clock' : 'fa-times-circle') %> me-1"></i>
+              <%= (painter.availability || 'unavailable').charAt(0).toUpperCase() + (painter.availability || 'unavailable').slice(1) %>
+            </span>
+          </div>
+
+          <div>
+            <span class="badge bg-primary"> <%= painter.pricePerSqm %> DZD / m²</span>
+          </div>
         </div>
 
-        <div>
-          <span class="badge bg-primary"> <%= painter.pricePerSqm %> DZD / m²</span>
-        </div>
+        <% if (painter.verification && painter.verification.status === 'verified') { %>
+          <div class="text-center text-md-start"><span class="badge bg-success"><i class="fas fa-check me-1"></i>Verified</span></div>
+        <% } %>
       </div>
-
-      <% if (painter.verification && painter.verification.status === 'verified') { %>
-        <div><span class="badge bg-success"><i class="fas fa-check me-1"></i>Verified</span></div>
-      <% } %>
     </div>
   </div>
 
@@ -156,7 +258,8 @@
               <% } %>
             </div>
           <% } %>
- <!-- ✅ Hire Painter Button Section -->
+          
+          <!-- ✅ Hire Painter Button Section -->
           <div class="text-center mt-4">
             <a href="/painters/<%= painter._id %>/order" class="btn btn-lg btn-primary px-5 shadow-sm">
               <i class="fas fa-handshake me-2"></i>Hire Painter
@@ -370,6 +473,4 @@
 </script>
 
 <%- include('../partials/footer') %>
-
-
 
