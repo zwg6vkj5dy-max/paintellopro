@@ -1,7 +1,7 @@
 <%- include('../partials/header', { title: 'Find Painters - Paintello Pro' }) %>
 
 <style>
-/* Muula/Modern Style */
+/* Modern Muula Style - Clean & Simple */
 :root {
     --primary-blue: #2C5F8A;
     --primary-green: #4A9B6E;
@@ -24,7 +24,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* Hero Section - Modern Header */
+/* Hero Section - Minimal */
 .painters-hero {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
     padding: 48px 0;
@@ -86,7 +86,7 @@ body {
     font-size: 1.1rem;
 }
 
-/* Filter Chips - Modern Style */
+/* Modern Filter Section - Same Structure, Modern Style */
 .filter-section {
     max-width: 1200px;
     margin: 0 auto 32px;
@@ -98,10 +98,11 @@ body {
     flex-wrap: wrap;
     gap: 12px;
     margin-bottom: 24px;
+    justify-content: center;
 }
 
 .chip {
-    padding: 10px 20px;
+    padding: 10px 24px;
     background: var(--bg-white);
     border: 1px solid var(--border-light);
     border-radius: 40px;
@@ -136,6 +137,37 @@ body {
     color: white;
 }
 
+/* Filter Row with Selects - Clean Modern */
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.filter-select {
+    padding: 10px 20px;
+    border: 1px solid var(--border-light);
+    border-radius: 40px;
+    background: var(--bg-white);
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 150px;
+}
+
+.filter-select:hover {
+    border-color: var(--primary-green);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(74, 155, 110, 0.1);
+}
+
 /* Results Header */
 .results-header {
     max-width: 1200px;
@@ -162,9 +194,9 @@ body {
 }
 
 .sort-modern select {
-    padding: 10px 16px;
+    padding: 10px 20px;
     border: 1px solid var(--border-light);
-    border-radius: 12px;
+    border-radius: 40px;
     background: var(--bg-white);
     font-size: 0.9rem;
     color: var(--text-dark);
@@ -176,17 +208,17 @@ body {
     border-color: var(--primary-green);
 }
 
-/* Painter Cards - Muula Style */
+/* Painter Cards - Only Profile Picture, No Cover */
 .painters-grid {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 24px 48px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 28px;
 }
 
-.painter-card-muula {
+.painter-card-modern {
     background: var(--bg-white);
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -196,149 +228,135 @@ body {
     position: relative;
 }
 
-.painter-card-muula:hover {
+.painter-card-modern:hover {
     transform: translateY(-6px);
     box-shadow: var(--shadow-lg);
 }
 
-/* Card Cover */
-.card-cover-muula {
-    height: 140px;
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-light));
+/* Card Body - No Cover, Avatar at Top */
+.card-body-modern {
+    padding: 30px 24px 24px;
+    text-align: center;
+}
+
+/* Avatar - Large and Centered */
+.avatar-modern-card {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto 16px;
     position: relative;
     overflow: hidden;
-}
-
-.card-cover-muula img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* Avatar */
-.avatar-muula {
-    position: absolute;
-    bottom: -35px;
-    left: 20px;
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
     border: 4px solid var(--bg-white);
-    background: var(--bg-white);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
+    background: var(--bg-light);
 }
 
-.avatar-muula img {
+.avatar-modern-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.verified-badge-muula {
+.verified-badge-modern {
     position: absolute;
-    bottom: -2px;
-    right: -2px;
+    bottom: 0;
+    right: 0;
     background: var(--primary-green);
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    width: 26px;
+    height: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
     border: 2px solid var(--bg-white);
 }
 
-.verified-badge-muula i {
-    font-size: 0.6rem;
+.verified-badge-modern i {
+    font-size: 0.75rem;
     color: white;
 }
 
-/* Card Body */
-.card-body-muula {
-    padding: 48px 20px 20px;
-}
-
-.painter-name-muula {
-    font-size: 1.2rem;
+.painter-name-modern {
+    font-size: 1.3rem;
     font-weight: 700;
     color: var(--text-dark);
-    margin-bottom: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
+    margin-bottom: 6px;
 }
 
-.location-muula {
-    font-size: 0.8rem;
+.location-modern {
+    font-size: 0.85rem;
     color: var(--text-gray);
     display: flex;
     align-items: center;
-    gap: 4px;
+    justify-content: center;
+    gap: 6px;
     margin-bottom: 16px;
 }
 
 /* Stats Row */
-.stats-row-muula {
+.stats-row-modern {
     display: flex;
-    gap: 20px;
+    gap: 24px;
+    justify-content: center;
     padding: 12px 0;
     border-top: 1px solid var(--border-light);
     border-bottom: 1px solid var(--border-light);
     margin-bottom: 16px;
 }
 
-.stat-item-muula {
+.stat-item-modern {
     text-align: center;
-    flex: 1;
 }
 
-.stat-value-muula {
+.stat-value-modern {
     font-size: 1rem;
     font-weight: 700;
     color: var(--primary-blue);
     display: block;
 }
 
-.stat-label-muula {
+.stat-label-modern {
     font-size: 0.7rem;
     color: var(--text-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Rating Stars */
-.rating-muula {
+.rating-modern {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     margin-bottom: 12px;
 }
 
-.stars-muula {
+.stars-modern {
     display: flex;
-    gap: 2px;
+    gap: 3px;
 }
 
-.stars-muula i {
-    font-size: 0.8rem;
+.stars-modern i {
+    font-size: 0.85rem;
 }
 
-.rating-number-muula {
-    font-size: 0.8rem;
+.rating-number-modern {
+    font-size: 0.85rem;
     font-weight: 500;
     color: var(--text-dark);
 }
 
 /* Specialties */
-.specialties-muula {
+.specialties-modern {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    justify-content: center;
     margin-bottom: 16px;
 }
 
-.specialty-tag-muula {
+.specialty-tag-modern {
     font-size: 0.7rem;
     padding: 4px 12px;
     background: var(--bg-light);
@@ -347,49 +365,50 @@ body {
 }
 
 /* Price Section */
-.price-section-muula {
+.price-section-modern {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    padding: 0 8px;
 }
 
-.price-muula {
-    font-size: 1.4rem;
+.price-modern {
+    font-size: 1.3rem;
     font-weight: 700;
     color: var(--primary-green);
 }
 
-.price-muula small {
+.price-modern small {
     font-size: 0.7rem;
     font-weight: 400;
     color: var(--text-gray);
 }
 
-.availability-muula {
+.availability-modern {
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 0.7rem;
     font-weight: 600;
 }
 
-.availability-muula.available {
+.availability-modern.available {
     background: #E6F7EC;
     color: var(--primary-green);
 }
 
-.availability-muula.busy {
+.availability-modern.busy {
     background: #FEF3E2;
     color: #E67E22;
 }
 
 /* Action Buttons */
-.actions-muula {
+.actions-modern {
     display: flex;
     gap: 12px;
 }
 
-.btn-muula {
+.btn-modern {
     flex: 1;
     padding: 10px;
     border-radius: 40px;
@@ -403,40 +422,42 @@ body {
     font-family: inherit;
 }
 
-.btn-muula-primary {
+.btn-modern-primary {
     background: var(--primary-green);
     color: white;
 }
 
-.btn-muula-primary:hover {
+.btn-modern-primary:hover {
     background: #3D8A5E;
     transform: translateY(-2px);
 }
 
-.btn-muula-secondary {
+.btn-modern-secondary {
     background: transparent;
     border: 1px solid var(--border-light);
     color: var(--text-dark);
 }
 
-.btn-muula-secondary:hover {
+.btn-modern-secondary:hover {
     border-color: var(--primary-green);
     background: #F0FAF4;
 }
 
-/* Portfolio Preview */
-.portfolio-preview-muula {
+/* Portfolio Preview - Small Gallery */
+.portfolio-preview-modern {
     display: flex;
     gap: 8px;
+    justify-content: center;
     margin-bottom: 16px;
 }
 
-.preview-img-muula {
+.preview-img-modern {
     width: 60px;
     height: 60px;
     border-radius: var(--radius-sm);
     object-fit: cover;
     background: var(--bg-light);
+    border: 1px solid var(--border-light);
 }
 
 /* Empty State */
@@ -574,16 +595,8 @@ body {
         padding: 0 16px;
     }
     
-    .chip span {
-        display: none;
-    }
-    
-    .chip i {
-        margin: 0;
-    }
-    
-    .chip {
-        padding: 10px 14px;
+    .painter-card-modern {
+        max-width: 100%;
     }
 }
 
@@ -606,7 +619,7 @@ body {
     }
 }
 
-.painter-card-muula {
+.painter-card-modern {
     animation: fadeInUp 0.4s ease forwards;
     opacity: 0;
 }
@@ -691,13 +704,10 @@ body {
             <button type="submit" class="btn" style="background: var(--primary-green); color: white; padding: 12px; border-radius: 40px; border: none; font-weight: 600;">Apply Filters</button>
             <a href="/painters" class="btn" style="background: transparent; border: 1px solid var(--border-light); padding: 12px; border-radius: 40px; text-align: center; text-decoration: none; color: var(--text-dark);">Reset All</a>
         </div>
-        <% if (Object.keys(query).length > 0 && query.wilaya) { %>
-        <input type="hidden" name="search" value="<%= query.search || '' %>">
-        <% } %>
     </form>
 </div>
 
-<!-- Filter Chips (Desktop) -->
+<!-- Modern Filter Section (Desktop) -->
 <div class="filter-section">
     <div class="filter-chips-modern">
         <div class="chip <%= !query.wilaya && !query.availability && !query.minRating ? 'active' : '' %>" data-filter="all">
@@ -712,11 +722,43 @@ body {
         <div class="chip" data-filter="experienced" data-experience="5">
             <i class="fas fa-trophy"></i><span>5+ Years Exp</span>
         </div>
-        <% if (query.wilaya) { %>
-        <div class="chip active">
-            <i class="fas fa-map-marker-alt"></i><span><%= query.wilaya %></span>
-        </div>
-        <% } %>
+    </div>
+    
+    <div class="filter-row">
+        <select class="filter-select" id="wilayaSelect" name="wilaya">
+            <option value="">All Wilayas</option>
+            <% wilayas.forEach(wilaya => { %>
+            <option value="<%= wilaya.name %>" <%= query.wilaya === wilaya.name ? 'selected' : '' %>>
+                <%= wilaya.name %>
+            </option>
+            <% }); %>
+        </select>
+        
+        <select class="filter-select" id="experienceSelect" name="minExperience">
+            <option value="">Any Experience</option>
+            <option value="1" <%= query.minExperience === '1' ? 'selected' : '' %>>1+ years</option>
+            <option value="3" <%= query.minExperience === '3' ? 'selected' : '' %>>3+ years</option>
+            <option value="5" <%= query.minExperience === '5' ? 'selected' : '' %>>5+ years</option>
+            <option value="10" <%= query.minExperience === '10' ? 'selected' : '' %>>10+ years</option>
+        </select>
+        
+        <select class="filter-select" id="ratingSelect" name="minRating">
+            <option value="">Any Rating</option>
+            <option value="4" <%= query.minRating === '4' ? 'selected' : '' %>>4★ & above</option>
+            <option value="3" <%= query.minRating === '3' ? 'selected' : '' %>>3★ & above</option>
+        </select>
+        
+        <select class="filter-select" id="priceSelect" name="priceRange">
+            <option value="">Any Price</option>
+            <option value="0-500" <%= query.priceRange === '0-500' ? 'selected' : '' %>>0 - 500 DA/m²</option>
+            <option value="500-1000" <%= query.priceRange === '500-1000' ? 'selected' : '' %>>500 - 1000 DA/m²</option>
+            <option value="1000-1500" <%= query.priceRange === '1000-1500' ? 'selected' : '' %>>1000 - 1500 DA/m²</option>
+            <option value="1500+" <%= query.priceRange === '1500+' ? 'selected' : '' %>>1500+ DA/m²</option>
+        </select>
+        
+        <button class="chip" id="resetFiltersBtn" style="background: transparent;">
+            <i class="fas fa-redo"></i><span>Reset</span>
+        </button>
     </div>
     
     <form id="desktopFilterForm" action="/painters" method="GET" style="display: none;">
@@ -725,6 +767,7 @@ body {
         <input type="hidden" name="minExperience" id="desktopExperience" value="<%= query.minExperience || '' %>">
         <input type="hidden" name="minRating" id="desktopRating" value="<%= query.minRating || '' %>">
         <input type="hidden" name="search" id="desktopSearch" value="<%= query.search || '' %>">
+        <input type="hidden" name="sort" id="desktopSort" value="<%= query.sort || '' %>">
     </form>
 </div>
 
@@ -744,14 +787,14 @@ body {
     </div>
 </div>
 
-<!-- Painters Grid -->
+<!-- Painters Grid - No Cover Image, Only Profile Picture -->
 <% if (painters.length === 0) { %>
 <div class="painters-grid">
     <div class="empty-state">
         <i class="fas fa-search"></i>
         <h3>No painters found</h3>
         <p>Try adjusting your filters or search in a different area</p>
-        <a href="/painters" class="btn-muula btn-muula-primary" style="display: inline-block; padding: 12px 28px;">Clear All Filters</a>
+        <a href="/painters" class="btn-modern btn-modern-primary" style="display: inline-block; padding: 12px 28px;">Clear All Filters</a>
     </div>
 </div>
 <% } else { %>
@@ -763,98 +806,88 @@ body {
                 portfolioImages.push(project.images[0].url);
             }
         });
-        const coverImage = portfolioImages[0] || null;
     %>
-    <div class="painter-card-muula" style="animation-delay: <%= cardIndex * 0.05 %>s" onclick="viewProfile('<%= painter._id %>')">
-        <!-- Card Cover -->
-        <div class="card-cover-muula">
-            <% if (coverImage) { %>
-                <img src="<%= coverImage %>" alt="Cover" onerror="this.style.display='none'">
-            <% } %>
-        </div>
-        
-        <!-- Avatar -->
-        <div class="avatar-muula">
-            <% if (painter.profilePicture && painter.profilePicture.url) { %>
-                <img src="<%= painter.profilePicture.url %>" alt="<%= painter.name %>" onerror="this.src='https://placehold.co/200x200/2C5F8A/white?text=P'">
-            <% } else { %>
-                <img src="https://placehold.co/200x200/2C5F8A/white?text=P" alt="<%= painter.name %>">
-            <% } %>
-            <% if (painter.verification?.status === 'verified') { %>
-                <div class="verified-badge-muula">
-                    <i class="fas fa-check"></i>
-                </div>
-            <% } %>
-        </div>
-        
-        <!-- Card Body -->
-        <div class="card-body-muula">
-            <div class="painter-name-muula">
-                <%= painter.name %>
+    <div class="painter-card-modern" style="animation-delay: <%= cardIndex * 0.05 %>s" onclick="viewProfile('<%= painter._id %>')">
+        <div class="card-body-modern">
+            <!-- Avatar - Large Centered -->
+            <div class="avatar-modern-card">
+                <% if (painter.profilePicture && painter.profilePicture.url) { %>
+                    <img src="<%= painter.profilePicture.url %>" alt="<%= painter.name %>" onerror="this.src='https://placehold.co/200x200/2C5F8A/white?text=P'">
+                <% } else { %>
+                    <img src="https://placehold.co/200x200/2C5F8A/white?text=P" alt="<%= painter.name %>">
+                <% } %>
+                <% if (painter.verification?.status === 'verified') { %>
+                    <div class="verified-badge-modern">
+                        <i class="fas fa-check"></i>
+                    </div>
+                <% } %>
             </div>
-            <div class="location-muula">
+            
+            <!-- Painter Info -->
+            <div class="painter-name-modern"><%= painter.name %></div>
+            <div class="location-modern">
                 <i class="fas fa-map-marker-alt"></i>
                 <%= painter.location?.wilaya || 'Algeria' %>
             </div>
             
             <!-- Stats Row -->
-            <div class="stats-row-muula">
-                <div class="stat-item-muula">
-                    <span class="stat-value-muula"><%= painter.completedJobs || 0 %></span>
-                    <span class="stat-label-muula">Jobs Done</span>
+            <div class="stats-row-modern">
+                <div class="stat-item-modern">
+                    <span class="stat-value-modern"><%= painter.completedJobs || 0 %></span>
+                    <span class="stat-label-modern">Jobs</span>
                 </div>
-                <div class="stat-item-muula">
-                    <span class="stat-value-muula"><%= painter.experience || 0 %></span>
-                    <span class="stat-label-muula">Years Exp</span>
+                <div class="stat-item-modern">
+                    <span class="stat-value-modern"><%= painter.experience || 0 %></span>
+                    <span class="stat-label-modern">Years</span>
                 </div>
             </div>
             
             <!-- Rating -->
-            <div class="rating-muula">
-                <div class="stars-muula">
+            <div class="rating-modern">
+                <div class="stars-modern">
                     <% for (let i = 1; i <= 5; i++) { %>
                         <i class="fas fa-star <%= i <= Math.round(painter.rating || 0) ? 'text-warning' : 'text-muted' %>" style="color: <%= i <= Math.round(painter.rating || 0) ? '#FBBF24' : '#E2E8F0' %>;"></i>
                     <% } %>
                 </div>
-                <span class="rating-number-muula">(<%= (painter.rating || 0).toFixed(1) %>)</span>
+                <span class="rating-number-modern">(<%= (painter.rating || 0).toFixed(1) %>)</span>
             </div>
             
             <!-- Specialties -->
             <% const specialties = painter.specialization || []; %>
             <% if (specialties.length > 0) { %>
-            <div class="specialties-muula">
+            <div class="specialties-modern">
                 <% specialties.slice(0, 2).forEach(spec => { %>
-                    <span class="specialty-tag-muula"><%= spec %></span>
+                    <span class="specialty-tag-modern"><%= spec %></span>
                 <% }) %>
                 <% if (specialties.length > 2) { %>
-                    <span class="specialty-tag-muula">+<%= specialties.length - 2 %></span>
+                    <span class="specialty-tag-modern">+<%= specialties.length - 2 %></span>
                 <% } %>
             </div>
             <% } %>
             
-            <!-- Portfolio Preview -->
+            <!-- Portfolio Preview (Small Images) -->
             <% if (portfolioImages.length > 0) { %>
-            <div class="portfolio-preview-muula">
+            <div class="portfolio-preview-modern">
                 <% portfolioImages.slice(0, 3).forEach((img, idx) => { %>
-                    <img src="<%= img %>" class="preview-img-muula" alt="Work" onerror="this.style.display='none'">
+                    <img src="<%= img %>" class="preview-img-modern" alt="Work" onerror="this.style.display='none'">
                 <% }) %>
             </div>
             <% } %>
             
             <!-- Price & Availability -->
-            <div class="price-section-muula">
-                <div class="price-muula">
+            <div class="price-section-modern">
+                <div class="price-modern">
                     <%= painter.pricePerSqm || 0 %><small> DA/m²</small>
                 </div>
-                <div class="availability-muula <%= painter.availability === 'available' ? 'available' : 'busy' %>">
+                <div class="availability-modern <%= painter.availability === 'available' ? 'available' : 'busy' %>">
                     <%= painter.availability === 'available' ? 'Available' : 'Busy' %>
                 </div>
             </div>
             
             <!-- Actions -->
-            <div class="actions-muula" onclick="event.stopPropagation()">
-                <a href="/painters/<%= painter._id %>" class="btn-muula btn-muula-secondary">Profile</a>
-                <a href="/painters/<%= painter._id %>/order" class="btn-muula btn-muula-primary">Hire</a>
+            <div class="actions-modern" onclick="event.stopPropagation()">
+                <a href="/painters/<%= painter._id %>" class="btn-modern btn-modern-secondary">Profile</a>
+                <a href="/painters/<%= painter._id %>/order" class="btn-modern btn-modern-primary">Hire</a>
             </div>
         </div>
     </div>
@@ -892,6 +925,35 @@ document.getElementById('sortSelect').addEventListener('change', function() {
     window.location.href = url.toString();
 });
 
+// Desktop filter selects
+const wilayaSelect = document.getElementById('wilayaSelect');
+const experienceSelect = document.getElementById('experienceSelect');
+const ratingSelect = document.getElementById('ratingSelect');
+const priceSelect = document.getElementById('priceSelect');
+
+function applyFilters() {
+    const url = new URL(window.location);
+    
+    if (wilayaSelect.value) url.searchParams.set('wilaya', wilayaSelect.value);
+    else url.searchParams.delete('wilaya');
+    
+    if (experienceSelect.value) url.searchParams.set('minExperience', experienceSelect.value);
+    else url.searchParams.delete('minExperience');
+    
+    if (ratingSelect.value) url.searchParams.set('minRating', ratingSelect.value);
+    else url.searchParams.delete('minRating');
+    
+    if (priceSelect.value) url.searchParams.set('priceRange', priceSelect.value);
+    else url.searchParams.delete('priceRange');
+    
+    window.location.href = url.toString();
+}
+
+wilayaSelect.addEventListener('change', applyFilters);
+experienceSelect.addEventListener('change', applyFilters);
+ratingSelect.addEventListener('change', applyFilters);
+priceSelect.addEventListener('change', applyFilters);
+
 // Filter chips (desktop)
 document.querySelectorAll('.chip[data-filter]').forEach(chip => {
     chip.addEventListener('click', function() {
@@ -911,6 +973,11 @@ document.querySelectorAll('.chip[data-filter]').forEach(chip => {
             window.location.href = url.toString();
         }
     });
+});
+
+// Reset filters button
+document.getElementById('resetFiltersBtn').addEventListener('click', function() {
+    window.location.href = '/painters';
 });
 
 // Close filter drawer on escape
