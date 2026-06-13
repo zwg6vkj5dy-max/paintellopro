@@ -1,442 +1,785 @@
 <% layout('layout') %>
 
 <style>
-.profile-header {
-    display: flex;
-    gap: 30px;
-    align-items: flex-start;
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+/* Modern Instagram/Muula Style Profile */
+:root {
+    --primary: #007bff;
+    --primary-dark: #0056b3;
+    --background: #fafafa;
+    --card-bg: #ffffff;
+    --text-dark: #262626;
+    --text-gray: #8e8e8e;
+    --border-color: #dbdbdb;
+}
+
+body {
+    background: var(--background);
+}
+
+/* Profile Header - Instagram Style */
+.profile-header-modern {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 30px 0;
     margin-bottom: 30px;
 }
 
-.avatar-large {
-    width: 200px;
-    height: 200px;
-    border-radius: 15px;
-    object-fit: cover;
-    border: 4px solid #f8f9fa;
+.profile-container {
+    max-width: 935px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-.profile-info {
-    flex: 1;
-}
-
-.profile-name {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 5px;
-    color: #333;
-}
-
-.profile-location {
-    color: #666;
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-}
-
-.price-badge {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 25px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    display: inline-block;
-    margin-bottom: 20px;
-}
-
-.tags {
+.profile-info-grid {
     display: flex;
+    gap: 60px;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 25px;
 }
 
-.tag {
-    background: #e9ecef;
-    color: #495057;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
+/* Avatar Section */
+.avatar-section {
+    flex-shrink: 0;
 }
 
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin-bottom: 25px;
+.avatar-modern {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary);
+    padding: 3px;
+    background: white;
+    transition: transform 0.3s ease;
+    cursor: pointer;
 }
 
-.stat-card {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
+.avatar-modern:hover {
+    transform: scale(1.05);
+}
+
+/* Stats Section - Like Instagram */
+.stats-modern {
+    flex: 1;
+    display: flex;
+    gap: 40px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
     text-align: center;
-    border-left: 4px solid #007bff;
 }
 
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #007bff;
-    margin-bottom: 5px;
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    display: block;
 }
 
 .stat-label {
-    font-size: 0.9rem;
-    color: #666;
+    font-size: 1rem;
+    color: var(--text-gray);
+    font-weight: 400;
 }
 
-.portfolio-section {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
+/* Bio Section */
+.bio-modern {
+    margin-top: 20px;
 }
 
-.section-title {
-    font-size: 1.8rem;
+.name-modern {
+    font-size: 1.5rem;
     font-weight: 600;
-    margin-bottom: 25px;
-    color: #333;
-    border-bottom: 3px solid #007bff;
-    padding-bottom: 10px;
-}
-
-.portfolio-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-.portfolio-project {
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background: white;
-}
-
-.portfolio-project:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-.project-images {
-    position: relative;
-}
-
-.project-main-image {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-}
-
-.project-thumbnails {
-    display: flex;
-    padding: 10px;
-    background: #f8f9fa;
-    gap: 5px;
-}
-
-.project-thumb {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 6px;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: border-color 0.3s ease;
-}
-
-.project-thumb:hover {
-    border-color: #007bff;
-}
-
-.project-info {
-    padding: 20px;
-}
-
-.project-title {
-    font-size: 1.2rem;
-    font-weight: 600;
+    color: var(--text-dark);
     margin-bottom: 8px;
-    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-.project-description {
-    color: #666;
-    font-size: 0.95rem;
-    margin-bottom: 15px;
+.bio-text {
+    color: var(--text-dark);
+    margin-bottom: 10px;
     line-height: 1.5;
 }
 
-.project-meta {
+.location-modern {
+    color: var(--text-gray);
+    font-size: 0.9rem;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    font-size: 0.85rem;
-    color: #888;
+    gap: 5px;
 }
 
-.no-portfolio {
-    text-align: center;
-    padding: 60px 20px;
-    background: #f8f9fa;
-    border-radius: 12px;
-    color: #666;
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
 }
 
-.no-portfolio i {
-    font-size: 3rem;
-    margin-bottom: 15px;
-    color: #ccc;
-}
-
-.booking-section {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.btn-booking {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 10px;
-    font-size: 1.1rem;
+.btn-follow, .btn-message, .btn-book {
+    padding: 8px 24px;
+    border-radius: 8px;
     font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
     cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
 }
 
-.btn-booking:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,123,255,0.4);
-}
-
-.verified-badge {
-    background: #28a745;
+.btn-follow {
+    background: var(--primary);
     color: white;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-left: 10px;
 }
 
+.btn-follow:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.btn-message {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-dark);
+}
+
+.btn-message:hover {
+    background: #f5f5f5;
+}
+
+.btn-book {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.btn-book:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+}
+
+/* Tabs Section - Instagram Style */
+.tabs-modern {
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 30px;
+    background: var(--card-bg);
+}
+
+.tabs-container {
+    max-width: 935px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+}
+
+.tab {
+    padding: 16px 0;
+    cursor: pointer;
+    position: relative;
+    color: var(--text-gray);
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab i {
+    font-size: 1.1rem;
+}
+
+.tab.active {
+    color: var(--text-dark);
+}
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--text-dark);
+}
+
+.tab:hover:not(.active) {
+    color: var(--text-dark);
+}
+
+/* Portfolio Grid - Instagram Style */
+.portfolio-grid-modern {
+    max-width: 935px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    padding: 0 20px;
+}
+
+.portfolio-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f0f0f0;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.portfolio-item:hover {
+    transform: translateY(-5px);
+}
+
+.portfolio-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.portfolio-item:hover img {
+    transform: scale(1.05);
+}
+
+/* Overlay on Hover */
+.portfolio-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: white;
+}
+
+.portfolio-item:hover .portfolio-overlay {
+    opacity: 1;
+}
+
+.overlay-stats {
+    display: flex;
+    gap: 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.overlay-stats span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Modal for Lightbox - Instagram Story Style */
+.modal-lightbox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-lightbox.active {
+    display: flex;
+}
+
+.modal-content {
+    max-width: 90vw;
+    max-height: 90vh;
+    position: relative;
+}
+
+.modal-content img {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    color: white;
+    font-size: 40px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.modal-close:hover {
+    transform: scale(1.1);
+}
+
+/* Reviews Section */
+.reviews-section {
+    max-width: 935px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: none;
+}
+
+.reviews-section.active {
+    display: block;
+}
+
+.review-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.review-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.review-user {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.review-date {
+    font-size: 0.8rem;
+    color: var(--text-gray);
+}
+
+.review-stars {
+    color: #ffc107;
+    margin-bottom: 10px;
+}
+
+.review-text {
+    color: var(--text-dark);
+    line-height: 1.5;
+}
+
+/* About Section */
+.about-section {
+    max-width: 935px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: none;
+}
+
+.about-section.active {
+    display: block;
+}
+
+.about-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+}
+
+.about-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-dark);
+}
+
+.skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.skill-tag {
+    background: #f0f0f0;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .profile-header {
+    .profile-info-grid {
         flex-direction: column;
         text-align: center;
+        gap: 20px;
     }
     
-    .avatar-large {
-        width: 150px;
-        height: 150px;
-        margin: 0 auto;
+    .stats-modern {
+        justify-content: center;
     }
     
-    .portfolio-grid {
+    .action-buttons {
+        justify-content: center;
+    }
+    
+    .portfolio-grid-modern {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .tabs-container {
+        gap: 30px;
+    }
+    
+    .tab span {
+        display: none;
+    }
+    
+    .tab i {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .portfolio-grid-modern {
         grid-template-columns: 1fr;
     }
+    
+    .stats-modern {
+        gap: 20px;
+    }
+    
+    .stat-number {
+        font-size: 1.2rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+}
+
+/* Loading Animation */
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
 }
 </style>
 
-<div class="container py-4">
-    <!-- Profile Header -->
-    <div class="profile-header">
-        <img src="<%= painter.profilePicture?.url || painter.profilePhoto || '/img/placeholder-profile.jpg' %>" 
-             class="avatar-large"
-             alt="<%= painter.name %>"
-             onerror="this.src='/img/placeholder-profile.jpg'">
-        
-        <div class="profile-info">
-            <h1 class="profile-name">
-                <%= painter.name %>
-                <% if (painter.verification?.status === 'verified') { %>
-                    <span class="verified-badge">
-                        <i class="fas fa-check-circle me-1"></i>Verified
-                    </span>
-                <% } %>
-            </h1>
-            
-            <div class="profile-location">
-                <i class="fas fa-map-marker-alt me-2"></i>
-                <%= painter.location?.wilaya || painter.address || 'Location not specified' %>
-                <% if (painter.location?.address) { %>
-                    <br><small class="text-muted"><%= painter.location.address %></small>
-                <% } %>
+<!-- Modern Profile Header -->
+<div class="profile-header-modern">
+    <div class="profile-container">
+        <div class="profile-info-grid">
+            <!-- Avatar -->
+            <div class="avatar-section">
+                <img src="<%= painter.profilePicture?.url || painter.profilePhoto || '/img/placeholder-profile.jpg' %>" 
+                     class="avatar-modern"
+                     alt="<%= painter.name %>"
+                     onclick="openLightbox(this.src)"
+                     onerror="this.src='/img/placeholder-profile.jpg'">
             </div>
             
-            <div class="price-badge">
-                <i class="fas fa-paint-roller me-2"></i>
-                <%= painter.pricePerSqm || painter.painterProfile?.ratePerM2 || 0 %> DA/m²
-            </div>
-            
-            <!-- Skills/Tags -->
-            <div class="tags">
-                <% 
-                const skills = painter.specialization || painter.painterProfile?.skills || [];
-                skills.forEach(skill => { 
-                %>
-                    <span class="tag">
-                        <i class="fas fa-check me-1"></i><%= skill %>
-                    </span>
-                <% }) %>
-                
-                <% if (skills.length === 0) { %>
-                    <span class="tag text-muted">No specialties listed</span>
-                <% } %>
-            </div>
-            
-            <!-- Statistics -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value"><%= painter.experience || 0 %></div>
-                    <div class="stat-label">Years Experience</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value"><%= painter.completedJobs || 0 %></div>
-                    <div class="stat-label">Completed Jobs</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value"><%= painter.rating || 'New' %></div>
-                    <div class="stat-label">Rating</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">
-                        <%= painter.availability === 'available' ? 'Available' : 'Busy' %>
+            <!-- Stats & Info -->
+            <div class="info-section">
+                <div class="stats-modern">
+                    <div class="stat-item">
+                        <span class="stat-number"><%= painter.portfolio?.length || 0 %></span>
+                        <span class="stat-label">Projects</span>
                     </div>
-                    <div class="stat-label">Status</div>
+                    <div class="stat-item">
+                        <span class="stat-number"><%= painter.completedJobs || 0 %></span>
+                        <span class="stat-label">Jobs Done</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number"><%= painter.followers || 0 %></span>
+                        <span class="stat-label">Followers</span>
+                    </div>
+                </div>
+                
+                <div class="bio-modern">
+                    <div class="name-modern">
+                        <%= painter.name %>
+                        <% if (painter.verification?.status === 'verified') { %>
+                            <span class="verified-badge" style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem;">
+                                <i class="fas fa-check-circle"></i> Verified
+                            </span>
+                        <% } %>
+                    </div>
+                    
+                    <div class="location-modern">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <%= painter.location?.wilaya || painter.address || 'Algeria' %>
+                    </div>
+                    
+                    <div class="bio-text">
+                        <%= painter.bio || 'Professional painter with years of experience. Quality work guaranteed!' %>
+                    </div>
+                    
+                    <div class="price-badge" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; display: inline-block; margin-top: 10px;">
+                        <i class="fas fa-paint-roller"></i> <%= painter.pricePerSqm || painter.painterProfile?.ratePerM2 || 0 %> DA/m²
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn-book" onclick="bookPainter()">
+                        <i class="fas fa-calendar-check"></i> Book Now
+                    </button>
+                    <button class="btn-message" onclick="contactWhatsApp()">
+                        <i class="fab fa-whatsapp"></i> Message
+                    </button>
+                    <button class="btn-follow" onclick="followPainter()">
+                        <i class="fas fa-user-plus"></i> Follow
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Portfolio Section -->
-    <div class="portfolio-section">
-        <h2 class="section-title">
-            <i class="fas fa-images me-2"></i>Portfolio
-            <% if (painter.portfolio && painter.portfolio.length > 0) { %>
-                <small class="text-muted">(<%= painter.portfolio.length %> projects)</small>
-            <% } %>
-        </h2>
-        
-        <% 
-        // Gestion robuste du portfolio
-        const portfolio = painter.portfolio || [];
-        %>
-        
-        <% if (portfolio.length === 0) { %>
-            <div class="no-portfolio">
-                <i class="fas fa-images"></i>
-                <h3>No Portfolio Yet</h3>
-                <p class="mb-4">This painter hasn't added any portfolio projects yet.</p>
-                <a href="https://wa.me/1234567890?text=Hello! I'm interested in your painting services. Painter ID: <%= painter._id %>" 
-                   class="btn btn-success" target="_blank">
-                    <i class="fab fa-whatsapp me-2"></i>Contact via WhatsApp
-                </a>
-            </div>
-        <% } else { %>
-            <div class="portfolio-grid">
-                <% portfolio.forEach((project, projectIndex) => { %>
-                    <div class="portfolio-project">
-                        <div class="project-images">
-                            <% if (project.images && project.images.length > 0) { %>
-                                <img src="<%= project.images[0].url %>" 
-                                     class="project-main-image"
-                                     alt="<%= project.title || 'Project Image' %>"
-                                     onerror="this.src='/img/placeholder-project.jpg'">
-                                
-                                <% if (project.images.length > 1) { %>
-                                    <div class="project-thumbnails">
-                                        <% project.images.slice(0, 4).forEach((img, imgIndex) => { %>
-                                            <img src="<%= img.url %>" 
-                                                 class="project-thumb"
-                                                 alt="Thumbnail <%= imgIndex + 1 %>"
-                                                 onerror="this.src='/img/placeholder-project.jpg'">
-                                        <% }) %>
-                                        
-                                        <% if (project.images.length > 4) { %>
-                                            <div class="project-thumb" style="background: #007bff; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-                                                +<%= project.images.length - 4 %>
-                                            </div>
-                                        <% } %>
-                                    </div>
-                                <% } %>
-                            <% } else { %>
-                                <img src="/img/placeholder-project.jpg" 
-                                     class="project-main-image"
-                                     alt="No project images">
-                            <% } %>
-                        </div>
-                        
-                        <div class="project-info">
-                            <h4 class="project-title">
-                                <%= project.title || 'Untitled Project' %>
-                                <% if (project.uploadedByAdmin) { %>
-                                    <span class="verified-badge" style="background: #17a2b8;">Verified</span>
-                                <% } %>
-                            </h4>
-                            
-                            <p class="project-description">
-                                <%= project.description || 'No description available.' %>
-                            </p>
-                            
-                            <div class="project-meta">
-                                <span>
-                                    <i class="fas fa-calendar me-1"></i>
-                                    <%= project.uploadedAt ? new Date(project.uploadedAt).toLocaleDateString() : 'Unknown date' %>
-                                </span>
-                                
-                                <% if (project.category) { %>
-                                    <span class="badge bg-secondary"><%= project.category %></span>
-                                <% } %>
-                            </div>
-                        </div>
-                    </div>
-                <% }) %>
-            </div>
-        <% } %>
+<!-- Tabs -->
+<div class="tabs-modern">
+    <div class="tabs-container">
+        <div class="tab active" data-tab="portfolio">
+            <i class="fas fa-th"></i>
+            <span>PROJECTS</span>
+        </div>
+        <div class="tab" data-tab="reviews">
+            <i class="fas fa-star"></i>
+            <span>REVIEWS</span>
+        </div>
+        <div class="tab" data-tab="about">
+            <i class="fas fa-info-circle"></i>
+            <span>ABOUT</span>
+        </div>
     </div>
+</div>
 
-    <!-- Booking Section -->
-    <div class="booking-section">
-        <h3 class="mb-4">Ready to Start Your Project?</h3>
-        <p class="mb-4 text-muted">Contact <%= painter.name %> directly to discuss your painting needs and get a quote.</p>
+<!-- Portfolio Grid -->
+<div class="portfolio-grid-modern" id="portfolio-tab">
+    <% 
+    const portfolio = painter.portfolio || [];
+    const allImages = [];
+    
+    // Collect all images for lightbox
+    portfolio.forEach(project => {
+        if (project.images && project.images.length) {
+            project.images.forEach(img => {
+                allImages.push({
+                    url: img.url,
+                    title: project.title,
+                    description: project.description
+                });
+            });
+        }
+    });
+    %>
+    
+    <% if (allImages.length === 0) { %>
+        <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+            <i class="fas fa-camera" style="font-size: 3rem; color: var(--text-gray); margin-bottom: 20px;"></i>
+            <h3 style="color: var(--text-dark);">No Projects Yet</h3>
+            <p style="color: var(--text-gray);">This painter hasn't shared any projects.</p>
+        </div>
+    <% else { %>
+        <% allImages.forEach((image, index) => { %>
+            <div class="portfolio-item" onclick="openLightbox('<%= image.url %>')">
+                <img src="<%= image.url %>" alt="<%= image.title %>" loading="lazy">
+                <div class="portfolio-overlay">
+                    <div class="overlay-stats">
+                        <span><i class="fas fa-heart"></i> 0</span>
+                        <span><i class="fas fa-comment"></i> 0</span>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    <% } %>
+</div>
+
+<!-- Reviews Section -->
+<div class="reviews-section" id="reviews-tab">
+    <% const reviews = painter.reviews || []; %>
+    <% if (reviews.length === 0) { %>
+        <div style="text-align: center; padding: 60px 20px;">
+            <i class="fas fa-star" style="font-size: 3rem; color: var(--text-gray); margin-bottom: 20px;"></i>
+            <h3 style="color: var(--text-dark);">No Reviews Yet</h3>
+            <p style="color: var(--text-gray);">Be the first to review this painter!</p>
+        </div>
+    <% } else { %>
+        <% reviews.forEach(review => { %>
+            <div class="review-card">
+                <div class="review-header">
+                    <img src="<%= review.userAvatar || '/img/default-avatar.jpg' %>" class="review-avatar">
+                    <div>
+                        <div class="review-user"><%= review.userName %></div>
+                        <div class="review-date"><%= new Date(review.createdAt).toLocaleDateString() %></div>
+                    </div>
+                </div>
+                <div class="review-stars">
+                    <%= '★'.repeat(review.rating) %><%= '☆'.repeat(5 - review.rating) %>
+                </div>
+                <div class="review-text"><%= review.comment %></div>
+            </div>
+        <% }) %>
+    <% } %>
+</div>
+
+<!-- About Section -->
+<div class="about-section" id="about-tab">
+    <div class="about-card">
+        <div class="about-title">
+            <i class="fas fa-brush"></i> About <%= painter.name %>
+        </div>
         
-        <form method="POST" action="/painters/<%= painter._id %>/book" class="d-inline-block me-3">
-            <button type="submit" class="btn-booking">
-                <i class="fas fa-calendar-check me-2"></i>Book This Painter
-            </button>
-        </form>
+        <p style="margin-bottom: 20px; line-height: 1.6;">
+            <%= painter.about || `${painter.name} is a professional painter with ${painter.experience || 'extensive'} experience in the field. Specializing in residential and commercial painting projects.` %>
+        </p>
         
-        <a href="https://wa.me/1234567890?text=Hello <%= encodeURIComponent(painter.name) %>! I found you on Paintello and I'm interested in your painting services. Painter ID: <%= painter._id %>" 
-           class="btn btn-success btn-lg" target="_blank">
-            <i class="fab fa-whatsapp me-2"></i>Contact on WhatsApp
-        </a>
+        <div class="about-title" style="margin-top: 30px;">
+            <i class="fas fa-tools"></i> Skills & Specialties
+        </div>
+        <div class="skills-list">
+            <% 
+            const skills = painter.specialization || painter.painterProfile?.skills || ['Interior Painting', 'Exterior Painting', 'Wall Finishing'];
+            skills.forEach(skill => { 
+            %>
+                <span class="skill-tag"><%= skill %></span>
+            <% }) %>
+        </div>
+        
+        <div class="about-title" style="margin-top: 30px;">
+            <i class="fas fa-clock"></i> Availability
+        </div>
+        <p><%= painter.availability === 'available' ? '✅ Available for new projects' : '⏰ Currently booked, but accepting future projects' %></p>
+        
+        <div class="about-title" style="margin-top: 30px;">
+            <i class="fas fa-phone"></i> Contact Info
+        </div>
+        <p>
+            <i class="fab fa-whatsapp"></i> WhatsApp: 
+            <a href="https://wa.me/<%= painter.phone || '213XXXXXXXX' %>" target="_blank">
+                <%= painter.phone || 'Click to reveal number' %>
+            </a>
+        </p>
+    </div>
+</div>
+
+<!-- Lightbox Modal -->
+<div class="modal-lightbox" id="lightbox">
+    <span class="modal-close" onclick="closeLightbox()">&times;</span>
+    <div class="modal-content">
+        <img id="lightbox-img" src="">
     </div>
 </div>
 
 <script>
-// Simple image gallery functionality
-document.addEventListener('DOMContentLoaded', function() {
-    // Thumbnail click to change main image
-    document.querySelectorAll('.project-thumb').forEach(thumb => {
-        thumb.addEventListener('click', function() {
-            const projectCard = this.closest('.portfolio-project');
-            const mainImage = projectCard.querySelector('.project-main-image');
-            mainImage.src = this.src;
-        });
+// Tab Switching
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        const tabId = this.dataset.tab;
+        
+        // Update active tab
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Show/hide sections
+        document.getElementById('portfolio-tab').style.display = tabId === 'portfolio' ? 'grid' : 'none';
+        document.getElementById('reviews-tab').style.display = tabId === 'reviews' ? 'block' : 'none';
+        document.getElementById('about-tab').style.display = tabId === 'about' ? 'block' : 'none';
     });
+});
+
+// Set initial display
+document.getElementById('reviews-tab').style.display = 'none';
+document.getElementById('about-tab').style.display = 'none';
+
+// Lightbox functions
+function openLightbox(imgSrc) {
+    const modal = document.getElementById('lightbox');
+    const modalImg = document.getElementById('lightbox-img');
+    modal.classList.add('active');
+    modalImg.src = imgSrc;
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+}
+
+// Close lightbox with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeLightbox();
+    }
+});
+
+// Action functions
+function bookPainter() {
+    // Submit booking form
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/painters/<%= painter._id %>/book';
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function contactWhatsApp() {
+    const phone = '<%= painter.phone || "213555000000" %>';
+    const text = encodeURIComponent('Hello <%= painter.name %>! I found you on Paintello and I\'m interested in your painting services.');
+    window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+}
+
+function followPainter() {
+    fetch('/painters/<%= painter._id %>/follow', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('You are now following this painter!');
+            location.reload();
+        } else {
+            alert('Please login to follow painters');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+// Lazy loading images
+const imageObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const img = entry.target;
+            img.src = img.dataset.src;
+            observer.unobserve(img);
+        }
+    });
+});
+
+document.querySelectorAll('img[data-src]').forEach(img => {
+    imageObserver.observe(img);
 });
 </script>
