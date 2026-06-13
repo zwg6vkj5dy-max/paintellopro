@@ -1,5 +1,5 @@
-// Ensure deprecation warnings are handled (optional)
-require('./server-setup'); // Keep only if this file exists – otherwise remove this line
+// Ensure deprecation warnings are handled (optional – remove if server-setup.js doesn't exist)
+require('./server-setup'); // Only keep this line if the file actually exists
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -8,9 +8,6 @@ const flash = require('connect-flash');
 const path = require('path');
 const bodyParser = require('body-parser');
 require('dotenv').config();
-
-// Import connect-mongo – we'll handle both old and new versions
-let MongoStore = require('connect-mongo');
 
 const app = express();
 
@@ -37,27 +34,32 @@ mongoose.connect(MONGODB_URI, {
   process.exit(1);
 });
 
-// ---------- 🛠️ FIX FOR MongoStore.create error ----------
-// This works with both connect-mongo v3.x (old) and v4.x (new)
+// ---------------- FIX: Handle both ESM and CommonJS exports of connect-mongo ----------------
+let MongoStoreModule = require('connect-mongo');
+// Support ESM default export (v4+ when required via CommonJS)
+let MongoStore = MongoStoreModule.default || MongoStoreModule;
+
 let sessionStore;
 
-// Check if the modern .create() method exists
 if (typeof MongoStore.create === 'function') {
-  // ----- connect-mongo v4.x or higher -----
+  // ----- connect-mongo v4+ (modern API) -----
   sessionStore = MongoStore.create({
     mongoUrl: MONGODB_URI,
     ttl: 14 * 24 * 60 * 60   // 14 days
   });
-} else {
-  // ----- connect-mongo v3.x (legacy) -----
-  // In v3.x, the module returns a function that needs the 'session' object
-  MongoStore = MongoStore(session);   // re-assign the legacy store constructor
-  sessionStore = new MongoStore({
+} else if (typeof MongoStore === 'function') {
+  // ----- connect-mongo v3.x or older (legacy API) -----
+  const LegacyMongoStore = MongoStore(session);
+  sessionStore = new LegacyMongoStore({
     mongooseConnection: mongoose.connection,
     ttl: 14 * 24 * 60 * 60
   });
+} else {
+  console.error('❌ Unsupported connect-mongo version. Please install connect-mongo@4 or higher.');
+  console.error('   Run: npm install connect-mongo@latest');
+  process.exit(1);
 }
-// -------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
