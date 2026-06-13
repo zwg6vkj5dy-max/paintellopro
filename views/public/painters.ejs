@@ -1,344 +1,872 @@
 <%- include('../partials/header', { title: 'Find Painters - Paintello Pro' }) %>
 
-<div class="container-fluid py-4">
-    <div class="row">
-        <!-- Filters Sidebar -->
-        <div class="col-lg-3 col-md-4">
-            <div class="card shadow-sm sticky-top" style="top: 100px;">
-                <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Filters</h6>
-                </div>
-                <div class="card-body">
-                    <form id="searchForm" action="/painters" method="GET">
-                        <!-- Wilaya Filter -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Wilaya</label>
-                            <select class="form-select" name="wilaya" id="wilayaFilter">
-                                <option value="">All Wilayas</option>
-                                <% wilayas.forEach(wilaya => { %>
-                                <option value="<%= wilaya.name %>" 
-                                        <%= query.wilaya === wilaya.name ? 'selected' : '' %>>
-                                    <%= wilaya.name %>
-                                </option>
-                                <% }); %>
-                            </select>
-                        </div>
+<style>
+/* Modern Muula/Instagram Style for Search Page */
+:root {
+    --primary: #007bff;
+    --primary-dark: #0056b3;
+    --background: #fafafa;
+    --card-bg: #ffffff;
+    --text-dark: #262626;
+    --text-gray: #8e8e8e;
+    --border-color: #dbdbdb;
+}
 
-                        <!-- Availability -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Availability</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="availability" value="true" 
-                                       id="available" <%= query.availability === 'true' ? 'checked' : '' %>>
-                                <label class="form-check-label" for="available">
-                                    Available Now
-                                </label>
-                            </div>
-                        </div>
+body {
+    background: var(--background);
+}
 
-                        <!-- Experience -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Minimum Experience</label>
-                            <select class="form-select" name="minExperience">
-                                <option value="">Any experience</option>
-                                <option value="1" <%= query.minExperience === '1' ? 'selected' : '' %>>1+ years</option>
-                                <option value="3" <%= query.minExperience === '3' ? 'selected' : '' %>>3+ years</option>
-                                <option value="5" <%= query.minExperience === '5' ? 'selected' : '' %>>5+ years</option>
-                                <option value="10" <%= query.minExperience === '10' ? 'selected' : '' %>>10+ years</option>
-                            </select>
-                        </div>
+/* Modern Filter Bar - Like Instagram Stories */
+.filter-bar-modern {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
 
-                        <!-- Rating -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Minimum Rating</label>
-                            <select class="form-select" name="minRating">
-                                <option value="">Any rating</option>
-                                <option value="4" <%= query.minRating === '4' ? 'selected' : '' %>>4★ & above</option>
-                                <option value="3" <%= query.minRating === '3' ? 'selected' : '' %>>3★ & above</option>
-                                <option value="2" <%= query.minRating === '2' ? 'selected' : '' %>>2★ & above</option>
-                            </select>
-                        </div>
+.filter-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+}
 
-                        <!-- Specialization -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Specialization</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="specialization" value="interior" 
-                                       id="interior" <%= (query.specialization && query.specialization.includes('interior')) ? 'checked' : '' %>>
-                                <label class="form-check-label" for="interior">Interior</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="specialization" value="exterior" 
-                                       id="exterior" <%= (query.specialization && query.specialization.includes('exterior')) ? 'checked' : '' %>>
-                                <label class="form-check-label" for="exterior">Exterior</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="specialization" value="commercial" 
-                                       id="commercial" <%= (query.specialization && query.specialization.includes('commercial')) ? 'checked' : '' %>>
-                                <label class="form-check-label" for="commercial">Commercial</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="specialization" value="residential" 
-                                       id="residential" <%= (query.specialization && query.specialization.includes('residential')) ? 'checked' : '' %>>
-                                <label class="form-check-label" for="residential">Residential</label>
-                            </div>
-                        </div>
+.filter-container::-webkit-scrollbar {
+    height: 4px;
+}
 
-                        <!-- Price Range -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Price per m²</label>
-                            <div class="row">
-                                <div class="col-6">
-                                    <input type="number" class="form-control" placeholder="Min" name="minPrice" 
-                                           value="<%= query.minPrice || '' %>" min="0">
-                                </div>
-                                <div class="col-6">
-                                    <input type="number" class="form-control" placeholder="Max" name="maxPrice" 
-                                           value="<%= query.maxPrice || '' %>" min="0">
-                                </div>
-                            </div>
-                        </div>
+.filter-container::-webkit-scrollbar-track {
+    background: var(--border-color);
+    border-radius: 10px;
+}
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-search me-2"></i>Apply Filters
-                            </button>
-                            <a href="/painters" class="btn btn-outline-secondary">Reset</a>
-                        </div>
-                    </form>
+.filter-container::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+.filter-chips {
+    display: inline-flex;
+    gap: 12px;
+    padding-bottom: 5px;
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 30px;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.filter-chip i {
+    font-size: 1rem;
+}
+
+.filter-chip.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.filter-chip:hover:not(.active) {
+    border-color: var(--primary);
+    background: #f8f9fa;
+}
+
+/* Stats Header */
+.stats-header {
+    max-width: 1200px;
+    margin: 20px auto 0;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.results-count h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+}
+
+.results-count p {
+    color: var(--text-gray);
+    margin: 0;
+}
+
+.sort-modern select {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: white;
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+/* Painter Grid - Instagram Style */
+.painters-grid-modern {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+/* Painter Card - Like Instagram Profile Card */
+.painter-card-modern {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.painter-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Card Header with Cover and Avatar */
+.card-cover {
+    position: relative;
+    height: 120px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    overflow: hidden;
+}
+
+.card-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-modern-card {
+    position: absolute;
+    bottom: -40px;
+    left: 20px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid white;
+    background: white;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-modern-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.verified-badge-card {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: #28a745;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
+.verified-badge-card i {
+    font-size: 0.7rem;
+    color: white;
+}
+
+/* Card Body */
+.card-body-modern {
+    padding: 50px 16px 16px;
+}
+
+.painter-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.painter-location {
+    font-size: 0.8rem;
+    color: var(--text-gray);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+/* Stats Row */
+.stats-row {
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 12px;
+}
+
+.stat-item-card {
+    text-align: center;
+}
+
+.stat-value-card {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    display: block;
+}
+
+.stat-label-card {
+    font-size: 0.7rem;
+    color: var(--text-gray);
+}
+
+/* Rating Stars */
+.rating-modern {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 12px;
+}
+
+.stars {
+    display: flex;
+    gap: 2px;
+}
+
+.stars i {
+    font-size: 0.8rem;
+}
+
+.rating-number {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+/* Specializations */
+.specializations-modern {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.spec-tag {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    background: #f0f0f0;
+    border-radius: 12px;
+    color: var(--text-dark);
+}
+
+/* Price Section */
+.price-section-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+}
+
+.price-modern {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.price-modern small {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: var(--text-gray);
+}
+
+.availability-badge-modern {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.availability-badge-modern.available {
+    background: #d4edda;
+    color: #155724;
+}
+
+.availability-badge-modern.busy {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.availability-badge-modern.unavailable {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Action Buttons */
+.card-actions-modern {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.btn-view-modern, .btn-hire-modern {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-view-modern {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-dark);
+}
+
+.btn-view-modern:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-hire-modern {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.btn-hire-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+/* Portfolio Preview */
+.portfolio-preview {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.preview-image {
+    flex: 1;
+    height: 50px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+/* No Results */
+.no-results-modern {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.no-results-modern i {
+    font-size: 4rem;
+    color: var(--text-gray);
+    margin-bottom: 20px;
+}
+
+.no-results-modern h3 {
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+
+.no-results-modern p {
+    color: var(--text-gray);
+    margin-bottom: 20px;
+}
+
+/* Floating Filter Button for Mobile */
+.floating-filter-btn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.floating-filter-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Sidebar Filter Modal for Mobile */
+.filter-sidebar-modern {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 85%;
+    max-width: 350px;
+    height: 100%;
+    background: white;
+    z-index: 1050;
+    transition: right 0.3s ease;
+    box-shadow: -2px 0 20px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+.filter-sidebar-modern.active {
+    right: 0;
+}
+
+.filter-sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
+}
+
+.filter-sidebar-body {
+    padding: 20px;
+}
+
+.filter-group {
+    margin-bottom: 20px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+    display: block;
+}
+
+.overlay-dark {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+}
+
+.overlay-dark.active {
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filter-bar-modern {
+        display: none;
+    }
+    
+    .floating-filter-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .stats-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .painters-grid-modern {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 0 16px;
+    }
+    
+    .results-count h2 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .painters-grid-modern {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Loading Animation */
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+.loading-card {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+</style>
+
+<!-- Floating Filter Button (Mobile) -->
+<button class="floating-filter-btn" onclick="toggleFilterSidebar()">
+    <i class="fas fa-sliders-h"></i>
+</button>
+
+<!-- Overlay -->
+<div class="overlay-dark" id="overlayDark" onclick="toggleFilterSidebar()"></div>
+
+<!-- Filter Sidebar (Mobile) -->
+<div class="filter-sidebar-modern" id="filterSidebar">
+    <div class="filter-sidebar-header">
+        <h6 class="mb-0">Filters</h6>
+        <button class="btn-close" onclick="toggleFilterSidebar()"></button>
+    </div>
+    <div class="filter-sidebar-body">
+        <form id="mobileSearchForm" action="/painters" method="GET">
+            <!-- Wilaya Filter -->
+            <div class="filter-group">
+                <label>Wilaya</label>
+                <select class="form-select" name="wilaya">
+                    <option value="">All Wilayas</option>
+                    <% wilayas.forEach(wilaya => { %>
+                    <option value="<%= wilaya.name %>" <%= query.wilaya === wilaya.name ? 'selected' : '' %>>
+                        <%= wilaya.name %>
+                    </option>
+                    <% }); %>
+                </select>
+            </div>
+
+            <!-- Availability -->
+            <div class="filter-group">
+                <label>Availability</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="availability" value="true" 
+                           id="mobileAvailable" <%= query.availability === 'true' ? 'checked' : '' %>>
+                    <label class="form-check-label" for="mobileAvailable">
+                        Available Now
+                    </label>
                 </div>
             </div>
-        </div>
 
-        <!-- Main Content -->
-        <div class="col-lg-9 col-md-8">
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="mb-1">Find Professional Painters</h2>
-                    <p class="text-muted mb-0">
-                        <%= painters.length %> painters found
-                        <% if (Object.keys(query).length > 0) { %>
-                        <span class="badge bg-primary ms-2">Filtered</span>
-                        <% } %>
-                    </p>
-                </div>
-                <div>
-                    <select class="form-select" id="sortSelect">
-                        <option value="rating" <%= query.sort === 'rating' ? 'selected' : '' %>>Highest Rated</option>
-                        <option value="experience" <%= query.sort === 'experience' ? 'selected' : '' %>>Most Experienced</option>
-                        <option value="price_low" <%= query.sort === 'price_low' ? 'selected' : '' %>>Price: Low to High</option>
-                        <option value="price_high" <%= query.sort === 'price_high' ? 'selected' : '' %>>Price: High to Low</option>
-                    </select>
-                </div>
+            <!-- Experience -->
+            <div class="filter-group">
+                <label>Minimum Experience</label>
+                <select class="form-select" name="minExperience">
+                    <option value="">Any experience</option>
+                    <option value="1" <%= query.minExperience === '1' ? 'selected' : '' %>>1+ years</option>
+                    <option value="3" <%= query.minExperience === '3' ? 'selected' : '' %>>3+ years</option>
+                    <option value="5" <%= query.minExperience === '5' ? 'selected' : '' %>>5+ years</option>
+                    <option value="10" <%= query.minExperience === '10' ? 'selected' : '' %>>10+ years</option>
+                </select>
             </div>
 
-            <!-- Painters Grid -->
-            <% if (painters.length === 0) { %>
-            <div class="text-center py-5">
-                <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                <h4 class="text-muted">No painters found</h4>
-                <p class="text-muted">Try adjusting your filters or search in a different wilaya</p>
-                <a href="/painters" class="btn btn-primary">Clear Filters</a>
+            <!-- Rating -->
+            <div class="filter-group">
+                <label>Minimum Rating</label>
+                <select class="form-select" name="minRating">
+                    <option value="">Any rating</option>
+                    <option value="4" <%= query.minRating === '4' ? 'selected' : '' %>>4★ & above</option>
+                    <option value="3" <%= query.minRating === '3' ? 'selected' : '' %>>3★ & above</option>
+                    <option value="2" <%= query.minRating === '2' ? 'selected' : '' %>>2★ & above</option>
+                </select>
             </div>
-            <% } else { %>
-            <div class="row">
-                <% painters.forEach(painter => { %>
-                <div class="col-xl-4 col-lg-6 mb-4">
-                    <div class="card h-100 card-hover shadow-sm">
-                        <!-- Painter Header -->
-                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-placeholder bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center"
-                                     style="width: 40px; height: 40px; overflow: hidden;">
-                                    <% if (painter.profilePicture && painter.profilePicture.url) { %>
-                                        <img src="<%= painter.profilePicture.url %>" alt="<%= painter.name %>" 
-                                             style="width: 100%; height: 100%; object-fit: cover;"
-                                             onerror="this.style.display='none'">
-                                    <% } %>
-                                    <i class="fas fa-brush text-white" 
-                                       style="<%= (painter.profilePicture && painter.profilePicture.url) ? 'display: none;' : '' %>"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-0"><%= painter.name %></h6>
-                                    <small class="text-muted">
-                                        <i class="fas fa-map-marker-alt me-1"></i>
-                                        <%= painter.location?.wilaya || 'Location not specified' %>
-                                    </small>
-                                </div>
-                            </div>
-                            <% if (painter.verification?.status === 'verified') { %>
-                            <span class="badge bg-success">
-                                <i class="fas fa-check-circle me-1"></i>Verified
-                            </span>
-                            <% } %>
-                        </div>
 
-                        <div class="card-body">
-                            <!-- Rating and Experience -->
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div>
-                                    <div class="star-rating">
-                                        <% for (let i = 1; i <= 5; i++) { %>
-                                        <i class="fas fa-star <%= i <= (painter.rating || 0) ? 'text-warning' : 'text-muted' %>"></i>
-                                        <% } %>
-                                        <small class="text-muted ms-1">(<%= (painter.rating || 0).toFixed(1) %>)</small>
-                                    </div>
-                                </div>
-                                <div class="text-end">
-                                    <div class="fw-bold text-primary"><%= painter.experience || 0 %> years</div>
-                                    <small class="text-muted">Experience</small>
-                                </div>
-                            </div>
-
-                            <!-- Specialization -->
-                            <div class="mb-3">
-                                <small class="text-muted d-block mb-1">Specialization:</small>
-                                <div class="d-flex flex-wrap gap-1">
-                                    <% 
-                                    const specialties = painter.specialization || [];
-                                    if (specialties.length > 0) {
-                                        specialties.forEach(spec => { 
-                                    %>
-                                    <span class="badge bg-light text-dark border"><%= spec %></span>
-                                    <% });
-                                    } else { %>
-                                    <span class="badge bg-light text-dark border">General Painting</span>
-                                    <% } %>
-                                </div>
-                            </div>
-
-                            <!-- Portfolio Preview - CORRECTION APPLIQUÉE -->
-                            <% 
-                            const portfolio = painter.portfolio || [];
-                            const portfolioImages = [];
-                            
-                            // Collecter la première image de chaque projet
-                            portfolio.forEach(project => {
-                                if (project.images && project.images.length > 0 && project.images[0].url) {
-                                    portfolioImages.push(project.images[0].url);
-                                }
-                            });
-                            %>
-                            
-                            <% if (portfolioImages.length > 0) { %>
-                            <div class="mb-3">
-                                <small class="text-muted d-block mb-1">Portfolio Preview:</small>
-                                <div class="row g-1">
-                                    <% portfolioImages.slice(0, 3).forEach((imageUrl, index) => { %>
-                                    <div class="col-4">
-                                        <img src="<%= imageUrl %>" 
-                                             class="img-fluid rounded" 
-                                             alt="Portfolio work <%= index + 1 %>"
-                                             style="height: 60px; object-fit: cover; width: 100%;"
-                                             onerror="this.src='https://via.placeholder.com/80x60/f8f9fa/6c757d?text=Work'">
-                                    </div>
-                                    <% }); %>
-                                    <% if (portfolioImages.length > 3) { %>
-                                    <div class="col-4">
-                                        <div class="bg-light rounded d-flex align-items-center justify-content-center"
-                                             style="height: 60px;">
-                                            <small class="text-muted">+<%= portfolioImages.length - 3 %></small>
-                                        </div>
-                                    </div>
-                                    <% } %>
-                                </div>
-                                <small class="text-muted mt-1">
-                                    <i class="fas fa-images me-1"></i>
-                                    <%= portfolio.length %> project<%= portfolio.length !== 1 ? 's' : '' %>
-                                </small>
-                            </div>
-                            <% } else if (portfolio.length > 0) { %>
-                            <div class="mb-3">
-                                <small class="text-muted d-block mb-1">Portfolio:</small>
-                                <div class="bg-light rounded p-2 text-center">
-                                    <small class="text-muted">
-                                        <i class="fas fa-images me-1"></i>
-                                        <%= portfolio.length %> project<%= portfolio.length !== 1 ? 's' : '' %> (no images)
-                                    </small>
-                                </div>
-                            </div>
-                            <% } %>
-
-                            <!-- Price and Availability -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="text-primary mb-0"><%= painter.pricePerSqm || 0 %> DZD</h5>
-                                    <small class="text-muted">per m²</small>
-                                </div>
-                                <div class="text-end">
-                                    <% if (painter.availability === 'available') { %>
-                                    <span class="badge bg-success">Available</span>
-                                    <% } else if (painter.availability === 'busy') { %>
-                                    <span class="badge bg-warning">Busy</span>
-                                    <% } else { %>
-                                    <span class="badge bg-secondary">Unavailable</span>
-                                    <% } %>
-                                    <div class="text-muted small">
-                                        <%= painter.completedJobs || 0 %> job<%= (painter.completedJobs || 0) !== 1 ? 's' : '' %>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-footer bg-transparent">
-                            <div class="d-grid gap-2">
-                                <a href="/painters/<%= painter._id %>" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-eye me-1"></i>View Profile
-                                </a>
-                                <a href="/painters/<%= painter._id %>/order" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-paint-roller me-1"></i>Hire Now
-                                </a>
-                            </div>
-                        </div>
+            <!-- Price Range -->
+            <div class="filter-group">
+                <label>Price per m²</label>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <input type="number" class="form-control" placeholder="Min" name="minPrice" 
+                               value="<%= query.minPrice || '' %>">
+                    </div>
+                    <div class="col-6">
+                        <input type="number" class="form-control" placeholder="Max" name="maxPrice" 
+                               value="<%= query.maxPrice || '' %>">
                     </div>
                 </div>
-                <% }); %>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+                <a href="/painters" class="btn btn-outline-secondary">Reset All</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modern Filter Bar (Desktop) -->
+<div class="filter-bar-modern">
+    <div class="filter-container">
+        <div class="filter-chips">
+            <div class="filter-chip <%= !query.wilaya ? 'active' : '' %>" data-filter="all">
+                <i class="fas fa-th-large"></i> All
+            </div>
+            <div class="filter-chip" data-filter="available" data-availability="true">
+                <i class="fas fa-check-circle"></i> Available Now
+            </div>
+            <div class="filter-chip" data-filter="top-rated" data-rating="4">
+                <i class="fas fa-star"></i> Top Rated
+            </div>
+            <div class="filter-chip" data-filter="experienced" data-experience="5">
+                <i class="fas fa-trophy"></i> Experienced (5+ yrs)
+            </div>
+            <% if (query.wilaya) { %>
+            <div class="filter-chip active" data-filter="wilaya">
+                <i class="fas fa-map-marker-alt"></i> <%= query.wilaya %>
             </div>
             <% } %>
         </div>
     </div>
 </div>
 
-<style>
-.card-hover {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 1px solid rgba(0,0,0,0.125);
-}
+<!-- Stats Header -->
+<div class="stats-header">
+    <div class="results-count">
+        <h2>Find Professional Painters</h2>
+        <p><strong><%= painters.length %></strong> painters found in Algeria</p>
+    </div>
+    <div class="sort-modern">
+        <select id="sortSelect">
+            <option value="rating" <%= query.sort === 'rating' ? 'selected' : '' %>>Highest Rated</option>
+            <option value="experience" <%= query.sort === 'experience' ? 'selected' : '' %>>Most Experienced</option>
+            <option value="price_low" <%= query.sort === 'price_low' ? 'selected' : '' %>>Price: Low to High</option>
+            <option value="price_high" <%= query.sort === 'price_high' ? 'selected' : '' %>>Price: High to Low</option>
+        </select>
+    </div>
+</div>
 
-.card-hover:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
-}
-
-.star-rating {
-    color: #ffc107;
-}
-
-.avatar-placeholder {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-}
-
-.badge {
-    font-size: 0.75rem;
-}
-</style>
+<!-- Painters Grid -->
+<% if (painters.length === 0) { %>
+<div class="painters-grid-modern">
+    <div class="no-results-modern">
+        <i class="fas fa-search"></i>
+        <h3>No painters found</h3>
+        <p>Try adjusting your filters or search in a different wilaya</p>
+        <a href="/painters" class="btn btn-primary">Clear All Filters</a>
+    </div>
+</div>
+<% } else { %>
+<div class="painters-grid-modern">
+    <% painters.forEach(painter => { 
+        const portfolioImages = [];
+        (painter.portfolio || []).forEach(project => {
+            if (project.images && project.images.length > 0 && project.images[0].url) {
+                portfolioImages.push(project.images[0].url);
+            }
+        });
+        const coverImage = portfolioImages[0] || null;
+    %>
+    <div class="painter-card-modern" onclick="viewProfile('<%= painter._id %>')">
+        <!-- Card Cover -->
+        <div class="card-cover">
+            <% if (coverImage) { %>
+                <img src="<%= coverImage %>" alt="Cover" onerror="this.style.display='none'">
+            <% } else { %>
+                <img src="https://via.placeholder.com/400x120/667eea/ffffff?text=Painter" alt="Cover">
+            <% } %>
+        </div>
+        
+        <!-- Avatar -->
+        <div class="avatar-modern-card">
+            <% if (painter.profilePicture && painter.profilePicture.url) { %>
+                <img src="<%= painter.profilePicture.url %>" alt="<%= painter.name %>"
+                     onerror="this.src='https://via.placeholder.com/80x80/007bff/ffffff?text=P'">
+            <% } else { %>
+                <img src="https://via.placeholder.com/80x80/007bff/ffffff?text=P" alt="<%= painter.name %>">
+            <% } %>
+            <% if (painter.verification?.status === 'verified') { %>
+                <div class="verified-badge-card">
+                    <i class="fas fa-check"></i>
+                </div>
+            <% } %>
+        </div>
+        
+        <!-- Card Body -->
+        <div class="card-body-modern">
+            <div class="painter-name"><%= painter.name %></div>
+            <div class="painter-location">
+                <i class="fas fa-map-marker-alt"></i>
+                <%= painter.location?.wilaya || 'Location not specified' %>
+            </div>
+            
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-item-card">
+                    <span class="stat-value-card"><%= painter.completedJobs || 0 %></span>
+                    <span class="stat-label-card">Jobs</span>
+                </div>
+                <div class="stat-item-card">
+                    <span class="stat-value-card"><%= painter.experience || 0 %></span>
+                    <span class="stat-label-card">Years</span>
+                </div>
+            </div>
+            
+            <!-- Rating -->
+            <div class="rating-modern">
+                <div class="stars">
+                    <% for (let i = 1; i <= 5; i++) { %>
+                        <i class="fas fa-star <%= i <= Math.floor(painter.rating || 0) ? 'text-warning' : 'text-muted' %>"></i>
+                    <% } %>
+                </div>
+                <span class="rating-number">(<%= (painter.rating || 0).toFixed(1) %>)</span>
+            </div>
+            
+            <!-- Specializations -->
+            <% const specialties = painter.specialization || []; %>
+            <% if (specialties.length > 0) { %>
+            <div class="specializations-modern">
+                <% specialties.slice(0, 3).forEach(spec => { %>
+                    <span class="spec-tag"><%= spec %></span>
+                <% }) %>
+                <% if (specialties.length > 3) { %>
+                    <span class="spec-tag">+<%= specialties.length - 3 %></span>
+                <% } %>
+            </div>
+            <% } %>
+            
+            <!-- Portfolio Preview -->
+            <% if (portfolioImages.length > 0) { %>
+            <div class="portfolio-preview">
+                <% portfolioImages.slice(0, 3).forEach((img, idx) => { %>
+                    <img src="<%= img %>" class="preview-image" alt="Work <%= idx + 1 %>"
+                         onerror="this.style.display='none'">
+                <% }) %>
+            </div>
+            <% } %>
+            
+            <!-- Price & Availability -->
+            <div class="price-section-modern">
+                <div>
+                    <span class="price-modern"><%= painter.pricePerSqm || 0 %><small> DA/m²</small></span>
+                </div>
+                <div>
+                    <span class="availability-badge-modern <%= painter.availability === 'available' ? 'available' : (painter.availability === 'busy' ? 'busy' : 'unavailable') %>">
+                        <%= painter.availability === 'available' ? 'Available' : (painter.availability === 'busy' ? 'Busy' : 'Unavailable') %>
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="card-actions-modern" onclick="event.stopPropagation()">
+                <a href="/painters/<%= painter._id %>" class="btn-view-modern">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+                <a href="/painters/<%= painter._id %>/order" class="btn-hire-modern">
+                    <i class="fas fa-calendar-check"></i> Hire
+                </a>
+            </div>
+        </div>
+    </div>
+    <% }); %>
+</div>
+<% } %>
 
 <script>
+// View profile function
+function viewProfile(painterId) {
+    window.location.href = `/painters/${painterId}`;
+}
+
+// Toggle filter sidebar for mobile
+function toggleFilterSidebar() {
+    const sidebar = document.getElementById('filterSidebar');
+    const overlay = document.getElementById('overlayDark');
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+
+// Sort functionality
 document.getElementById('sortSelect').addEventListener('change', function() {
     const url = new URL(window.location);
     url.searchParams.set('sort', this.value);
     window.location.href = url.toString();
 });
 
-// Auto-submit form when filters change
-document.querySelectorAll('#searchForm input, #searchForm select').forEach(element => {
-    element.addEventListener('change', function() {
-        // Don't auto-submit for checkboxes to allow multiple selection
-        if (this.type !== 'checkbox') {
-            document.getElementById('searchForm').submit();
+// Filter chips functionality
+document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+        const filter = this.dataset.filter;
+        const url = new URL(window.location);
+        
+        if (filter === 'all') {
+            window.location.href = '/painters';
+        } else if (filter === 'available') {
+            url.searchParams.set('availability', 'true');
+            window.location.href = url.toString();
+        } else if (filter === 'top-rated') {
+            url.searchParams.set('minRating', '4');
+            window.location.href = url.toString();
+        } else if (filter === 'experienced') {
+            url.searchParams.set('minExperience', '5');
+            window.location.href = url.toString();
         }
     });
+});
+
+// Remove loading state
+document.addEventListener('DOMContentLoaded', () => {
+    // Add animation to cards
+    const cards = document.querySelectorAll('.painter-card-modern');
+    cards.forEach((card, index) => {
+        card.style.animation = `fadeInUp 0.5s ease ${index * 0.05}s forwards`;
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+    });
+});
+
+// Add keyframes dynamically
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// Close filter sidebar on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const sidebar = document.getElementById('filterSidebar');
+        const overlay = document.getElementById('overlayDark');
+        if (sidebar.classList.contains('active')) {
+            toggleFilterSidebar();
+        }
+    }
 });
 </script>
 
