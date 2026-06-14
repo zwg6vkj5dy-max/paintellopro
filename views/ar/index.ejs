@@ -1,7 +1,11 @@
 <%- include('../partials/header', { title: 'بينتيلو برو - منصة الدهانين المحترفين في الجزائر' }) %>
 
+<!-- Leaflet CSS + JS (same map) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <style>
-/* Modern Muula Style - Arabic Version */
+/* Same as English version, but with RTL overrides */
 :root {
     --primary-blue: #2C5F8A;
     --primary-green: #4A9B6E;
@@ -20,42 +24,49 @@
     --radius-sm: 12px;
 }
 
-/* RTL Specific Styles */
+/* RTL specific */
 [dir="rtl"] {
     text-align: right;
     font-family: 'Tajawal', 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
-
 [dir="rtl"] .me-1 { margin-right: 0 !important; margin-left: 0.25rem !important; }
 [dir="rtl"] .me-2 { margin-right: 0 !important; margin-left: 0.5rem !important; }
-[dir="rtl"] .me-3 { margin-right: 0 !important; margin-left: 1rem !important; }
 [dir="rtl"] .ms-1 { margin-left: 0 !important; margin-right: 0.25rem !important; }
 [dir="rtl"] .ms-2 { margin-left: 0 !important; margin-right: 0.5rem !important; }
-[dir="rtl"] .ms-3 { margin-left: 0 !important; margin-right: 1rem !important; }
+[dir="rtl"] .hero-buttons .btn-hero-primary i,
+[dir="rtl"] .hero-buttons .btn-hero-secondary i {
+    margin-left: 8px;
+    margin-right: 0;
+}
+[dir="rtl"] .view-all-link i {
+    transform: rotate(180deg);
+}
+[dir="rtl"] .map-legend { flex-direction: row-reverse; }
+[dir="rtl"] .legend-item { flex-direction: row-reverse; }
+[dir="rtl"] .map-stat-card { flex-direction: row-reverse; text-align: right; }
 
-/* Modern Language Switcher - Arabic */
+/* Import Arabic fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap');
+
+/* All other styles identical to English version, just keep the same classes */
 .language-switcher-modern {
     background: var(--bg-white);
     border-bottom: 1px solid var(--border-light);
     padding: 8px 0;
 }
-
 .language-switcher-modern .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 24px;
 }
-
 .language-buttons {
     display: flex;
     gap: 8px;
     justify-content: flex-start;
 }
-
 [dir="rtl"] .language-buttons {
     justify-content: flex-end;
 }
-
 .btn-lang {
     padding: 6px 18px;
     border-radius: 40px;
@@ -67,26 +78,21 @@
     background: transparent;
     color: var(--text-gray);
 }
-
 .btn-lang.active {
     background: var(--primary-green);
     border-color: var(--primary-green);
     color: white;
 }
-
 .btn-lang:hover:not(.active) {
     border-color: var(--primary-green);
     color: var(--primary-green);
 }
-
-/* Hero Section - Arabic */
 .hero-modern {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
     position: relative;
     overflow: hidden;
     padding: 60px 0;
 }
-
 .hero-modern::before {
     content: '';
     position: absolute;
@@ -98,7 +104,6 @@
     background-size: cover;
     opacity: 0.3;
 }
-
 .hero-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -106,23 +111,19 @@
     position: relative;
     z-index: 2;
 }
-
 .hero-grid {
     display: flex;
     align-items: center;
     gap: 60px;
     flex-wrap: wrap;
 }
-
 [dir="rtl"] .hero-grid {
     flex-direction: row-reverse;
 }
-
 .hero-content {
     flex: 1;
     min-width: 280px;
 }
-
 .hero-badge {
     display: inline-block;
     background: rgba(255,255,255,0.2);
@@ -134,7 +135,6 @@
     color: white;
     margin-bottom: 24px;
 }
-
 .hero-title {
     font-size: 3rem;
     font-weight: 800;
@@ -142,31 +142,21 @@
     margin-bottom: 20px;
     line-height: 1.3;
 }
-
 .hero-title span {
     color: #FFD700;
-    position: relative;
-    display: inline-block;
 }
-
 .hero-description {
     font-size: 1.1rem;
     color: rgba(255,255,255,0.9);
     margin-bottom: 32px;
     line-height: 1.8;
 }
-
 .hero-buttons {
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
     margin-bottom: 32px;
 }
-
-[dir="rtl"] .hero-buttons {
-    justify-content: flex-start;
-}
-
 .btn-hero-primary {
     background: var(--primary-green);
     color: white;
@@ -179,22 +169,13 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    border: none;
-    cursor: pointer;
 }
-
-[dir="rtl"] .btn-hero-primary i {
-    margin-left: 8px;
-    margin-right: 0;
-}
-
 .btn-hero-primary:hover {
     background: #3D8A5E;
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
     color: white;
 }
-
 .btn-hero-secondary {
     background: transparent;
     border: 2px solid white;
@@ -209,29 +190,17 @@
     align-items: center;
     gap: 10px;
 }
-
-[dir="rtl"] .btn-hero-secondary i {
-    margin-left: 8px;
-    margin-right: 0;
-}
-
 .btn-hero-secondary:hover {
     background: white;
     color: var(--primary-blue);
     transform: translateY(-2px);
 }
-
 .trust-badges {
     display: flex;
     gap: 24px;
     align-items: center;
     flex-wrap: wrap;
 }
-
-[dir="rtl"] .trust-badges {
-    justify-content: flex-start;
-}
-
 .trust-item {
     display: flex;
     align-items: center;
@@ -239,31 +208,25 @@
     color: rgba(255,255,255,0.85);
     font-size: 0.85rem;
 }
-
 [dir="rtl"] .trust-item i {
     margin-left: 6px;
     margin-right: 0;
 }
-
 .hero-image {
     flex: 1;
     text-align: center;
     min-width: 280px;
 }
-
 .hero-image img {
     max-width: 100%;
     max-height: 400px;
     filter: drop-shadow(var(--shadow-lg));
 }
-
-/* Stats Section */
 .stats-modern {
     background: var(--bg-white);
     padding: 50px 0;
     border-bottom: 1px solid var(--border-light);
 }
-
 .stats-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -273,49 +236,118 @@
     flex-wrap: wrap;
     gap: 40px;
 }
-
 .stat-item {
     text-align: center;
 }
-
 .stat-number {
     font-size: 2rem;
     font-weight: 800;
     color: var(--primary-blue);
     display: block;
 }
-
 .stat-label {
     font-size: 0.85rem;
     color: var(--text-gray);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
-
-/* How It Works - Modern Cards */
-.how-it-works-modern {
+.map-section-modern {
     padding: 80px 0;
-    background: var(--bg-light);
+    background: linear-gradient(135deg, #F7FAFC 0%, #FFFFFF 100%);
+    border-top: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light);
 }
-
 .section-header {
     text-align: center;
     max-width: 700px;
     margin: 0 auto 48px;
 }
-
 .section-header h2 {
     font-size: 2rem;
     font-weight: 700;
     color: var(--text-dark);
     margin-bottom: 16px;
 }
-
 .section-header p {
     font-size: 1rem;
     color: var(--text-gray);
 }
-
+#algeriaMap {
+    height: 500px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    margin-top: 20px;
+    z-index: 1;
+    background: #E8F5E9;
+}
+.map-legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--text-gray);
+    background: var(--bg-white);
+    padding: 6px 12px;
+    border-radius: 40px;
+    box-shadow: var(--shadow-sm);
+}
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+.legend-dot.high { background: #2C5F8A; box-shadow: 0 0 0 3px rgba(44,95,138,0.2); }
+.legend-dot.medium { background: #7AB2C8; }
+.legend-dot.low { background: #B8D4E3; }
+.map-stats-grid {
+    max-width: 800px;
+    margin: 30px auto 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+}
+.map-stat-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-light);
+}
+.map-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+.map-stat-card i {
+    font-size: 2rem;
+    color: var(--primary-green);
+}
+.map-stat-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    display: block;
+    line-height: 1;
+}
+.map-stat-label {
+    font-size: 0.8rem;
+    color: var(--text-gray);
+}
+.how-it-works-modern {
+    padding: 80px 0;
+    background: var(--bg-light);
+}
 .steps-grid {
     max-width: 1200px;
     margin: 0 auto;
@@ -324,7 +356,6 @@
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 30px;
 }
-
 .step-card-modern {
     text-align: center;
     padding: 32px 24px;
@@ -333,12 +364,10 @@
     transition: all 0.3s ease;
     box-shadow: var(--shadow-sm);
 }
-
 .step-card-modern:hover {
     transform: translateY(-8px);
     box-shadow: var(--shadow-lg);
 }
-
 .step-icon-wrapper {
     width: 80px;
     height: 80px;
@@ -349,12 +378,10 @@
     justify-content: center;
     margin: 0 auto 24px;
 }
-
 .step-icon-wrapper i {
     font-size: 2rem;
     color: white;
 }
-
 .step-number-modern {
     width: 32px;
     height: 32px;
@@ -368,26 +395,21 @@
     font-weight: 700;
     font-size: 0.85rem;
 }
-
 .step-card-modern h3 {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-dark);
     margin-bottom: 12px;
 }
-
 .step-card-modern p {
     color: var(--text-gray);
     line-height: 1.8;
     font-size: 0.9rem;
 }
-
-/* Featured Painters - Modern */
 .featured-modern {
     padding: 80px 0;
     background: var(--bg-white);
 }
-
 .section-header-with-link {
     max-width: 1200px;
     margin: 0 auto 40px;
@@ -398,23 +420,19 @@
     flex-wrap: wrap;
     gap: 16px;
 }
-
 [dir="rtl"] .section-header-with-link {
     flex-direction: row-reverse;
 }
-
 .section-header-with-link h2 {
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--text-dark);
     margin-bottom: 8px;
 }
-
 .section-header-with-link p {
     color: var(--text-gray);
     margin: 0;
 }
-
 .view-all-link {
     color: var(--primary-green);
     text-decoration: none;
@@ -427,17 +445,11 @@
     border-radius: 40px;
     background: #F0FAF4;
 }
-
-[dir="rtl"] .view-all-link i {
-    transform: rotate(180deg);
-}
-
 .view-all-link:hover {
     gap: 12px;
     background: var(--primary-green);
     color: white;
 }
-
 .painters-grid-home {
     max-width: 1200px;
     margin: 0 auto;
@@ -446,7 +458,6 @@
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 30px;
 }
-
 .painter-card-home {
     background: var(--bg-white);
     border-radius: var(--radius-lg);
@@ -456,17 +467,14 @@
     border: 1px solid var(--border-light);
     cursor: pointer;
 }
-
 .painter-card-home:hover {
     transform: translateY(-5px);
     box-shadow: var(--shadow-lg);
 }
-
 .card-body-home {
     padding: 24px;
     text-align: center;
 }
-
 .avatar-home {
     width: 80px;
     height: 80px;
@@ -479,18 +487,15 @@
     align-items: center;
     justify-content: center;
 }
-
 .avatar-home img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
-
 .avatar-home i {
     font-size: 2rem;
     color: white;
 }
-
 .verified-badge-home {
     position: absolute;
     bottom: 0;
@@ -504,19 +509,16 @@
     justify-content: center;
     border: 2px solid var(--bg-white);
 }
-
 .verified-badge-home i {
     font-size: 0.65rem;
     color: white;
 }
-
 .painter-name-home {
     font-size: 1.15rem;
     font-weight: 700;
     color: var(--text-dark);
     margin-bottom: 4px;
 }
-
 .painter-location-home {
     font-size: 0.8rem;
     color: var(--text-gray);
@@ -526,12 +528,10 @@
     gap: 4px;
     margin-bottom: 16px;
 }
-
 [dir="rtl"] .painter-location-home i {
     margin-left: 4px;
     margin-right: 0;
 }
-
 .stats-home {
     display: flex;
     justify-content: center;
@@ -541,42 +541,35 @@
     border-bottom: 1px solid var(--border-light);
     margin-bottom: 16px;
 }
-
 .stat-home {
     text-align: center;
 }
-
 .stat-value-home {
     font-size: 0.9rem;
     font-weight: 700;
     color: var(--primary-blue);
     display: block;
 }
-
 .stat-label-home {
     font-size: 0.65rem;
     color: var(--text-gray);
     text-transform: uppercase;
 }
-
 .rating-home {
     display: flex;
     justify-content: center;
     gap: 4px;
     margin-bottom: 12px;
 }
-
 .rating-home i {
     font-size: 0.75rem;
 }
-
 .price-home {
     font-size: 1.2rem;
     font-weight: 700;
     color: var(--primary-green);
     margin-bottom: 16px;
 }
-
 .btn-profile-home {
     width: 100%;
     padding: 10px;
@@ -588,14 +581,11 @@
     transition: all 0.3s ease;
     cursor: pointer;
 }
-
 .btn-profile-home:hover {
     border-color: var(--primary-green);
     background: #F0FAF4;
     color: var(--primary-green);
 }
-
-/* CTA Section - Modern */
 .cta-modern {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light) 100%);
     padding: 80px 0;
@@ -603,7 +593,6 @@
     position: relative;
     overflow: hidden;
 }
-
 .cta-modern::before {
     content: '';
     position: absolute;
@@ -614,7 +603,6 @@
     background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.03)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat top;
     background-size: cover;
 }
-
 .cta-container {
     max-width: 700px;
     margin: 0 auto;
@@ -622,28 +610,24 @@
     position: relative;
     z-index: 2;
 }
-
 .cta-modern h2 {
     font-size: 2rem;
     font-weight: 700;
     color: white;
     margin-bottom: 16px;
 }
-
 .cta-modern p {
     font-size: 1.1rem;
     color: rgba(255,255,255,0.9);
     margin-bottom: 32px;
     line-height: 1.8;
 }
-
 .cta-buttons {
     display: flex;
     gap: 16px;
     justify-content: center;
     flex-wrap: wrap;
 }
-
 .btn-cta-light {
     background: white;
     color: var(--primary-blue);
@@ -656,17 +640,14 @@
     align-items: center;
     gap: 10px;
 }
-
 [dir="rtl"] .btn-cta-light i {
     margin-left: 8px;
     margin-right: 0;
 }
-
 .btn-cta-light:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
 }
-
 .btn-cta-outline {
     background: transparent;
     border: 2px solid white;
@@ -680,116 +661,51 @@
     align-items: center;
     gap: 10px;
 }
-
 [dir="rtl"] .btn-cta-outline i {
     margin-left: 8px;
     margin-right: 0;
 }
-
 .btn-cta-outline:hover {
     background: white;
     color: var(--primary-blue);
     transform: translateY(-2px);
 }
-
 /* Responsive */
 @media (max-width: 768px) {
-    .hero-title {
-        font-size: 2rem;
-    }
-    
-    .hero-description {
-        font-size: 1rem;
-    }
-    
-    .hero-grid {
-        gap: 40px;
-        text-align: center;
-    }
-    
-    [dir="rtl"] .hero-grid {
-        text-align: center;
-    }
-    
-    .hero-buttons {
-        justify-content: center;
-    }
-    
-    .trust-badges {
-        justify-content: center;
-    }
-    
-    .section-header h2 {
-        font-size: 1.6rem;
-    }
-    
-    .steps-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    .painters-grid-home {
-        grid-template-columns: 1fr;
-    }
-    
-    .section-header-with-link {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .stats-container {
-        gap: 25px;
-    }
-    
-    .stat-number {
-        font-size: 1.5rem;
-    }
-    
-    .cta-modern h2 {
-        font-size: 1.5rem;
-    }
-    
-    .language-buttons {
-        justify-content: center;
-    }
-    
-    [dir="rtl"] .language-buttons {
-        justify-content: center;
-    }
+    .hero-title { font-size: 2rem; }
+    .hero-description { font-size: 1rem; }
+    .hero-grid { gap: 40px; text-align: center; }
+    .hero-buttons, .trust-badges { justify-content: center; }
+    .section-header h2 { font-size: 1.6rem; }
+    .steps-grid { grid-template-columns: 1fr; gap: 20px; }
+    .painters-grid-home { grid-template-columns: 1fr; }
+    .section-header-with-link { flex-direction: column; text-align: center; }
+    .stats-container { gap: 25px; }
+    .stat-number { font-size: 1.5rem; }
+    .cta-modern h2 { font-size: 1.5rem; }
+    .language-buttons { justify-content: center; }
+    #algeriaMap { height: 350px; }
+    .map-stats-grid { grid-template-columns: 1fr; padding: 0 20px; }
+    .legend-item { font-size: 0.7rem; }
 }
-
 @media (min-width: 769px) and (max-width: 1024px) {
-    .painters-grid-home {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    .painters-grid-home { grid-template-columns: repeat(2, 1fr); }
 }
-
 /* Animations */
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
 .hero-content, .hero-image, .step-card-modern, .painter-card-home {
     animation: fadeInUp 0.6s ease forwards;
 }
-
 .step-card-modern:nth-child(1) { animation-delay: 0.1s; }
 .step-card-modern:nth-child(2) { animation-delay: 0.2s; }
 .step-card-modern:nth-child(3) { animation-delay: 0.3s; }
 .step-card-modern:nth-child(4) { animation-delay: 0.4s; }
-
-/* Arabic Font */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap');
 </style>
 
-<!-- Language Switcher - Modern -->
+<!-- ===== LANGUAGE SWITCHER (ARABIC ACTIVE) ===== -->
 <div class="language-switcher-modern">
     <div class="container">
         <div class="language-buttons">
@@ -799,41 +715,22 @@
     </div>
 </div>
 
-<!-- Hero Section - Modern Arabic -->
+<!-- ===== HERO SECTION (ARABIC) ===== -->
 <section class="hero-modern" dir="rtl">
     <div class="hero-container">
         <div class="hero-grid">
             <div class="hero-content">
-                <div class="hero-badge">
-                    <i class="fas fa-check-circle"></i> المنصة الأولى للدهانين في الجزائر
-                </div>
-                <h1 class="hero-title">
-                    ابحث عن دهانين <span>محترفين</span> في منطقتك
-                </h1>
-                <p class="hero-description">
-                    تواصل مع دهانين موثوقين عبر الجزائر. خدمة عالية الجودة، أسعار عادلة، ورضا مضمون لجميع مشاريع الدهان الخاصة بك.
-                </p>
+                <div class="hero-badge"><i class="fas fa-check-circle"></i> المنصة الأولى للدهانين في الجزائر</div>
+                <h1 class="hero-title">ابحث عن دهانين <span>محترفين</span> في منطقتك</h1>
+                <p class="hero-description">تواصل مع دهانين موثوقين عبر الجزائر. خدمة عالية الجودة، أسعار عادلة، ورضا مضمون لجميع مشاريع الدهان الخاصة بك.</p>
                 <div class="hero-buttons">
-                    <a href="/painters" class="btn-hero-primary">
-                        <i class="fas fa-search"></i> ابحث عن دهانين
-                    </a>
-                    <a href="/auth/register-painter" class="btn-hero-secondary">
-                        <i class="fas fa-brush"></i> انضم كدهان
-                    </a>
+                    <a href="/painters" class="btn-hero-primary"><i class="fas fa-search"></i> ابحث عن دهانين</a>
+                    <a href="/auth/register-painter" class="btn-hero-secondary"><i class="fas fa-brush"></i> انضم كدهان</a>
                 </div>
                 <div class="trust-badges">
-                    <div class="trust-item">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>دهانين موثوقين</span>
-                    </div>
-                    <div class="trust-item">
-                        <i class="fas fa-star"></i>
-                        <span>تقييم 4.8+</span>
-                    </div>
-                    <div class="trust-item">
-                        <i class="fas fa-handshake"></i>
-                        <span>رضا 100%</span>
-                    </div>
+                    <div class="trust-item"><i class="fas fa-shield-alt"></i><span>دهانين موثوقين</span></div>
+                    <div class="trust-item"><i class="fas fa-star"></i><span>تقييم 4.8+</span></div>
+                    <div class="trust-item"><i class="fas fa-handshake"></i><span>رضا 100%</span></div>
                 </div>
             </div>
             <div class="hero-image">
@@ -843,29 +740,38 @@
     </div>
 </section>
 
-<!-- Stats Section -->
+<!-- ===== STATS SECTION (ARABIC) ===== -->
 <section class="stats-modern" dir="rtl">
     <div class="stats-container">
-        <div class="stat-item">
-            <span class="stat-number">500+</span>
-            <span class="stat-label">دهان موثوق</span>
+        <div class="stat-item"><span class="stat-number">500+</span><span class="stat-label">دهان موثوق</span></div>
+        <div class="stat-item"><span class="stat-number">2,000+</span><span class="stat-label">عميل سعيد</span></div>
+        <div class="stat-item"><span class="stat-number">58</span><span class="stat-label">ولاية مغطاة</span></div>
+        <div class="stat-item"><span class="stat-number">4.9★</span><span class="stat-label">متوسط التقييم</span></div>
+    </div>
+</section>
+
+<!-- ===== INTERACTIVE MAP SECTION (ARABIC TEXT) ===== -->
+<section class="map-section-modern" dir="rtl">
+    <div class="container">
+        <div class="section-header">
+            <h2>الدهانين عبر الجزائر</h2>
+            <p>شبكتنا من الدهانين المحترفين تغطي جميع الولايات الـ 58</p>
         </div>
-        <div class="stat-item">
-            <span class="stat-number">2,000+</span>
-            <span class="stat-label">عميل سعيد</span>
+        <div id="algeriaMap"></div>
+        <div class="map-legend">
+            <div class="legend-item"><div class="legend-dot high"></div><span>نشاط عالي (50+ دهان)</span></div>
+            <div class="legend-item"><div class="legend-dot medium"></div><span>نشاط متوسط (20-50)</span></div>
+            <div class="legend-item"><div class="legend-dot low"></div><span>نشاط متنامٍ (أقل من 20)</span></div>
         </div>
-        <div class="stat-item">
-            <span class="stat-number">58</span>
-            <span class="stat-label">ولاية مغطاة</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">4.9★</span>
-            <span class="stat-label">متوسط التقييم</span>
+        <div class="map-stats-grid">
+            <div class="map-stat-card"><i class="fas fa-city"></i><div><span class="map-stat-number">58</span><span class="map-stat-label">ولاية مغطاة</span></div></div>
+            <div class="map-stat-card"><i class="fas fa-users"></i><div><span class="map-stat-number">500+</span><span class="map-stat-label">دهان نشط</span></div></div>
+            <div class="map-stat-card"><i class="fas fa-chart-line"></i><div><span class="map-stat-number">100%</span><span class="map-stat-label">تغطية وطنية</span></div></div>
         </div>
     </div>
 </section>
 
-<!-- How It Works - Modern Arabic -->
+<!-- ===== HOW IT WORKS (ARABIC) ===== -->
 <section class="how-it-works-modern" dir="rtl">
     <div class="section-header">
         <h2>كيف تعمل بينتيلو برو</h2>
@@ -874,51 +780,37 @@
     <div class="steps-grid">
         <div class="step-card-modern">
             <div class="step-number-modern">١</div>
-            <div class="step-icon-wrapper">
-                <i class="fas fa-search"></i>
-            </div>
+            <div class="step-icon-wrapper"><i class="fas fa-search"></i></div>
             <h3>ابحث عن دهانين</h3>
             <p>ابحث عن دهانين موثوقين في ولايتك مع التقييمات والأعمال السابقة</p>
         </div>
         <div class="step-card-modern">
             <div class="step-number-modern">٢</div>
-            <div class="step-icon-wrapper">
-                <i class="fas fa-clipboard-list"></i>
-            </div>
+            <div class="step-icon-wrapper"><i class="fas fa-clipboard-list"></i></div>
             <h3>أنشئ طلباً</h3>
             <p>صف مشروعك، حدد الميزانية، واختر الدهان المفضل لديك</p>
         </div>
         <div class="step-card-modern">
             <div class="step-number-modern">٣</div>
-            <div class="step-icon-wrapper">
-                <i class="fas fa-paint-roller"></i>
-            </div>
+            <div class="step-icon-wrapper"><i class="fas fa-paint-roller"></i></div>
             <h3>ابدأ العمل</h3>
             <p>يقوم الدهانين المحترفون بإنجاز مشروعك بمواد عالية الجودة</p>
         </div>
         <div class="step-card-modern">
             <div class="step-number-modern">٤</div>
-            <div class="step-icon-wrapper">
-                <i class="fas fa-star"></i>
-            </div>
+            <div class="step-icon-wrapper"><i class="fas fa-star"></i></div>
             <h3>قيم العمل</h3>
             <p>شارك تجربتك وساعد في الحفاظ على معايير الجودة</p>
         </div>
     </div>
 </section>
 
-<!-- Featured Painters - Modern Arabic -->
+<!-- ===== FEATURED PAINTERS (ARABIC) ===== -->
 <section class="featured-modern" dir="rtl">
     <div class="section-header-with-link">
-        <div>
-            <h2>الدهانين المميزين</h2>
-            <p>المحترفون الأعلى تقييماً في منطقتك</p>
-        </div>
-        <a href="/painters" class="view-all-link">
-            عرض جميع الدهانين <i class="fas fa-arrow-left"></i>
-        </a>
+        <div><h2>الدهانين المميزين</h2><p>المحترفون الأعلى تقييماً في منطقتك</p></div>
+        <a href="/painters" class="view-all-link">عرض جميع الدهانين <i class="fas fa-arrow-left"></i></a>
     </div>
-    
     <div class="painters-grid-home">
         <% featuredPainters.forEach(painter => { %>
         <div class="painter-card-home" onclick="window.location.href='/painters/<%= painter._id %>'">
@@ -930,24 +822,14 @@
                         <i class="fas fa-brush"></i>
                     <% } %>
                     <% if (painter.verification?.status === 'verified') { %>
-                        <div class="verified-badge-home">
-                            <i class="fas fa-check"></i>
-                        </div>
+                        <div class="verified-badge-home"><i class="fas fa-check"></i></div>
                     <% } %>
                 </div>
                 <div class="painter-name-home"><%= painter.name %></div>
-                <div class="painter-location-home">
-                    <i class="fas fa-map-marker-alt"></i> <%= painter.location?.wilaya || 'الجزائر' %>
-                </div>
+                <div class="painter-location-home"><i class="fas fa-map-marker-alt"></i> <%= painter.location?.wilaya || 'الجزائر' %></div>
                 <div class="stats-home">
-                    <div class="stat-home">
-                        <span class="stat-value-home"><%= painter.experience || 0 %></span>
-                        <span class="stat-label-home">سنوات</span>
-                    </div>
-                    <div class="stat-home">
-                        <span class="stat-value-home"><%= painter.completedJobs || 0 %></span>
-                        <span class="stat-label-home">مشاريع</span>
-                    </div>
+                    <div class="stat-home"><span class="stat-value-home"><%= painter.experience || 0 %></span><span class="stat-label-home">سنوات</span></div>
+                    <div class="stat-home"><span class="stat-value-home"><%= painter.completedJobs || 0 %></span><span class="stat-label-home">مشاريع</span></div>
                 </div>
                 <div class="rating-home">
                     <% for (let i = 1; i <= 5; i++) { %>
@@ -955,32 +837,70 @@
                     <% } %>
                     <span style="font-size: 0.7rem; color: var(--text-gray); margin-right: 4px;">(<%= (painter.rating || 0).toFixed(1) %>)</span>
                 </div>
-                <div class="price-home">
-                    <%= painter.pricePerSqm || 0 %> دج/م²
-                </div>
-                <button class="btn-profile-home" onclick="event.stopPropagation(); window.location.href='/painters/<%= painter._id %>'">
-                    عرض الملف الشخصي
-                </button>
+                <div class="price-home"><%= painter.pricePerSqm || 0 %> دج/م²</div>
+                <button class="btn-profile-home" onclick="event.stopPropagation(); window.location.href='/painters/<%= painter._id %>'">عرض الملف الشخصي</button>
             </div>
         </div>
         <% }); %>
     </div>
 </section>
 
-<!-- CTA Section - Modern Arabic -->
+<!-- ===== CTA SECTION (ARABIC) ===== -->
 <section class="cta-modern" dir="rtl">
     <div class="cta-container">
         <h2>مستعد لبدء مشروع الدهان الخاص بك؟</h2>
         <p>انضم إلى آلاف العملاء الراضين الذين وجدوا دهّامهم المثالي عبر بينتيلو برو</p>
         <div class="cta-buttons">
-            <a href="/auth/register" class="btn-cta-light">
-                <i class="fas fa-user-plus"></i> ابدأ كعميل
-            </a>
-            <a href="/auth/register-painter" class="btn-cta-outline">
-                <i class="fas fa-brush"></i> انضم كدهان
-            </a>
+            <a href="/auth/register" class="btn-cta-light"><i class="fas fa-user-plus"></i> ابدأ كعميل</a>
+            <a href="/auth/register-painter" class="btn-cta-outline"><i class="fas fa-brush"></i> انضم كدهان</a>
         </div>
     </div>
 </section>
+
+<script>
+    // Same map initialization as English version (works with RTL layout)
+    var map = L.map('algeriaMap').setView([28.0, 2.0], 6);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CartoDB',
+        subdomains: 'abcd',
+        maxZoom: 19,
+        minZoom: 5
+    }).addTo(map);
+    
+    const wilayas = [
+        { name: "الجزائر", lat: 36.763056, lng: 3.050556, painters: 128, activity: "high" },
+        { name: "وهران", lat: 35.696944, lng: -0.633056, painters: 86, activity: "high" },
+        { name: "قسنطينة", lat: 36.365, lng: 6.614722, painters: 64, activity: "high" },
+        { name: "عنابة", lat: 36.902778, lng: 7.7525, painters: 42, activity: "medium" },
+        { name: "تيزي وزو", lat: 36.716667, lng: 4.05, painters: 38, activity: "medium" },
+        { name: "بجاية", lat: 36.75, lng: 5.083333, painters: 35, activity: "medium" },
+        { name: "سطيف", lat: 36.183333, lng: 5.4, painters: 52, activity: "medium" },
+        { name: "البليدة", lat: 36.466667, lng: 2.816667, painters: 29, activity: "low" },
+        { name: "تلمسان", lat: 34.882778, lng: -1.316667, painters: 31, activity: "low" },
+        { name: "باتنة", lat: 35.555, lng: 6.178056, painters: 27, activity: "low" },
+        { name: "بسكرة", lat: 34.85, lng: 5.733333, painters: 22, activity: "low" },
+        { name: "الجلفة", lat: 34.666667, lng: 3.25, painters: 18, activity: "low" },
+        { name: "ورقلة", lat: 31.95, lng: 5.316667, painters: 15, activity: "low" },
+        { name: "غرداية", lat: 32.483333, lng: 3.666667, painters: 12, activity: "low" },
+        { name: "تمنراست", lat: 22.785, lng: 5.522778, painters: 8, activity: "low" }
+    ];
+    
+    const markerColors = { high: '#2C5F8A', medium: '#7AB2C8', low: '#B8D4E3' };
+    
+    wilayas.forEach(w => {
+        const color = markerColors[w.activity];
+        const customIcon = L.divIcon({
+            html: `<div style="background-color: ${color}; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">${w.painters}</div>`,
+            iconSize: [32, 32],
+            className: 'custom-marker'
+        });
+        const marker = L.marker([w.lat, w.lng], { icon: customIcon }).addTo(map);
+        marker.bindPopup(`<b>${w.name}</b><br><span style="color: #2C5F8A;">${w.painters} دهاناً</span><br><small>محترفون جاهزون للعمل</small>`);
+    });
+    
+    L.control.scale({ metric: true, imperial: false }).addTo(map);
+    const group = L.featureGroup(wilayas.map(w => L.marker([w.lat, w.lng])));
+    map.fitBounds(group.getBounds().pad(0.2));
+</script>
 
 <%- include('../partials/footer') %>
