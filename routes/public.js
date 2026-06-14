@@ -29,6 +29,56 @@ router.get('/', async (req, res) => {
     });
   }
 });
+// Arabic route for painters search (same data, different view)
+router.get('/ar/painters', async (req, res) => {
+  try {
+    const { wilaya, specialization, minRating, maxPrice, minExperience, availability, sort = 'rating' } = req.query;
+    
+    // Build query – exactly the same as English version
+    let query = { 
+      'verification.status': 'verified',
+      'isActive': true
+    };
+
+    if (wilaya && wilaya !== 'all') query['location.wilaya'] = wilaya;
+    if (specialization) query['specialization'] = Array.isArray(specialization) ? { $in: specialization } : specialization;
+    if (minRating) query['rating'] = { $gte: parseFloat(minRating) };
+    if (maxPrice) query['pricePerSqm'] = { $lte: parseInt(maxPrice) };
+    if (minExperience) query['experience'] = { $gte: parseInt(minExperience) };
+    if (availability === 'true') query['availability'] = 'available';
+
+    let sortOptions = {};
+    switch (sort) {
+      case 'rating': sortOptions = { rating: -1, completedJobs: -1 }; break;
+      case 'experience': sortOptions = { experience: -1, rating: -1 }; break;
+      case 'price_low': sortOptions = { pricePerSqm: 1 }; break;
+      case 'price_high': sortOptions = { pricePerSqm: -1 }; break;
+      default: sortOptions = { rating: -1 };
+    }
+
+    const painters = await Painter.find(query)
+      .select('name experience pricePerSqm specialization rating completedJobs profilePicture location portfolio verification availability')
+      .sort(sortOptions);
+
+    // Render the Arabic view (make sure the file exists at views/public/paintersar.ejs)
+    res.render('public/paintersar', {
+      title: 'ابحث عن دهانين محترفين - بينتيلو برو',
+      painters: painters,
+      wilayas: wilayas,
+      query: req.query,
+      user: req.session.user || null
+    });
+  } catch (error) {
+    console.error('Arabic painters search error:', error);
+    res.render('public/paintersar', {
+      title: 'ابحث عن دهانين - بينتيلو برو',
+      painters: [],
+      wilayas: wilayas,
+      query: {},
+      error: 'حدث خطأ أثناء تحميل الدهانين'
+    });
+  }
+});
 // Public painter search page
 router.get('/painters', async (req, res) => {
   try {
