@@ -317,75 +317,6 @@ body {
     gap: 5px;
 }
 
-/* Project Detail */
-.project-detail {
-    max-width: 935px;
-    margin: 0 auto;
-    padding: 0 20px;
-    display: none;
-}
-
-.project-detail.active {
-    display: block;
-}
-
-.project-detail-card {
-    background: var(--bg-white);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 30px;
-    border: 1px solid var(--border-color);
-}
-
-.project-detail-image {
-    width: 100%;
-    max-height: 600px;
-    object-fit: contain;
-    background: #000;
-}
-
-.project-detail-info {
-    padding: 30px;
-}
-
-.project-title-modern {
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin-bottom: 15px;
-    color: var(--text-dark);
-}
-
-.project-description-modern {
-    color: var(--text-dark);
-    line-height: 1.6;
-    margin-bottom: 20px;
-}
-
-.project-meta-modern {
-    display: flex;
-    gap: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-color);
-    color: var(--text-gray);
-}
-
-.btn-back-to-grid {
-    margin: 20px 20px;
-    padding: 8px 20px;
-    background: var(--primary-blue);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.3s ease;
-}
-
-.btn-back-to-grid:hover {
-    background: var(--primary-dark);
-    color: white;
-}
-
 /* Reviews */
 .reviews-section {
     max-width: 935px;
@@ -482,23 +413,7 @@ body {
     color: var(--text-dark);
 }
 
-/* Carousel */
-.carousel-item img {
-    width: 100%;
-    height: auto;
-    max-height: 600px;
-    object-fit: contain;
-    cursor: pointer;
-}
-
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    background-color: rgba(0,0,0,0.5);
-    border-radius: 50%;
-    padding: 20px;
-}
-
-/* Lightbox Overlay */
+/* LIGHTBOX MODAL */
 #lightboxOverlay {
     display: none;
     position: fixed;
@@ -510,6 +425,7 @@ body {
     z-index: 9999;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
 }
 
 #lightboxOverlay.active {
@@ -582,6 +498,19 @@ body {
 
 .lightbox-nav button:hover {
     background: rgba(255,255,255,0.4);
+}
+
+.lightbox-counter {
+    color: white;
+    font-size: 0.9rem;
+    background: rgba(0,0,0,0.6);
+    padding: 6px 14px;
+    border-radius: 20px;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
 }
 
 /* Responsive */
@@ -736,31 +665,28 @@ body {
 <!-- Posts Grid -->
 <div id="posts-view">
     <% 
-    const allImages = [];
-    (painter.portfolio || []).forEach((project, pIndex) => {
-        const imgs = Array.isArray(project.images) ? project.images.filter(i => i && i.url) : [];
-        imgs.forEach((img, localIdx) => {
-            allImages.push({
-                url: img.url,
-                projectIndex: pIndex,
-                localIndex: localIdx,
-                project: project
+    // Build array of all image URLs for lightbox navigation
+    const allImageUrls = [];
+    (painter.portfolio || []).forEach(project => {
+        if (project.images && project.images.length) {
+            project.images.forEach(img => {
+                if (img.url) allImageUrls.push(img.url);
             });
-        });
+        }
     });
     %>
     
     <div class="portfolio-grid-modern" id="posts-grid">
-        <% if (allImages.length === 0) { %>
+        <% if (allImageUrls.length === 0) { %>
             <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
                 <i class="fas fa-camera" style="font-size: 3rem; color: var(--text-gray); margin-bottom: 20px;"></i>
                 <h3 style="color: var(--text-dark);">No Posts Yet</h3>
                 <p style="color: var(--text-gray);">This painter hasn't shared any projects.</p>
             </div>
         <% } else { %>
-            <% allImages.forEach((image, idx) => { %>
-                <div class="portfolio-item" onclick="showProjectDetail(<%= image.projectIndex %>, <%= image.localIndex %>)">
-                    <img src="<%= image.url %>" alt="<%= image.project.title %>" loading="lazy">
+            <% allImageUrls.forEach((url, index) => { %>
+                <div class="portfolio-item" onclick="openLightboxAt(<%= index %>)">
+                    <img src="<%= url %>" alt="Project" loading="lazy">
                     <div class="portfolio-overlay">
                         <div class="overlay-stats">
                             <span><i class="fas fa-heart"></i> 0</span>
@@ -773,48 +699,7 @@ body {
     </div>
 </div>
 
-<!-- Project Detail View -->
-<div id="project-detail-view" style="display: none;">
-    <div class="project-detail active">
-        <button class="btn-back-to-grid" onclick="showPostsGrid()">
-            <i class="fas fa-arrow-left"></i> Back to all posts
-        </button>
-        
-        <div class="project-detail-card">
-            <div id="project-carousel" class="carousel slide" data-bs-ride="false">
-                <div class="carousel-inner" id="project-carousel-inner">
-                    <!-- injected by JS -->
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#project-carousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#project-carousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
-            
-            <div class="project-detail-info">
-                <h3 class="project-title-modern" id="project-title"></h3>
-                <div class="project-description-modern" id="project-description"></div>
-                <div class="project-meta-modern">
-                    <span><i class="fas fa-tag"></i> <span id="project-category"></span></span>
-                    <span><i class="fas fa-ruler"></i> <span id="project-size"></span></span>
-                    <span><i class="fas fa-calendar"></i> <span id="project-date"></span></span>
-                </div>
-                
-                <div class="text-center mt-4">
-                    <a href="/painters/<%= painter._id %>/order" class="btn-action btn-book" style="padding: 12px 40px;">
-                        <i class="fas fa-handshake"></i> Hire This Painter
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Reviews -->
+<!-- Reviews Section -->
 <div class="reviews-section" id="reviews-tab">
     <% const reviews = painter.reviews || []; %>
     <% if (reviews.length === 0) { %>
@@ -844,7 +729,7 @@ body {
     <% } %>
 </div>
 
-<!-- About -->
+<!-- About Section -->
 <div class="about-section" id="about-tab">
     <div class="about-card">
         <div class="about-title">
@@ -884,7 +769,7 @@ body {
     </div>
 </div>
 
-<!-- Lightbox Overlay -->
+<!-- LIGHTBOX MODAL -->
 <div id="lightboxOverlay" role="dialog" aria-hidden="true">
     <div id="lightboxBox">
         <img id="lightboxImg" src="" alt="Zoomed">
@@ -893,29 +778,20 @@ body {
             <button onclick="prevLightbox()" title="Previous">❮</button>
             <button onclick="nextLightbox()" title="Next">❯</button>
         </div>
+        <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
     </div>
 </div>
 
 <script>
 // ===== DATA =====
-const allImagesData = <%= JSON.stringify(allImages) %>;
-const allImageUrls = allImagesData.map(img => img.url);
-const portfolioData = <%= JSON.stringify(painter.portfolio || []) %>;
+const imageUrls = <%= JSON.stringify(allImageUrls) %>;
+let currentIndex = 0;
 
 // ===== LIGHTBOX =====
-let lightboxIndex = 0;
-let scale = 1;
-let translateX = 0;
-let translateY = 0;
-let isDragging = false;
-let startX, startY, startTranslateX, startTranslateY;
-let currentCarousel = null;
-
 function openLightboxAt(index) {
-    if (!allImageUrls.length) return;
-    lightboxIndex = ((index % allImageUrls.length) + allImageUrls.length) % allImageUrls.length;
-    document.getElementById('lightboxImg').src = allImageUrls[lightboxIndex];
-    resetTransform();
+    if (!imageUrls.length) return;
+    currentIndex = ((index % imageUrls.length) + imageUrls.length) % imageUrls.length;
+    updateLightboxImage();
     document.getElementById('lightboxOverlay').classList.add('active');
     document.body.style.overflow = 'hidden';
 }
@@ -923,18 +799,38 @@ function openLightboxAt(index) {
 function closeLightbox() {
     document.getElementById('lightboxOverlay').classList.remove('active');
     document.body.style.overflow = '';
-    resetTransform();
+    resetZoom();
 }
 
 function nextLightbox() {
-    openLightboxAt(lightboxIndex + 1);
+    if (imageUrls.length <= 1) return;
+    currentIndex = (currentIndex + 1) % imageUrls.length;
+    updateLightboxImage();
 }
 
 function prevLightbox() {
-    openLightboxAt(lightboxIndex - 1);
+    if (imageUrls.length <= 1) return;
+    currentIndex = (currentIndex - 1 + imageUrls.length) % imageUrls.length;
+    updateLightboxImage();
 }
 
-function resetTransform() {
+function updateLightboxImage() {
+    const img = document.getElementById('lightboxImg');
+    img.src = imageUrls[currentIndex];
+    document.getElementById('lightboxCounter').textContent = `${currentIndex + 1} / ${imageUrls.length}`;
+    resetZoom();
+}
+
+// ===== ZOOM & PAN =====
+let scale = 1;
+let translateX = 0;
+let translateY = 0;
+let isDragging = false;
+let startX, startY, startTranslateX, startTranslateY;
+
+const img = document.getElementById('lightboxImg');
+
+function resetZoom() {
     scale = 1;
     translateX = 0;
     translateY = 0;
@@ -942,62 +838,64 @@ function resetTransform() {
 }
 
 function applyTransform() {
-    const img = document.getElementById('lightboxImg');
     img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    img.style.cursor = scale > 1 ? 'grab' : 'default';
 }
 
-// Lightbox events
-document.addEventListener('DOMContentLoaded', function() {
-    const overlay = document.getElementById('lightboxOverlay');
-    const img = document.getElementById('lightboxImg');
-    
-    overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) closeLightbox();
-    });
-    
-    document.addEventListener('keydown', function(e) {
-        if (!overlay.classList.contains('active')) return;
-        if (e.key === 'Escape') closeLightbox();
-        if (e.key === 'ArrowRight') nextLightbox();
-        if (e.key === 'ArrowLeft') prevLightbox();
-    });
-    
-    img.addEventListener('wheel', function(e) {
-        if (!e.ctrlKey && !e.metaKey) return;
-        e.preventDefault();
-        const delta = e.deltaY > 0 ? 0.9 : 1.1;
-        const newScale = Math.max(1, Math.min(4, scale * delta));
+// Mousewheel zoom
+img.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    const newScale = Math.max(1, Math.min(4, scale * delta));
+    if (newScale !== scale) {
         scale = newScale;
         applyTransform();
-    }, { passive: false });
-    
-    img.addEventListener('dblclick', function() {
-        resetTransform();
-    });
-    
-    img.addEventListener('mousedown', function(e) {
-        if (scale <= 1) return;
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        startTranslateX = translateX;
-        startTranslateY = translateY;
-        img.style.cursor = 'grabbing';
-    });
-    
-    document.addEventListener('mousemove', function(e) {
-        if (!isDragging) return;
-        translateX = e.clientX - startX + startTranslateX;
-        translateY = e.clientY - startY + startTranslateY;
-        applyTransform();
-    });
-    
-    document.addEventListener('mouseup', function() {
-        if (isDragging) {
-            isDragging = false;
-            img.style.cursor = 'grab';
-        }
-    });
+    }
+}, { passive: false });
+
+// Double-click reset
+img.addEventListener('dblclick', function(e) {
+    e.preventDefault();
+    resetZoom();
+});
+
+// Drag to pan
+img.addEventListener('mousedown', function(e) {
+    if (scale <= 1) return;
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    startTranslateX = translateX;
+    startTranslateY = translateY;
+    img.style.cursor = 'grabbing';
+});
+
+document.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    translateX = e.clientX - startX + startTranslateX;
+    translateY = e.clientY - startY + startTranslateY;
+    applyTransform();
+});
+
+document.addEventListener('mouseup', function() {
+    if (isDragging) {
+        isDragging = false;
+        img.style.cursor = 'grab';
+    }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    const overlay = document.getElementById('lightboxOverlay');
+    if (!overlay.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight') nextLightbox();
+    if (e.key === 'ArrowLeft') prevLightbox();
+});
+
+// Click outside to close
+document.getElementById('lightboxOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
 });
 
 // ===== TABS =====
@@ -1008,64 +906,10 @@ document.querySelectorAll('.tab').forEach(tab => {
         this.classList.add('active');
         
         document.getElementById('posts-view').style.display = tabId === 'posts' ? 'block' : 'none';
-        document.getElementById('project-detail-view').style.display = 'none';
         document.getElementById('reviews-tab').style.display = tabId === 'reviews' ? 'block' : 'none';
         document.getElementById('about-tab').style.display = tabId === 'about' ? 'block' : 'none';
-        
-        if (tabId === 'posts') showPostsGrid();
     });
 });
-
-function showPostsGrid() {
-    document.getElementById('posts-view').style.display = 'block';
-    document.getElementById('project-detail-view').style.display = 'none';
-}
-
-// ===== PROJECT DETAIL =====
-function showProjectDetail(projectIndex, imageIndex) {
-    const project = portfolioData[projectIndex];
-    if (!project) return;
-    
-    const images = (project.images || []).filter(i => i && i.url);
-    if (!images.length) return;
-    
-    const carouselInner = document.getElementById('project-carousel-inner');
-    carouselInner.innerHTML = '';
-    
-    images.forEach((img, idx) => {
-        const div = document.createElement('div');
-        div.className = `carousel-item ${idx === imageIndex ? 'active' : ''}`;
-        div.innerHTML = `<img src="${img.url}" class="d-block w-100" alt="${project.title}" onclick="openLightboxFromProjectDetail(${projectIndex}, ${idx})">`;
-        carouselInner.appendChild(div);
-    });
-    
-    document.getElementById('project-title').textContent = project.title || 'Untitled Project';
-    document.getElementById('project-description').textContent = project.description || 'No description available.';
-    document.getElementById('project-category').textContent = project.category || 'General';
-    document.getElementById('project-size').textContent = project.projectSize || 'Not specified';
-    document.getElementById('project-date').textContent = project.uploadedAt ? new Date(project.uploadedAt).toLocaleDateString() : 'Unknown';
-    
-    document.getElementById('posts-view').style.display = 'none';
-    document.getElementById('project-detail-view').style.display = 'block';
-    
-    // Init Bootstrap carousel
-    const carouselEl = document.getElementById('project-carousel');
-    if (currentCarousel) currentCarousel.dispose();
-    currentCarousel = new bootstrap.Carousel(carouselEl, {
-        interval: false,
-        ride: false
-    });
-}
-
-function openLightboxFromProjectDetail(projectIndex, imageIndex) {
-    let absIdx = 0;
-    for (let i = 0; i < projectIndex; i++) {
-        const proj = portfolioData[i];
-        absIdx += (proj.images || []).filter(img => img && img.url).length;
-    }
-    absIdx += imageIndex;
-    openLightboxAt(absIdx);
-}
 
 // ===== ACTIONS =====
 function contactWhatsApp() {
