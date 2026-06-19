@@ -304,7 +304,7 @@ body {
     gap: 5px;
 }
 
-/* Project Detail View (for when clicking on grid item) */
+/* Project Detail View */
 .project-detail {
     max-width: 935px;
     margin: 0 auto;
@@ -460,6 +460,15 @@ body {
     color: var(--text-dark);
 }
 
+/* Carousel overrides */
+.carousel-item img {
+    width: 100%;
+    height: auto;
+    max-height: 600px;
+    object-fit: contain;
+    cursor: pointer;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .profile-grid {
@@ -511,15 +520,6 @@ body {
         font-size: 0.8rem;
     }
 }
-
-/* Carousel overrides for project detail */
-.carousel-item img {
-    width: 100%;
-    height: auto;
-    max-height: 600px;
-    object-fit: contain;
-    cursor: pointer;
-}
 </style>
 
 <!-- Modern Profile Header -->
@@ -530,7 +530,7 @@ body {
             <div class="avatar-modern">
                 <% if (painter.profilePicture && painter.profilePicture.url) { %>
                     <img src="<%= painter.profilePicture.url %>" alt="<%= painter.name %>" 
-                         onclick="openLightboxFromProject(0, 0, true)">
+                         onclick="openLightboxAt(0)">
                 <% } else { %>
                     <img src="https://via.placeholder.com/300x300?text=Painter" alt="No profile">
                 <% } %>
@@ -662,7 +662,7 @@ body {
 
 <!-- Project Detail View -->
 <div id="project-detail-view" style="display: none;">
-    <div class="project-detail">
+    <div class="project-detail active">
         <button class="btn-back-to-grid" onclick="showPostsGrid()">
             <i class="fas fa-arrow-left"></i> Back to all posts
         </button>
@@ -673,10 +673,12 @@ body {
                     <!-- Carousel items will be injected here -->
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#project-carousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon"></span>
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
                 </button>
                 <button class="carousel-control-next" type="button" data-bs-target="#project-carousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon"></span>
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
                 </button>
             </div>
             
@@ -769,7 +771,7 @@ body {
     </div>
 </div>
 
-<!-- Keep existing lightbox overlay from original -->
+<!-- Lightbox Overlay -->
 <div id="lightboxOverlay" role="dialog" aria-hidden="true">
     <div id="lightboxBox">
         <img id="lightboxImg" src="" alt="Zoomed">
@@ -782,29 +784,124 @@ body {
 </div>
 
 <script>
-// Store all images data
+// Store all images data globally
 const allImagesData = <%= JSON.stringify(allImages) %>;
-let currentAbsIndex = 0;
+const allImageUrls = allImagesData.map(img => img.url);
 
-// Tab switching
+// ===== LIGHTBOX FUNCTIONS =====
+let lightboxIndex = 0;
+let scale = 1;
+let translateX = 0;
+let translateY = 0;
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+
+function openLightboxAt(index) {
+    if (!allImageUrls.length) return;
+    lightboxIndex = ((index % allImageUrls.length) + allImageUrls.length) % allImageUrls.length;
+    document.getElementById('lightboxImg').src = allImageUrls[lightboxIndex];
+    resetTransform();
+    document.getElementById('lightboxOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    document.getElementById('lightboxOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+    resetTransform();
+}
+
+function nextLightbox() {
+    openLightboxAt(lightboxIndex + 1);
+}
+
+function prevLightbox() {
+    openLightboxAt(lightboxIndex - 1);
+}
+
+function resetTransform() {
+    scale = 1;
+    translateX = 0;
+    translateY = 0;
+    applyTransform();
+}
+
+function applyTransform() {
+    const img = document.getElementById('lightboxImg');
+    img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+}
+
+// Lightbox event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const overlay = document.getElementById('lightboxOverlay');
+    const img = document.getElementById('lightboxImg');
+    
+    // Click outside to close
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) closeLightbox();
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (!overlay.classList.contains('active')) return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowRight') nextLightbox();
+        if (e.key === 'ArrowLeft') prevLightbox();
+    });
+    
+    // Zoom with mousewheel
+    img.addEventListener('wheel', function(e) {
+        if (!e.ctrlKey && !e.metaKey) return;
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? 0.9 : 1.1;
+        const newScale = Math.max(1, Math.min(4, scale * delta));
+        scale = newScale;
+        applyTransform();
+    }, { passive: false });
+    
+    // Double click to reset zoom
+    img.addEventListener('dblclick', function() {
+        resetTransform();
+    });
+    
+    // Drag to pan when zoomed
+    img.addEventListener('mousedown', function(e) {
+        if (scale <= 1) return;
+        isDragging = true;
+        dragStartX = e.clientX - translateX;
+        dragStartY = e.clientY - translateY;
+        img.style.cursor = 'grabbing';
+    });
+    
+    document.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        translateX = e.clientX - dragStartX;
+        translateY = e.clientY - dragStartY;
+        applyTransform();
+    });
+    
+    document.addEventListener('mouseup', function() {
+        if (isDragging) {
+            isDragging = false;
+            img.style.cursor = 'grab';
+        }
+    });
+});
+
+// ===== TAB SWITCHING =====
 document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', function() {
         const tabId = this.dataset.tab;
-        
-        // Update active tab
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         this.classList.add('active');
         
-        // Show/hide sections
         document.getElementById('posts-view').style.display = tabId === 'posts' ? 'block' : 'none';
         document.getElementById('project-detail-view').style.display = 'none';
         document.getElementById('reviews-tab').style.display = tabId === 'reviews' ? 'block' : 'none';
         document.getElementById('about-tab').style.display = tabId === 'about' ? 'block' : 'none';
         
-        // Reset posts grid visibility
-        if (tabId === 'posts') {
-            showPostsGrid();
-        }
+        if (tabId === 'posts') showPostsGrid();
     });
 });
 
@@ -813,21 +910,24 @@ function showPostsGrid() {
     document.getElementById('project-detail-view').style.display = 'none';
 }
 
+// ===== PROJECT DETAIL VIEW =====
+let currentCarousel = null;
+
 function showProjectDetail(projectIndex, imageIndex) {
     const project = <%= JSON.stringify(painter.portfolio || []) %>[projectIndex];
     if (!project) return;
     
     const images = (project.images || []).filter(i => i && i.url);
+    if (!images.length) return;
     
-    // Build carousel
+    // Build carousel items
     const carouselInner = document.getElementById('project-carousel-inner');
     carouselInner.innerHTML = '';
     
     images.forEach((img, idx) => {
-        const isActive = idx === imageIndex;
         const div = document.createElement('div');
-        div.className = `carousel-item ${isActive ? 'active' : ''}`;
-        div.innerHTML = `<img src="${img.url}" class="d-block w-100" alt="${project.title}" onclick="openLightboxFromProjectDetail(${projectIndex}, ${idx})">`;
+        div.className = `carousel-item ${idx === imageIndex ? 'active' : ''}`;
+        div.innerHTML = `<img src="${img.url}" class="d-block w-100" alt="${project.title}" onclick="openLightboxFromDetail(${projectIndex}, ${idx})">`;
         carouselInner.appendChild(div);
     });
     
@@ -841,10 +941,20 @@ function showProjectDetail(projectIndex, imageIndex) {
     // Show detail view
     document.getElementById('posts-view').style.display = 'none';
     document.getElementById('project-detail-view').style.display = 'block';
+    
+    // Initialize Bootstrap carousel
+    const carouselElement = document.getElementById('project-carousel');
+    if (currentCarousel) {
+        currentCarousel.dispose();
+    }
+    currentCarousel = new bootstrap.Carousel(carouselElement, {
+        interval: false,
+        ride: false
+    });
 }
 
-function openLightboxFromProjectDetail(projectIndex, imageIndex) {
-    // Calculate absolute index
+function openLightboxFromDetail(projectIndex, imageIndex) {
+    // Calculate absolute index in allImagesData
     let absIdx = 0;
     for (let i = 0; i < projectIndex; i++) {
         const proj = <%= JSON.stringify(painter.portfolio || []) %>[i];
@@ -854,27 +964,18 @@ function openLightboxFromProjectDetail(projectIndex, imageIndex) {
     openLightboxAt(absIdx);
 }
 
-// Lightbox functions (keeping original implementation)
-function openLightboxAt(index) {
-    if (window.openLightbox) {
-        window.openLightbox(index);
-    }
-}
-
-// Contact WhatsApp
+// ===== CONTACT WHATSAPP =====
 function contactWhatsApp() {
     const phone = '<%= painter.phone || "213555000000" %>';
     const text = encodeURIComponent('Hello <%= painter.name %>! I found you on Paintello and I\'m interested in your painting services.');
     window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
 }
 
-// Follow painter
+// ===== FOLLOW PAINTER =====
 function followPainter() {
     fetch('/painters/<%= painter._id %>/follow', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
+        headers: { 'Content-Type': 'application/json' }
     })
     .then(response => response.json())
     .then(data => {
@@ -885,95 +986,8 @@ function followPainter() {
             alert('Please login to follow painters');
         }
     })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+    .catch(error => console.error('Error:', error));
 }
-
-// Keep original lightbox implementation
-(function(){
-    const allImages = <%= JSON.stringify(allImages.map(img => img.url)) %>;
-    const overlay = document.getElementById('lightboxOverlay');
-    const imgEl = document.getElementById('lightboxImg');
-    let absIndex = 0;
-    let scale = 1;
-    let translate = { x: 0, y: 0 };
-    let dragging = false;
-    let lastPointer = { x: 0, y: 0 };
-    
-    window.openLightbox = function(index) {
-        if (!allImages.length) return;
-        absIndex = (index + allImages.length) % allImages.length;
-        imgEl.src = allImages[absIndex];
-        resetTransform();
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    };
-    
-    window.closeLightbox = function() {
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-        resetTransform();
-    };
-    
-    window.nextLightbox = function() { 
-        if (window.openLightbox) window.openLightbox(absIndex + 1);
-    };
-    
-    window.prevLightbox = function() { 
-        if (window.openLightbox) window.openLightbox(absIndex - 1);
-    };
-    
-    function resetTransform() {
-        scale = 1;
-        translate = { x: 0, y: 0 };
-        applyTransform();
-    }
-    
-    function applyTransform() {
-        imgEl.style.transform = `translate(${translate.x}px, ${translate.y}px) scale(${scale})`;
-        imgEl.style.cursor = scale > 1 ? 'grab' : 'zoom-in';
-    }
-    
-    // Keep other lightbox event handlers...
-    imgEl.addEventListener('dblclick', function(e) {
-        e.preventDefault();
-        if (scale <= 1) {
-            zoomAt(e.clientX, e.clientY, 2.2);
-        } else {
-            resetTransform();
-        }
-    });
-    
-    imgEl.addEventListener('wheel', function(e) {
-        if (!e.ctrlKey && !e.metaKey) return;
-        e.preventDefault();
-        const delta = -e.deltaY;
-        const zoomFactor = delta > 0 ? 1.12 : 0.9;
-        zoomAt(e.clientX, e.clientY, zoomFactor);
-    }, { passive: false });
-    
-    function zoomAt(cx, cy, factor) {
-        const rect = imgEl.getBoundingClientRect();
-        const ix = (cx - rect.left - rect.width/2 - translate.x) / scale;
-        const iy = (cy - rect.top - rect.height/2 - translate.y) / scale;
-        scale = Math.max(1, Math.min(4, scale * factor));
-        translate.x = (cx - rect.left - rect.width/2) - ix * scale;
-        translate.y = (cy - rect.top - rect.height/2) - iy * scale;
-        applyTransform();
-    }
-    
-    overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) window.closeLightbox();
-    });
-    
-    document.addEventListener('keydown', function(e) {
-        if (!overlay.classList.contains('active')) return;
-        if (e.key === 'Escape') window.closeLightbox();
-        if (e.key === 'ArrowRight') window.nextLightbox();
-        if (e.key === 'ArrowLeft') window.prevLightbox();
-    });
-})();
 </script>
 
 <%- include('../partials/footer') %>
