@@ -1,12 +1,13 @@
 <%- include('../partials/header', { title: painter.name, painter: painter }) %>
 
 <style>
-/* Modern Instagram/Muula Style */
-:root{
+/* Paintello Premium Marketplace Style */
+:root {
     --primary:#1E4EA8;
     --primary-dark:#153A80;
+    --gold:#F4C430;
     --background:#F4F7FB;
-    --card-bg:#FFFFFF;
+    --card-bg:#ffffff;
     --text-dark:#1B1B1B;
     --text-gray:#6B7280;
     --border-color:#DCE5F2;
@@ -521,25 +522,41 @@ body {
     }
 }
 
-.paintello-premium-banner{
-background:linear-gradient(135deg,#F4C430,#FFD84D);
-padding:15px;text-align:center;font-weight:700;color:#000;
-}
-.paintello-whatsapp{
-position:fixed;right:25px;bottom:25px;width:65px;height:65px;
-background:#25D366;border-radius:50%;display:flex;
-align-items:center;justify-content:center;color:#fff;
-font-size:30px;z-index:99999;text-decoration:none;
-box-shadow:0 10px 25px rgba(0,0,0,.2);
-}
 .profile-header-modern{
 background:linear-gradient(135deg,#1E4EA8,#153A80)!important;
-color:white;
+border:none!important;
+padding:50px 0!important;
 }
+.profile-header-modern *{color:white;}
 .avatar-modern img{
+width:190px!important;height:190px!important;
 border-radius:24px!important;
-border:5px solid #fff!important;
-width:180px!important;height:180px!important;
+border:5px solid white!important;
+padding:0!important;
+box-shadow:0 20px 40px rgba(0,0,0,.25)!important;
+}
+.stat-item{
+background:rgba(255,255,255,.12);
+padding:16px;border-radius:16px;
+backdrop-filter:blur(8px);
+}
+.btn-book{
+background:linear-gradient(135deg,#F4C430,#FFD84D)!important;
+color:#000!important;
+}
+.btn-follow{
+background:white!important;
+color:#1E4EA8!important;
+}
+.tabs-modern,.about-card,.review-card,.portfolio-item{
+box-shadow:0 10px 30px rgba(30,78,168,.12)!important;
+}
+.paintello-whatsapp{
+position:fixed;right:25px;bottom:25px;
+width:64px;height:64px;border-radius:50%;
+background:#25D366;color:white;
+display:flex;align-items:center;justify-content:center;
+font-size:30px;z-index:9999;text-decoration:none;
 }
 
 </style>
@@ -552,7 +569,7 @@ width:180px!important;height:180px!important;
             <div class="avatar-modern">
                 <% if (painter.profilePicture && painter.profilePicture.url) { %>
                     <img src="<%= painter.profilePicture.url %>" alt="<%= painter.name %>" 
-                         onclick="if(allImageUrls.length){openLightboxAt(0)}">
+                         onclick="openLightboxAt(0)">
                 <% } else { %>
                     <img src="https://via.placeholder.com/300x300?text=Painter" alt="No profile">
                 <% } %>
@@ -621,8 +638,6 @@ width:180px!important;height:180px!important;
         </div>
     </div>
 </div>
-
-<div class="paintello-premium-banner"><i class="fas fa-paint-roller"></i> Paintello Certified Professional</div>
 
 <!-- Tabs -->
 <div class="tabs-modern">
@@ -1014,5 +1029,4 @@ function followPainter() {
 }
 </script>
 
-<a href="https://wa.me/<%= painter.phone || '' %>" class="paintello-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
 <%- include('../partials/footer') %>
