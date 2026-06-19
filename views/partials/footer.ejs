@@ -1,61 +1,62 @@
-    <footer class="bg-dark text-light py-5 mt-5">
+    <footer class="footer-modern py-5 mt-5">
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <h5 class="mb-3">
+                    <h5 class="footer-brand mb-3">
                         <i class="fas fa-paint-roller me-2"></i>Paintello Pro
                     </h5>
-                    <p class="text-muted">Connecting clients with professional painters across Algeria. Quality service guaranteed.</p>
-                    <div class="d-flex gap-3">
-                        <a href="#" class="text-light"><i class="fab fa-facebook fa-lg"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-instagram fa-lg"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-twitter fa-lg"></i></a>
+                    <p class="footer-text">Connecting clients with professional painters across Algeria. Quality service guaranteed.</p>
+                    <div class="d-flex gap-3 social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6 mb-4">
-                    <h6 class="mb-3">Quick Links</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="/" class="text-muted text-decoration-none">Home</a></li>
-                        <li><a href="/painters" class="text-muted text-decoration-none">Find Painters</a></li>
-                        <li><a href="/about" class="text-muted text-decoration-none">About</a></li>
-                        <li><a href="/contact" class="text-muted text-decoration-none">Contact</a></li>
+                    <h6 class="footer-heading mb-3">Quick Links</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/painters">Find Painters</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6 mb-4">
-                    <h6 class="mb-3">For Painters</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="/auth/register-painter" class="text-muted text-decoration-none">Join Our Team</a></li>
-                        <li><a href="/painter/store" class="text-muted text-decoration-none">Team Store</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Benefits</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Support</a></li>
+                    <h6 class="footer-heading mb-3">For Painters</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="/auth/register-painter">Join Our Team</a></li>
+                        <li><a href="/painter/store">Team Store</a></li>
+                        <li><a href="#">Benefits</a></li>
+                        <li><a href="#">Support</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6 mb-4">
-                    <h6 class="mb-3">Contact Info</h6>
-                    <ul class="list-unstyled text-muted">
+                    <h6 class="footer-heading mb-3">Contact Info</h6>
+                    <ul class="list-unstyled footer-contact">
                         <li class="mb-2">
-                            <i class="fas fa-map-marker-alt me-2"></i>
-                            Algiers, Algeria
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Algiers, Algeria</span>
                         </li>
                         <li class="mb-2">
-                            <i class="fas fa-phone me-2"></i>
-                            +213 XXX XX XX XX
+                            <i class="fas fa-phone"></i>
+                            <span>+213 XXX XX XX XX</span>
                         </li>
                         <li class="mb-2">
-                            <i class="fas fa-envelope me-2"></i>
-                            contact@paintellopro.dz
+                            <i class="fas fa-envelope"></i>
+                            <span>contact@paintellopro.dz</span>
                         </li>
                     </ul>
                 </div>
             </div>
-            <hr class="bg-light">
+            <hr class="footer-divider">
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <p class="text-muted mb-0">&copy; 2024 Paintello Pro. All rights reserved.</p>
+                    <p class="footer-copy mb-0">&copy; 2024 Paintello Pro. All rights reserved.</p>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <a href="/privacy" class="text-muted text-decoration-none me-3">Privacy Policy</a>
-                    <a href="/terms" class="text-muted text-decoration-none">Terms of Service</a>
+                <div class="col-md-6 text-md-end footer-legal">
+                    <a href="/privacy">Privacy Policy</a>
+                    <a href="/terms">Terms of Service</a>
                 </div>
             </div>
         </div>
@@ -194,6 +195,174 @@
             });
         });
     </script>
-<script src="/js/main.js"></script>
+    <script src="/js/main.js"></script>
+
+    <style>
+        /* ===== FOOTER STYLES ===== */
+        .footer-modern {
+            background: var(--bg-white);
+            border-top: 1px solid var(--border-light);
+            color: var(--text-dark);
+        }
+
+        .footer-brand {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--primary-blue);
+        }
+
+        .footer-brand i {
+            color: var(--accent-blue);
+        }
+
+        .footer-text {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            max-width: 320px;
+        }
+
+        .footer-heading {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--primary-blue);
+            letter-spacing: 0.3px;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 6px;
+        }
+
+        .footer-links a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-blue);
+        }
+
+        .footer-contact {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-contact li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        .footer-contact li i {
+            width: 18px;
+            color: var(--accent-blue);
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .social-links {
+            margin-top: 4px;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            color: var(--primary-blue);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+        }
+
+        .social-link:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .footer-divider {
+            border: 0;
+            border-top: 1px solid var(--border-light);
+            margin: 20px 0 24px;
+            opacity: 1;
+        }
+
+        .footer-copy {
+            color: var(--text-gray);
+            font-size: 0.85rem;
+        }
+
+        .footer-legal a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s ease;
+            margin-left: 20px;
+        }
+
+        .footer-legal a:first-child {
+            margin-left: 0;
+        }
+
+        .footer-legal a:hover {
+            color: var(--accent-blue);
+        }
+
+        /* RTL overrides for footer */
+        [dir="rtl"] .footer-legal a {
+            margin-left: 0;
+            margin-right: 20px;
+        }
+
+        [dir="rtl"] .footer-legal a:first-child {
+            margin-right: 0;
+        }
+
+        [dir="rtl"] .footer-contact li {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .social-links .social-link {
+            margin-left: 8px;
+            margin-right: 0;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .footer-text {
+                max-width: 100%;
+            }
+
+            .footer-legal {
+                text-align: center !important;
+                margin-top: 12px;
+            }
+
+            .footer-legal a {
+                display: inline-block;
+                margin: 0 10px !important;
+            }
+
+            .footer-copy {
+                text-align: center;
+            }
+        }
+    </style>
 </body>
 </html>
