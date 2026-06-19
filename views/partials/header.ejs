@@ -60,20 +60,25 @@
     <link href="/css/style.css" rel="stylesheet">
     
     <style>
-        /* Modern Muula Style Variables */
+        /* ===== COLOR THEME FROM VISION ANALYSIS =====
+           Primary Blue: #295797
+           Accent Blue:   #1C84C1
+           Light BG:      #E8EEF6
+           White:         #FFFFFF
+        */
         :root {
-            --primary-blue: #2C5F8A;
-            --primary-green: #4A9B6E;
-            --primary-light: #7AB2C8;
-            --primary-dark: #1E405E;
+            --primary-blue: #295797;
+            --accent-blue:  #1C84C1;
+            --primary-dark: #1E3F5C;
+            --primary-light: #4A7FA8;
             --text-dark: #2D3748;
-            --text-gray: #718096;
-            --bg-light: #F7FAFC;
+            --text-gray: #4A5568;
+            --bg-light: #E8EEF6;
             --bg-white: #FFFFFF;
-            --border-light: #E2E8F0;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --border-light: #D1DCE6;
+            --shadow-sm: 0 2px 8px rgba(41, 87, 151, 0.08);
+            --shadow-md: 0 4px 12px rgba(41, 87, 151, 0.12);
+            --shadow-lg: 0 8px 24px rgba(41, 87, 151, 0.16);
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
@@ -101,7 +106,7 @@
         .navbar-brand-modern {
             font-weight: 800;
             font-size: 1.5rem;
-            background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -111,7 +116,7 @@
         }
         
         .navbar-brand-modern i {
-            background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -149,8 +154,8 @@
         }
         
         .dropdown-modern .dropdown-item:hover {
-            background: #F0FAF4;
-            color: var(--primary-green);
+            background: rgba(28, 132, 193, 0.06);
+            color: var(--accent-blue);
         }
         
         .dropdown-modern .dropdown-item i {
@@ -172,13 +177,13 @@
         }
         
         .btn-login-modern:hover {
-            border-color: var(--primary-green);
-            background: #F0FAF4;
-            color: var(--primary-green);
+            border-color: var(--accent-blue);
+            background: rgba(28, 132, 193, 0.04);
+            color: var(--accent-blue);
         }
         
         .btn-signup-modern {
-            background: linear-gradient(135deg, var(--primary-green), #3D8A5E);
+            background: var(--primary-blue);
             border: none;
             color: white;
             padding: 8px 20px;
@@ -189,6 +194,7 @@
         }
         
         .btn-signup-modern:hover {
+            background: var(--primary-dark);
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
             color: white;
@@ -215,7 +221,7 @@
             height: 32px;
             border-radius: 50%;
             object-fit: cover;
-            background: linear-gradient(135deg, var(--primary-blue), var(--primary-light));
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -233,7 +239,7 @@
         }
         
         .verified-badge-nav {
-            background: var(--primary-green);
+            background: var(--accent-blue);
             color: white;
             font-size: 0.6rem;
             padding: 2px 6px;
