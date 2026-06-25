@@ -16,31 +16,31 @@
       s.parentNode.insertBefore(t,s)}(window, document,'script',
       'https://connect.facebook.net/en_US/fbevents.js');
 
-      // Initialise with advanced matching if user/painter is logged in
+      // Advanced matching: use sessionPainter (logged‑in painter) and user (logged‑in client)
       fbq('init', '<%= process.env.FB_PIXEL_ID %>', {
-        <% if (user && user.email) { %>em: '<%= user.email %>',<% } %>
-        <% if (user && user.firstName) { %>fn: '<%= user.firstName %>',<% } %>
-        <% if (user && user.lastName) { %>ln: '<%= user.lastName %>',<% } %>
-        <% if (user && user.numero) { %>ph: '<%= user.numero %>',<% } %>
-        <% if (typeof painter !== 'undefined' && painter && painter.email) { %>em: '<%= painter.email %>',<% } %>
-        <% if (typeof painter !== 'undefined' && painter && painter.name) { %>fn: '<%= painter.name %>',<% } %>
-        <% if (typeof painter !== 'undefined' && painter && painter.phone) { %>ph: '<%= painter.phone %>',<% } %>
+        <% if (typeof user !== 'undefined' && user && user.email) { %>em: '<%= user.email %>',<% } %>
+        <% if (typeof user !== 'undefined' && user && user.firstName) { %>fn: '<%= user.firstName %>',<% } %>
+        <% if (typeof user !== 'undefined' && user && user.lastName) { %>ln: '<%= user.lastName %>',<% } %>
+        <% if (typeof user !== 'undefined' && user && user.numero) { %>ph: '<%= user.numero %>',<% } %>
+        <% if (typeof sessionPainter !== 'undefined' && sessionPainter && sessionPainter.email) { %>em: '<%= sessionPainter.email %>',<% } %>
+        <% if (typeof sessionPainter !== 'undefined' && sessionPainter && sessionPainter.name) { %>fn: '<%= sessionPainter.name %>',<% } %>
+        <% if (typeof sessionPainter !== 'undefined' && sessionPainter && sessionPainter.phone) { %>ph: '<%= sessionPainter.phone %>',<% } %>
       });
 
-      // ---- PageView with server‑side event ID (deduplication) ----
+      // ---- PageView ----
       fbq('track', 'PageView', {}, {
-        eventID: '<%= metaEventIdPageView %>' || undefined
+        eventID: '<%= typeof metaEventIdPageView !== 'undefined' ? metaEventIdPageView : '' %>' || undefined
       });
 
-      // ---- ViewContent (if metaEventIdView is passed) ----
-      <% if (typeof metaEventIdView !== 'undefined' && metaEventIdView) { %>
+      // ---- ViewContent (database painter) ----
+      <% if (typeof metaEventIdView !== 'undefined' && metaEventIdView && typeof painter !== 'undefined' && painter) { %>
         setTimeout(function() {
           if (typeof fbq !== 'undefined') {
             fbq('track', 'ViewContent', {
-              content_name: '<%= (typeof painter !== 'undefined' && painter) ? painter.name.replace(/'/g, "\\'") : "" %>',
-              content_ids: ['<%= (typeof painter !== 'undefined' && painter) ? painter._id : "" %>'],
+              content_name: '<%= painter.name.replace(/'/g, "\\'") %>',
+              content_ids: ['<%= painter._id %>'],
               content_type: 'painter_profile',
-              value: <%= (typeof painter !== 'undefined' && painter) ? painter.pricePerSqm : 0 %>,
+              value: <%= painter.pricePerSqm || 0 %>,
               currency: 'DZD'
             }, {
               eventID: '<%= metaEventIdView %>'
@@ -49,15 +49,15 @@
         }, 1000);
       <% } %>
 
-      // ---- InitiateCheckout (if metaEventIdInitiateCheckout is passed) ----
-      <% if (typeof metaEventIdInitiateCheckout !== 'undefined' && metaEventIdInitiateCheckout) { %>
+      // ---- InitiateCheckout (database painter) ----
+      <% if (typeof metaEventIdInitiateCheckout !== 'undefined' && metaEventIdInitiateCheckout && typeof painter !== 'undefined' && painter) { %>
         setTimeout(function() {
           if (typeof fbq !== 'undefined') {
             fbq('track', 'InitiateCheckout', {
-              content_name: 'Hire <%= (typeof painter !== 'undefined' && painter) ? painter.name.replace(/'/g, "\\'") : "" %>',
-              content_ids: ['<%= (typeof painter !== 'undefined' && painter) ? painter._id : "" %>'],
+              content_name: 'Hire <%= painter.name.replace(/'/g, "\\'") %>',
+              content_ids: ['<%= painter._id %>'],
               content_type: 'painter_hire',
-              value: <%= (typeof painter !== 'undefined' && painter) ? painter.pricePerSqm : 0 %>,
+              value: <%= painter.pricePerSqm || 0 %>,
               currency: 'DZD'
             }, {
               eventID: '<%= metaEventIdInitiateCheckout %>'
@@ -101,20 +101,12 @@
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Custom CSS -->
     <link href="/css/style.css" rel="stylesheet">
     
     <style>
-        /* ===== COLOR THEME FROM VISION ANALYSIS =====
-           Primary Blue: #295797
-           Accent Blue:   #1C84C1
-           Light BG:      #E8EEF6
-           White:         #FFFFFF
-        */
+        /* ===== COLOR THEME ===== */
         :root {
             --primary-blue: #295797;
             --accent-blue:  #1C84C1;
@@ -139,7 +131,6 @@
             background: var(--bg-light);
         }
         
-        /* Modern Navbar */
         .navbar-modern {
             background: var(--bg-white) !important;
             box-shadow: var(--shadow-sm);
@@ -186,7 +177,6 @@
             color: var(--primary-blue) !important;
         }
         
-        /* Modern Dropdown */
         .dropdown-modern .dropdown-menu {
             border: none;
             box-shadow: var(--shadow-lg);
@@ -213,7 +203,6 @@
             color: var(--text-gray);
         }
         
-        /* Modern Buttons */
         .btn-login-modern {
             background: transparent;
             border: 1px solid var(--border-light);
@@ -249,7 +238,6 @@
             color: white;
         }
         
-        /* Avatar Dropdown */
         .avatar-dropdown {
             display: flex;
             align-items: center;
@@ -296,7 +284,6 @@
             margin-left: 6px;
         }
         
-        /* Card Styles */
         .card-hover {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: 1px solid var(--border-light);
@@ -308,26 +295,13 @@
             box-shadow: var(--shadow-lg);
         }
         
-        /* Carousel */
-        .carousel-inner img {
-            border-radius: var(--radius-md);
-            transition: transform 0.4s ease;
-        }
-        
-        .carousel-inner img:hover {
-            transform: scale(1.02);
-        }
-        
-        /* Star Rating */
         .star-rating {
             color: #FBBF24;
         }
         
-        /* RTL Support */
         [dir="rtl"] {
             text-align: right;
         }
-        
         [dir="rtl"] .me-1 { margin-right: 0 !important; margin-left: 0.25rem !important; }
         [dir="rtl"] .me-2 { margin-right: 0 !important; margin-left: 0.5rem !important; }
         [dir="rtl"] .me-3 { margin-right: 0 !important; margin-left: 1rem !important; }
@@ -335,47 +309,30 @@
         [dir="rtl"] .ms-2 { margin-left: 0 !important; margin-right: 0.5rem !important; }
         [dir="rtl"] .ms-3 { margin-left: 0 !important; margin-right: 1rem !important; }
         
-        /* Mobile Menu */
         @media (max-width: 768px) {
-            .navbar-nav {
-                padding: 16px 0;
-            }
-            
-            .nav-link-modern {
-                padding: 10px 16px !important;
-            }
-            
+            .navbar-nav { padding: 16px 0; }
+            .nav-link-modern { padding: 10px 16px !important; }
             .btn-login-modern, .btn-signup-modern {
                 width: 100%;
                 text-align: center;
                 margin: 5px 0;
                 display: inline-block;
             }
-            
-            .avatar-dropdown {
-                width: 100%;
-                justify-content: center;
-            }
+            .avatar-dropdown { width: 100%; justify-content: center; }
         }
         
-        /* Animation */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
-        .navbar-collapse.show {
-            animation: fadeIn 0.3s ease;
-        }
+        .navbar-collapse.show { animation: fadeIn 0.3s ease; }
     </style>
-
 </head>
 <body>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WQVTHK89"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
 
 <!-- Modern Navbar -->
 <nav class="navbar navbar-expand-lg navbar-modern sticky-top">
@@ -401,7 +358,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <i class="fas fa-search me-1"></i> Find Painters
                     </a>
                 </li>
-                <% if (typeof painter !== 'undefined' && painter) { %>
+                <% if (typeof sessionPainter !== 'undefined' && sessionPainter) { %>
                 <li class="nav-item">
                     <a class="nav-link nav-link-modern" href="/painter/dashboard">
                         <i class="fas fa-chart-line me-1"></i> Dashboard
@@ -411,21 +368,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </ul>
             
             <ul class="navbar-nav">
-                <% if (typeof painter !== 'undefined' && painter) { %>
-                    <!-- Painter is logged in -->
+                <% if (typeof sessionPainter !== 'undefined' && sessionPainter) { %>
+                    <!-- Painter logged in -->
                     <li class="nav-item dropdown dropdown-modern">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <div class="avatar-dropdown">
                                 <div class="avatar-small">
-                                    <% if (painter.profilePicture && painter.profilePicture.url) { %>
-                                        <img src="<%= painter.profilePicture.url %>" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                    <% if (sessionPainter.profilePicture && sessionPainter.profilePicture.url) { %>
+                                        <img src="<%= sessionPainter.profilePicture.url %>" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                                     <% } else { %>
                                         <i class="fas fa-brush"></i>
                                     <% } %>
                                 </div>
                                 <span class="painter-name-nav">
-                                    <%= painter.name %>
-                                    <% if (painter.verification && painter.verification.status === 'verified') { %>
+                                    <%= sessionPainter.name %>
+                                    <% if (sessionPainter.verification && sessionPainter.verification.status === 'verified') { %>
                                         <span class="verified-badge-nav">
                                             <i class="fas fa-check-circle"></i> Verified
                                         </span>
@@ -434,22 +391,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             </div>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/painter/dashboard">
-                                <i class="fas fa-tachometer-alt"></i> Dashboard
-                            </a></li>
-                            <li><a class="dropdown-item" href="/painter/profile">
-                                <i class="fas fa-user-circle"></i> My Profile
-                            </a></li>
-                            <li><a class="dropdown-item" href="/painter/portfolio">
-                                <i class="fas fa-images"></i> Portfolio
-                            </a></li>
-                            <li><a class="dropdown-item" href="/painter/orders">
-                                <i class="fas fa-clipboard-list"></i> My Orders
-                            </a></li>
+                            <li><a class="dropdown-item" href="/painter/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                            <li><a class="dropdown-item" href="/painter/profile"><i class="fas fa-user-circle"></i> My Profile</a></li>
+                            <li><a class="dropdown-item" href="/painter/portfolio"><i class="fas fa-images"></i> Portfolio</a></li>
+                            <li><a class="dropdown-item" href="/painter/orders"><i class="fas fa-clipboard-list"></i> My Orders</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="/index/logout">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a></li>
+                            <li><a class="dropdown-item text-danger" href="/index/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                         </ul>
                     </li>
                 <% } else { %>
@@ -471,17 +418,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </nav>
 
 <script>
-    // Add scrolled class to navbar on scroll
     window.addEventListener('scroll', function() {
         const navbar = document.querySelector('.navbar-modern');
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
+        if (window.scrollY > 50) navbar.classList.add('scrolled');
+        else navbar.classList.remove('scrolled');
     });
-    
-    // Close mobile menu after click
     document.querySelectorAll('.nav-link-modern, .dropdown-item, .btn-login-modern, .btn-signup-modern').forEach(link => {
         if (link) {
             link.addEventListener('click', () => {
