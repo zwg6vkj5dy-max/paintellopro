@@ -1,6 +1,9 @@
 // routes/public.js - For public access without login
 const express = require('express');
 const router = express.Router();
+const sendMetaCAPIEvent = require('../services/metaCapi');
+const getCleanUserData = require('../utils/userData');
+function generateEventId() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) { const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8); return v.toString(16); }); }
 const Painter = require('../models/Painter');
 const Order = require('../models/Order');
 const wilayas = require('../utils/wilayas');
