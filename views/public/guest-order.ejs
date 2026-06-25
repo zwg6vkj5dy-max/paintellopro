@@ -142,26 +142,7 @@
     </div>
 </div>
 
-<!-- InitiateCheckout with server‑side event ID -->
-<% if (metaEventIdInitiateCheckout) { %>
-<script>
-  // Wait a moment to ensure fbq is loaded
-  setTimeout(function() {
-    if (typeof fbq !== 'undefined') {
-      fbq('track', 'InitiateCheckout', {
-        content_name: 'Hire <%= painter.name.replace(/'/g, "\\'") %>',
-        content_ids: ['<%= painter._id %>'],
-        content_type: 'painter_hire',
-        value: <%= painter.pricePerSqm || 0 %>,
-        currency: 'DZD'
-      }, {
-        eventID: '<%= metaEventIdInitiateCheckout %>'
-      });
-      console.log('✅ InitiateCheckout event sent with ID:', '<%= metaEventIdInitiateCheckout %>');
-    }
-  }, 1000);
-</script>
-<% } %>
+
 <script>
 // Calculate estimated cost
 document.getElementById('roomSize').addEventListener('input', function() {
