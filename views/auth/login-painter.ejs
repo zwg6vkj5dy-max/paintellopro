@@ -42,7 +42,24 @@
     </div>
   <% }) %>
 <% } %>
-
+<% if (typeof metaEventIdCompleteRegistration !== 'undefined' && metaEventIdCompleteRegistration) { %>
+<script>
+  // Fire CompleteRegistration on login page after successful registration
+  setTimeout(function() {
+    if (typeof fbq !== 'undefined') {
+      fbq('track', 'CompleteRegistration', {
+        content_name: 'Painter Professional Registration',
+        status: 'pending_verification',
+        value: 0,
+        currency: 'DZD'
+      }, {
+        eventID: '<%= metaEventIdCompleteRegistration %>'
+      });
+      console.log('✅ CompleteRegistration fired (browser) with ID:', '<%= metaEventIdCompleteRegistration %>');
+    }
+  }, 1500);
+</script>
+<% } %>
                     <form action="/auth/login-painter" method="POST">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email Address</label>
