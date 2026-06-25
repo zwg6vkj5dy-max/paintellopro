@@ -2,7 +2,7 @@
 require("dotenv").config();
 const axios = require("axios");
 const crypto = require("crypto");
-const { isBotUserAgent } = require('../utils/botDetection'); // Import bot detection
+const { isBotRequest } = require('../utils/botDetection');
 
 // SHA-256 hash function
 function hash(data) {
@@ -40,7 +40,7 @@ const sendMetaCAPIEvent = async ({
   }
 
   // ✅ BOT DETECTION - Use imported function
-  if (isBotUserAgent(userData.userAgent)) {
+ if (isBotRequest(req)) {
     console.log(`🤖 Skipping ${eventName} event for bot`);
     return;
   }
