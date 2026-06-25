@@ -22,9 +22,9 @@
         <% if (user && user.firstName) { %>fn: '<%= user.firstName %>',<% } %>
         <% if (user && user.lastName) { %>ln: '<%= user.lastName %>',<% } %>
         <% if (user && user.numero) { %>ph: '<%= user.numero %>',<% } %>
-        <% if (painter && painter.email) { %>em: '<%= painter.email %>',<% } %>
-        <% if (painter && painter.name) { %>fn: '<%= painter.name %>',<% } %>
-        <% if (painter && painter.phone) { %>ph: '<%= painter.phone %>',<% } %>
+        <% if (typeof painter !== 'undefined' && painter && painter.email) { %>em: '<%= painter.email %>',<% } %>
+        <% if (typeof painter !== 'undefined' && painter && painter.name) { %>fn: '<%= painter.name %>',<% } %>
+        <% if (typeof painter !== 'undefined' && painter && painter.phone) { %>ph: '<%= painter.phone %>',<% } %>
       });
 
       // ---- PageView with server‑side event ID (deduplication) ----
@@ -37,10 +37,10 @@
         setTimeout(function() {
           if (typeof fbq !== 'undefined') {
             fbq('track', 'ViewContent', {
-              content_name: '<%= painter ? painter.name.replace(/'/g, "\\'") : "" %>',
-              content_ids: ['<%= painter ? painter._id : "" %>'],
+              content_name: '<%= (typeof painter !== 'undefined' && painter) ? painter.name.replace(/'/g, "\\'") : "" %>',
+              content_ids: ['<%= (typeof painter !== 'undefined' && painter) ? painter._id : "" %>'],
               content_type: 'painter_profile',
-              value: <%= painter ? painter.pricePerSqm : 0 %>,
+              value: <%= (typeof painter !== 'undefined' && painter) ? painter.pricePerSqm : 0 %>,
               currency: 'DZD'
             }, {
               eventID: '<%= metaEventIdView %>'
@@ -54,10 +54,10 @@
         setTimeout(function() {
           if (typeof fbq !== 'undefined') {
             fbq('track', 'InitiateCheckout', {
-              content_name: 'Hire <%= painter ? painter.name.replace(/'/g, "\\'") : "" %>',
-              content_ids: ['<%= painter ? painter._id : "" %>'],
+              content_name: 'Hire <%= (typeof painter !== 'undefined' && painter) ? painter.name.replace(/'/g, "\\'") : "" %>',
+              content_ids: ['<%= (typeof painter !== 'undefined' && painter) ? painter._id : "" %>'],
               content_type: 'painter_hire',
-              value: <%= painter ? painter.pricePerSqm : 0 %>,
+              value: <%= (typeof painter !== 'undefined' && painter) ? painter.pricePerSqm : 0 %>,
               currency: 'DZD'
             }, {
               eventID: '<%= metaEventIdInitiateCheckout %>'
