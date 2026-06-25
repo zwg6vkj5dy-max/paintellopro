@@ -289,13 +289,27 @@ router.get('/auth/login-painter', (req, res) => {
   if (req.session.painter && req.session.painter.role === 'painter') {
     return res.redirect('/painter/dashboard');
   }
-  const pageViewId = generateEventId(); // optional but recommended
+  const pageViewId = generateEventId();
+  let completeRegistrationId = null;
+
+  // Check if we have a pending registration event ID
+  if (req.session.pendingEvents && req.session.pendingEvents.completeRegistration) {
+    completeRegistrationId = req.session.pendingEvents.completeRegistration;
+    // Remove it so it only fires once
+    delete req.session.pendingEvents.completeRegistration;
+    // Optionally clean up the pendingEvents object if empty
+    if (Object.keys(req.session.pendingEvents).length === 0) {
+      delete req.session.pendingEvents;
+    }
+  }
+
   res.render('auth/login-painter', {
     title: 'Painter Login - Paintello Pro',
     user: req.session.user || null,
     sessionPainter: req.session.painter || null,
     painter: null,
     metaEventIdPageView: pageViewId,
+    metaEventIdCompleteRegistration: completeRegistrationId, // 👈 pass to view
   });
 });
 
@@ -396,7 +410,6 @@ router.post('/auth/register-painter', uploadIdCard.single('idCard'), async (req,
         testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE,
       });
     }
-    delete req.session.pendingEvents?.completeRegistration;
 
     // ---- success ----
     console.log(`🆕 New painter registered: ${name} (${email})`);
