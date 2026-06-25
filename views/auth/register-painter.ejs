@@ -251,13 +251,7 @@ document.getElementById('painterRegistrationForm').addEventListener('submit', fu
 
     console.log('Form data for Meta (lowercase):', formData);
 
-    // Track Lead event
-    fbq('track', 'Lead', {
-        content_name: 'Painter Registration',
-        content_category: 'Professional Signup',
-        value: 0,
-        currency: 'DZD'
-    });
+   
 
     // ✅ Track CompleteRegistration with lowercase advanced matching
     fbq('track', 'CompleteRegistration', {
@@ -274,6 +268,8 @@ document.getElementById('painterRegistrationForm').addEventListener('submit', fu
         st: formData.st, // ✅ lowercase
         zp: formData.zp,
         country: formData.country // ✅ lowercase
+ // ✅ Use the same ID as the server will send
+        eventID: '<%= metaEventIdCompleteRegistration %>'
     });
 
     // Small delay to ensure tracking is sent
