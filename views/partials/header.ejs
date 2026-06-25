@@ -4,18 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1079041583677854');
-    fbq('track', 'PageView');
+    <% if (process.env.FB_PIXEL_ID) { %>
+<!-- Facebook Pixel Code -->
+<script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+
+  // Initialize pixel with advanced matching data (if user is logged in)
+  fbq('init', '<%= process.env.FB_PIXEL_ID %>', {
+    <% if (user && user.email) { %>em: '<%= user.email %>',<% } %>
+    <% if (user && user.firstName) { %>fn: '<%= user.firstName %>',<% } %>
+    <% if (user && user.lastName) { %>ln: '<%= user.lastName %>',<% } %>
+    <% if (user && user.numero) { %>ph: '<%= user.numero %>',<% } %>
+    <% if (painter && painter.email) { %>em: '<%= painter.email %>',<% } %>
+    <% if (painter && painter.name) { %>fn: '<%= painter.name %>',<% } %>
+    <% if (painter && painter.phone) { %>ph: '<%= painter.phone %>',<% } %>
+  });
+
+  // ----- PageView with server‑side event ID (if provided) -----
+  fbq('track', 'PageView', {}, {
+    eventID: '<%= metaEventIdPageView %>' || undefined
+  });
+
+  // ----- ViewContent (if the page is a product/profile page) -----
+  <% if (typeof metaEventIdView !== 'undefined' && metaEventIdView) { %>
+  setTimeout(function() {
+    if (typeof fbq !== 'undefined') {
+      fbq('track', 'ViewContent', {
+        content_name: '<%= painter ? painter.name.replace(/'/g, "\\'") : "" %>',
+        content_ids: ['<%= painter ? painter._id : "" %>'],
+        content_type: 'painter_profile',
+        value: <%= painter ? painter.pricePerSqm : 0 %>,
+        currency: 'DZD'
+      }, {
+        eventID: '<%= metaEventIdView %>'
+      });
+    }
+  }, 1000);
+  <% } %>
     </script>
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1079041583677854&ev=PageView&noscript=1"
