@@ -50,6 +50,7 @@ const sendMetaCAPIEvent = async ({
       ph: hash(userData.numero),
       fn: hash(userData.firstName),
       ln: hash(userData.lastName),
+      ct: hash(userData.city),
       external_id: hash(userData.fbp || userData.email || userData.numero)
     };
 
