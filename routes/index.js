@@ -20,7 +20,7 @@ function generateEventId() {
   });
 }
 // Add to Cart – from product page "Buy Now" button
-router.get('/add-to-cart/:id', async (req, res) => {
+router.get('/products/add-to-cart/:id', async (req, res) => {
   try {
     const productId = req.params.id;
     const quantity = parseInt(req.query.qty) || 1;
