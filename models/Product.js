@@ -14,6 +14,7 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+ images: [{ type: String }],  
   image: {
     type: String,   // URL or file path
     default: '/images/default-product.png'
