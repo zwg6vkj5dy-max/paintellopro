@@ -230,10 +230,9 @@ router.get('/products/:id', async (req, res) => {
       });
     }
 
-    const lang = req.originalUrl.startsWith('/ar') ? 'ar' : 'en';
-    const viewPath = lang === 'ar' ? 'ar/products/product' : 'products/product';
+  
 
-    res.render(viewPath, {
+    res.render('ar/products/product', {
       title: product.name + ' - Paintello Pro',
       product,
       metaEventIdPageView: pageViewId,
