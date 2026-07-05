@@ -19,6 +19,52 @@ function generateEventId() {
     return v.toString(16);
   });
 }
+// Add to Cart – from product page "Buy Now" button
+router.get('/add-to-cart/:id', async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const quantity = parseInt(req.query.qty) || 1;
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).send('Product not found');
+
+    // Simple cart on session
+    if (!req.session.cart) {
+      req.session.cart = { items: {}, totalQty: 0, totalPrice: 0 };
+    }
+    const cart = req.session.cart;
+
+    if (cart.items[productId]) {
+      cart.items[productId].qty += quantity;
+      cart.items[productId].price += product.price * quantity;
+    } else {
+      cart.items[productId] = {
+        item: {
+          _id: product._id,
+          name: product.name,
+          price: product.price,
+          image: product.images?.[0] || product.image
+        },
+        qty: quantity,
+        price: product.price * quantity
+      };
+    }
+
+    // Recalculate totals
+    cart.totalQty = 0;
+    cart.totalPrice = 0;
+    for (const id in cart.items) {
+      cart.totalQty += cart.items[id].qty;
+      cart.totalPrice += cart.items[id].price;
+    }
+
+    // Redirect to checkout
+    res.redirect('/checkout');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
 
 // ==================== HOME ROUTES (BEFORE any parameterised catch-all) ====================
 router.get('/', async (req, res) => {
@@ -203,51 +249,7 @@ router.get('/products', async (req, res) => {
   }
 });
 
-// Add to Cart – from product page "Buy Now" button
-router.get('/add-to-cart/:id', async (req, res) => {
-  try {
-    const productId = req.params.id;
-    const quantity = parseInt(req.query.qty) || 1;
-    const product = await Product.findById(productId);
-    if (!product) return res.status(404).send('Product not found');
 
-    // Simple cart on session
-    if (!req.session.cart) {
-      req.session.cart = { items: {}, totalQty: 0, totalPrice: 0 };
-    }
-    const cart = req.session.cart;
-
-    if (cart.items[productId]) {
-      cart.items[productId].qty += quantity;
-      cart.items[productId].price += product.price * quantity;
-    } else {
-      cart.items[productId] = {
-        item: {
-          _id: product._id,
-          name: product.name,
-          price: product.price,
-          image: product.images?.[0] || product.image
-        },
-        qty: quantity,
-        price: product.price * quantity
-      };
-    }
-
-    // Recalculate totals
-    cart.totalQty = 0;
-    cart.totalPrice = 0;
-    for (const id in cart.items) {
-      cart.totalQty += cart.items[id].qty;
-      cart.totalPrice += cart.items[id].price;
-    }
-
-    // Redirect to checkout
-    res.redirect('/checkout');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
-  }
-});
 // Product listing page (Arabic) – prevents /products/ar from hitting /:id
 router.get('/products/ar', async (req, res) => {
   try {
