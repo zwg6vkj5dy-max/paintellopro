@@ -664,12 +664,30 @@ router.post('/checkout', async (req, res) => {
     firstName, lastName, address, city, commune,
     numero, paymentMethod, shippingFee, deliveryDelay, totalPriceFinal
   } = req.body;
-
+/ ---------- READ NEW QUANTITIES ----------
+  const newQtys = req.body.qtys || {};   // { productId: newQty }
+  let cart = req.session.cart;
+  let adjustedTotalPrice = 0;
+  let adjustedTotalQty = 0;
+   // Recalculate totals based on submitted quantities
+  for (const id in cart.items) {
+    const item = cart.items[id];
+    const qty = parseInt(newQtys[id]) || item.qty;  // fallback to original qty
+    item.qty = qty;                  // update session cart for consistency
+    item.price = item.item.price * qty;
+    adjustedTotalPrice += item.price;
+    adjustedTotalQty += qty;
+  }
+  
   // Clean phone number
   const cleanNumero = '213' + numero.replace(/^0+/, '').replace(/\D/g, '');
   const cart = req.session.cart;
-  const finalTotal = parseFloat(totalPriceFinal) || cart.totalPrice + parseFloat(shippingFee || 0);
+// Update cart session with recalculated values
+  cart.totalQty = adjustedTotalQty;
+  cart.totalPrice = adjustedTotalPrice;
 
+  const finalTotal = adjustedTotalPrice + parseFloat(shippingFee || 0);
+  
   // Generate InitiateCheckout Event ID (will be used later in confirmation)
   const initiateCheckoutId = generateEventId();
   const userData = getCleanUserData(req);
