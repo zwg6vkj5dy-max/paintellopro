@@ -659,7 +659,9 @@ router.post('/checkout', async (req, res) => {
   if (!req.session.cart || !req.session.cart.totalQty) {
     return res.redirect('/products');
   }
-
+// 2. Grab the cart ONCE and keep a reference
+  const cart = req.session.cart;   // 👈 declare early
+  
   const {
     firstName, lastName, address, city, commune,
     numero, paymentMethod, shippingFee, deliveryDelay, totalPriceFinal
@@ -671,28 +673,6 @@ router.post('/checkout', async (req, res) => {
   let adjustedTotalQty = 0;
    // Recalculate totals based on submitted quantities
   for (const id in cart.items) {
-    const item = cart.irouter.post('/checkout', async (req, res) => {
-  // 1. Validate session cart
-  if (!req.session.cart || !req.session.cart.totalQty) {
-    return res.redirect('/products');
-  }
-
-  // 2. Grab the cart ONCE and keep a reference
-  const cart = req.session.cart;   // 👈 declare early
-
-  // 3. Get form fields
-  const {
-    firstName, lastName, address, city, commune,
-    numero, paymentMethod, shippingFee, deliveryDelay
-  } = req.body;
-
-  // 4. Read updated quantities
-  const newQtys = req.body.qtys || {};
-  let adjustedTotalPrice = 0;
-  let adjustedTotalQty = 0;
-
-  // 5. Recalculate totals based on submitted quantities
-  for (const id in cart.items) {
     const item = cart.items[id];
     const qty = parseInt(newQtys[id]) || item.qty;
     item.qty = qty;
@@ -700,55 +680,56 @@ router.post('/checkout', async (req, res) => {
     adjustedTotalPrice += item.price;
     adjustedTotalQty += qty;
   }
-
+  
+  // Clean phone number
+  const cleanNumero = '213' + numero.replace(/^0+/, '').replace(/\D/g, '');
+  const cart = req.session.cart;
+// Update cart session with recalculated values
   cart.totalQty = adjustedTotalQty;
   cart.totalPrice = adjustedTotalPrice;
 
-  const shipping = parseFloat(shippingFee) || 0;
-  const finalTotal = adjustedTotalPrice + shipping;
-
-  // Clean phone
-  const cleanNumero = '213' + numero.replace(/^0+/, '').replace(/\D/g, '');
-
-  // Meta event
+  const finalTotal = adjustedTotalPrice + parseFloat(shippingFee || 0);
+  
+  // Generate InitiateCheckout Event ID (will be used later in confirmation)
   const initiateCheckoutId = generateEventId();
   const userData = getCleanUserData(req);
 
-  // ---------- COD ----------
+  // ---------- COD (Cash on Delivery) ----------
   if (paymentMethod === 'cod') {
     try {
-      const order = new ProductOrder({
-        user: req.session.user?._id || null,
-        guest: {
-          firstName,
-          lastName,
-          numero: cleanNumero,
-          address,
-          city,
-          commune
-        },
-        cart: {
-          items: Object.values(cart.items).map(item => ({
-            product: item.item._id,
-            name: item.item.name,
-            price: item.item.price,
-            image: item.item.image,
-            qty: item.qty
-          })),
-          totalQty: cart.totalQty,
-          totalPrice: cart.totalPrice
-        },
-        shippingFee: shipping,
-        deliveryDelay: deliveryDelay || '',
-        totalWithShipping: finalTotal,
-        paymentMethod: 'cod',
-        status: 'pending',
-        metaUserData: userData || {}
-      });
+      // Save order to DB (you already have an Order model)
+     const order = new ProductOrder({
+  user: req.session.user?._id || null,
+  guest: {
+    firstName,
+    lastName,
+    numero: cleanNumero,
+    address,
+    city,
+    commune
+  },
+  cart: {
+    items: Object.values(cart.items).map(item => ({
+      product: item.item._id,
+      name: item.item.name,
+      price: item.item.price,
+      image: item.item.image,
+      qty: item.qty
+    })),
+    totalQty: cart.totalQty,
+    totalPrice: cart.totalPrice
+  },
+  shippingFee: parseFloat(shippingFee || 0),
+  deliveryDelay: deliveryDelay || '',
+  totalWithShipping: finalTotal,
+  paymentMethod: 'cod',
+  status: 'pending',
+  metaUserData: userData || {}
+});
 
-      await order.save();
+await order.save();
 
-      // Pixel InitiateCheckout
+      // Pixel InitiateCheckout (server)
       if (userData) {
         await sendMetaCAPIEvent({
           eventName: 'InitiateCheckout',
@@ -773,7 +754,7 @@ router.post('/checkout', async (req, res) => {
       // Clear cart
       req.session.cart = null;
 
-      // Store confirmation data
+      // Store confirmation data in session
       req.session.confirmationData = {
         paymentMethod: 'cod',
         eventId: initiateCheckoutId,
@@ -785,7 +766,7 @@ router.post('/checkout', async (req, res) => {
         city,
         commune,
         cartTotal: cart.totalPrice,
-        shippingFee: shipping,
+        shippingFee: parseFloat(shippingFee || 0),
         deliveryDelay: deliveryDelay || '',
         totalPrice: finalTotal,
         cartItems: Object.values(cart.items)
@@ -801,6 +782,7 @@ router.post('/checkout', async (req, res) => {
 
   // ---------- Online Payment (Chargily) ----------
   if (paymentMethod === 'chargily') {
+    // Save pending order data (will be used after payment success)
     req.session.pendingOrder = {
       cart: req.session.cart,
       firstName,
@@ -808,7 +790,7 @@ router.post('/checkout', async (req, res) => {
       address,
       city,
       commune,
-      shippingFee: shipping,
+      shippingFee: parseFloat(shippingFee || 0),
       shippingDelay: deliveryDelay || '',
       finalTotal,
       rawNumero: numero,
@@ -816,6 +798,7 @@ router.post('/checkout', async (req, res) => {
       savedUserData: userData || {}
     };
 
+    // Create Chargily payment
     try {
       const baseUrl = `${req.protocol}://${req.get('host')}`;
       const payment = await createPayment({
@@ -833,9 +816,11 @@ router.post('/checkout', async (req, res) => {
     }
   }
 
+  // If unknown payment method
   req.flash('error', 'طريقة دفع غير معروفة.');
   return res.redirect('/checkout');
 });
+    
 // In confirmation route (GET)
 router.get('/confirmation', async (req, res) => {
   const data = req.session.confirmationData;
