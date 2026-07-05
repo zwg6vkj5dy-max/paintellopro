@@ -154,47 +154,125 @@
         </div>
       </div>
 
-      <!-- Right: Order Summary -->
-      <div class="col-lg-4">
-        <div class="summary-card">
-          <h3>ملخص الطلب</h3>
-          <div class="summary-item">
-            <span>إجمالي المنتجات</span>
-            <span id="baseTotal"><%= cart.totalPrice.toLocaleString('ar-DZ') %> دج</span>
-          </div>
-          <div class="summary-item">
-            <span>رسوم التوصيل</span>
-            <span id="shippingDisplay">—</span>
-          </div>
-          <div class="summary-item">
-            <span>مدة التوصيل</span>
-            <span id="delayDisplay">—</span>
-          </div>
-          <hr>
-          <div class="summary-total">
-            <span>المبلغ الإجمالي</span>
-            <span id="totalDisplay"><%= cart.totalPrice.toLocaleString('ar-DZ') %> دج</span>
-          </div>
+    <div class="col-lg-4">
+  <div class="summary-card">
+    <h3>ملخص الطلب</h3>
 
-          <button id="placeOrderBtn" type="submit" form="checkoutForm" class="btn-checkout">
-            <i class="fas fa-box"></i> تأكيد الطلب (الدفع عند الاستلام) — <span id="btn-total"><%= cart.totalPrice.toLocaleString('ar-DZ') %> دج</span>
-          </button>
-
-          <div class="support-link">
-            <a href="tel:0791679611"><i class="fas fa-phone"></i> اتصل بالدعم</a>
+    <!-- Product list with quantity controls -->
+    <% if (cart && cart.items) { %>
+      <% Object.keys(cart.items).forEach(id => {
+           const item = cart.items[id]; %>
+        <div class="cart-item" data-product-id="<%= id %>">
+          <img src="<%= item.item.image %>" alt="<%= item.item.name %>" />
+          <div class="cart-item-details">
+            <p><%= item.item.name %></p>
+            <div class="qty-control">
+              <button type="button" class="qty-btn" data-action="minus">−</button>
+              <input type="number" class="qty-input" value="<%= item.qty %>" min="1" readonly />
+              <button type="button" class="qty-btn" data-action="plus">+</button>
+            </div>
           </div>
-          <div class="security-note">
-            <span><i class="fas fa-lock"></i> دفع آمن</span>
-            <span><i class="fas fa-truck"></i> توصيل مضمون</span>
-          </div>
+          <span class="item-total"><%= (item.item.price * item.qty).toLocaleString('ar-DZ') %> دج</span>
+          <!-- hidden field to submit the new quantity -->
+          <input type="hidden" name="qtys[<%= id %>]" value="<%= item.qty %>" />
         </div>
-      </div>
+      <% }); %>
+    <% } %>
+
+    <hr>
+    <div class="summary-item">
+      <span>إجمالي المنتجات</span>
+      <span id="baseTotal"><%= cart.totalPrice.toLocaleString('ar-DZ') %> دج</span>
+    </div>
+    <div class="summary-item">
+      <span>رسوم التوصيل</span>
+      <span id="shippingDisplay">—</span>
+    </div>
+    <div class="summary-item">
+      <span>مدة التوصيل</span>
+      <span id="delayDisplay">—</span>
+    </div>
+    <hr>
+    <div class="summary-total">
+      <span>المبلغ الإجمالي</span>
+      <span id="totalDisplay"><%= cart.totalPrice.toLocaleString('ar-DZ') %> دج</span>
+    </div>
+
+    <button id="placeOrderBtn" type="submit" form="checkoutForm" class="btn-checkout">
+      <i class="fas fa-box"></i> تأكيد الطلب (الدفع عند الاستلام) — <span id="btn-total"><%= cart.totalPrice.toLocaleString('ar-DZ') %> دج</span>
+    </button>
+
+    <div class="support-link">
+      <a href="tel:0791679611"><i class="fas fa-phone"></i> اتصل بالدعم</a>
+    </div>
+    <div class="security-note">
+      <span><i class="fas fa-lock"></i> دفع آمن</span>
+      <span><i class="fas fa-truck"></i> توصيل مضمون</span>
+    </div>
+  </div>
+</div>
     </div>
   </div>
 </div>
 
 <!-- Styles (inline to keep everything together) -->
 <style>
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-light);
+}
+.cart-item img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.cart-item-details p {
+  margin: 0 0 6px 0;
+  font-weight: 500;
+}
+.qty-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-light);
+  background: var(--bg-white);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dark);
+  transition: all 0.2s;
+}
+.qty-btn:hover {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+}
+.qty-input {
+  width: 40px;
+  text-align: center;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  font-size: 14px;
+  padding: 4px;
+}
+.item-total {
+  font-weight: 700;
+  color: var(--primary-blue);
+  min-width: 70px;
+  text-align: left;
+}
   :root {
     --primary-blue: #295797;
     --accent-blue: #1C84C1;
@@ -592,5 +670,61 @@ const shippingData = {
       }
     }));
   });
+// ---------- Quantity Controls ----------
+// Make sure basePrice is declared with let at the top of the script
+let basePrice = <%= cart.totalPrice %>;
+
+// Pre-defined prices per product (from EJS)
+const pricesPerUnit = {
+  <% Object.keys(cart.items).forEach(id => { %>
+    "<%= id %>": <%= cart.items[id].item.price %>,
+  <% }); %>
+};
+
+function updateAllTotals() {
+  let newTotalQty = 0;
+  let newCartTotal = 0;
+
+  document.querySelectorAll('.cart-item').forEach(item => {
+    const productId = item.dataset.productId;
+    const qtyInput = item.querySelector('.qty-input');
+    const qty = parseInt(qtyInput.value) || 1;
+    const pricePerUnit = pricesPerUnit[productId] || 0;
+
+    const lineTotal = pricePerUnit * qty;
+    newTotalQty += qty;
+    newCartTotal += lineTotal;
+
+    // Update line total display
+    item.querySelector('.item-total').textContent = lineTotal.toLocaleString('ar-DZ') + ' دج';
+
+    // Update hidden quantity field
+    const hiddenQty = item.querySelector('input[name="qtys[' + productId + ']"]');
+    if (hiddenQty) hiddenQty.value = qty;
+  });
+
+  // Update base price (this will be used by updateShipping)
+  basePrice = newCartTotal;
+  document.getElementById('baseTotal').textContent = formatPrice(basePrice);
+  updateShipping(citySelect.value);
+}
+
+// Attach events to quantity buttons
+document.querySelectorAll('.qty-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    const item = this.closest('.cart-item');
+    const input = item.querySelector('.qty-input');
+    let qty = parseInt(input.value) || 1;
+
+    if (this.dataset.action === 'minus') {
+      qty = Math.max(1, qty - 1);
+    } else {
+      qty = qty + 1;
+    }
+    input.value = qty;
+    updateAllTotals();
+  });
+});
 </script>
 <%- include('partials/footer') %>
