@@ -11,7 +11,7 @@ const { uploadIdCard, deleteFromCloudinary } = require('../utils/cloudinary');
 var Cart = require("../models/cart");
 const { createPayment, verifyPayment } = require('../helpers/chargily');
 const { sendPurchaseForDeliveredCOD } = require('../helpers/deliveryEvents');
-
+const ProductOrder = require('../models/ProductOrder');
 
 function generateEventId() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -678,25 +678,36 @@ router.post('/checkout', async (req, res) => {
   if (paymentMethod === 'cod') {
     try {
       // Save order to DB (you already have an Order model)
-      const order = new Order({
-        user: req.session.user || null,
-        cart: cart,
-        firstName,
-        lastName,
-        address,
-        city,
-        commune,
-        country: 'Algeria',
-        numero: cleanNumero,
-        shippingFee: parseFloat(shippingFee || 0),
-        deliveryDelay: deliveryDelay || '',
-        orderType: req.session.user ? 'user' : 'guest',
-        totalWithShipping: finalTotal,
-        paymentMethod: 'cod',
-        status: 'pending',
-        metaUserData: userData || {}
-      });
-      await order.save();
+     const order = new ProductOrder({
+  user: req.session.user?._id || null,
+  guest: {
+    firstName,
+    lastName,
+    numero: cleanNumero,
+    address,
+    city,
+    commune
+  },
+  cart: {
+    items: Object.values(cart.items).map(item => ({
+      product: item.item._id,
+      name: item.item.name,
+      price: item.item.price,
+      image: item.item.image,
+      qty: item.qty
+    })),
+    totalQty: cart.totalQty,
+    totalPrice: cart.totalPrice
+  },
+  shippingFee: parseFloat(shippingFee || 0),
+  deliveryDelay: deliveryDelay || '',
+  totalWithShipping: finalTotal,
+  paymentMethod: 'cod',
+  status: 'pending',
+  metaUserData: userData || {}
+});
+
+await order.save();
 
       // Pixel InitiateCheckout (server)
       if (userData) {
