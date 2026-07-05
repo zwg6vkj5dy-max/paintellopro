@@ -260,12 +260,20 @@ router.get('/products/ar', async (req, res) => {
   }
 });
 
-// Product detail page (for both languages) – this comes AFTER /products and /products/ar
 router.get('/products/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).render('404');
 
+    // ----- Related products -----
+    const relatedProducts = await Product.find({
+      featured: true,
+      _id: { $ne: product._id }       // exclude the current product
+    })
+      .sort({ createdAt: -1 })
+      .limit(8);
+
+    // ----- Meta events (unchanged) -----
     const userData = getCleanUserData(req);
     const pageViewId = generateEventId();
     const viewContentId = generateEventId();
@@ -281,11 +289,10 @@ router.get('/products/:id', async (req, res) => {
       });
     }
 
-  
-
     res.render('ar/products/product', {
       title: product.name + ' - Paintello Pro',
       product,
+      relatedProducts,               // 👈 now passed to the view
       metaEventIdPageView: pageViewId,
       metaEventIdView: viewContentId,
       metaEventIdCart: addToCartId,
