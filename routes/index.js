@@ -664,7 +664,7 @@ router.post('/checkout', async (req, res) => {
     firstName, lastName, address, city, commune,
     numero, paymentMethod, shippingFee, deliveryDelay, totalPriceFinal
   } = req.body;
-/ ---------- READ NEW QUANTITIES ----------
+
   const newQtys = req.body.qtys || {};   // { productId: newQty }
   let cart = req.session.cart;
   let adjustedTotalPrice = 0;
