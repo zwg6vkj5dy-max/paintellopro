@@ -136,9 +136,14 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 <!-- ===== FULL-WIDTH CLOUDINARY VIDEO ===== -->
 <% if (product.videoFile) { %>
-<section class="product-video-section" dir="rtl">
+<section class="product-video-fullbleed" dir="rtl">
   <div class="container" style="max-width:1200px; margin:0 auto; padding:0 24px;">
     <div class="video-text">
       <p class="video-label">المنتج في حركة</p>
@@ -146,12 +151,15 @@
       <p class="video-desc">شاهد شكل المنتج وسطحه وحجمه من خلال الحركة الطبيعية.</p>
     </div>
   </div>
-  <div class="video-fullbleed">
-    <div class="video-ratio" style="aspect-ratio:16/9; background:#000;">
-      <video controls autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;">
-        <source src="<%= product.videoFile %>" type="video/mp4" />
-        متصفحك لا يدعم تشغيل الفيديو.
-      </video>
+  <div class="video-full">
+    <div class="video-ratio">
+      <iframe
+        src="<%= product.videoFile %>"
+        frameborder="0"
+        allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+        allowfullscreen
+        style="position:absolute;top:0;left:0;width:100%;height:100%;">
+      </iframe>
     </div>
   </div>
 </section>
@@ -159,7 +167,7 @@
 
 <!-- ===== FULL-WIDTH YOUTUBE VIDEO ===== -->
 <% if (product.videoId) { %>
-<section class="product-video-section" dir="rtl">
+<section class="product-video-fullbleed" dir="rtl">
   <div class="container" style="max-width:1200px; margin:0 auto; padding:0 24px;">
     <div class="video-text">
       <p class="video-label">فيديو توضيحي</p>
@@ -167,24 +175,19 @@
       <p class="video-desc">فيديو يوضح مميزات المنتج وطريقة استخدامه.</p>
     </div>
   </div>
-  <div class="video-fullbleed">
-    <div class="video-ratio" style="aspect-ratio:16/9; background:#000;">
+  <div class="video-full">
+    <div class="video-ratio">
       <iframe
         src="https://www.youtube.com/embed/<%= product.videoId %>?rel=0&playsinline=1"
         frameborder="0"
         allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen
-        style="width:100%;height:100%;">
+        style="position:absolute;top:0;left:0;width:100%;height:100%;">
       </iframe>
     </div>
   </div>
 </section>
 <% } %>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ===== RELATED PRODUCTS CAROUSEL ===== -->
 <% if (typeof relatedProducts !== 'undefined' && relatedProducts.length > 0) { %>
@@ -261,32 +264,42 @@
 
 <!-- ===== STYLES ===== -->
 <style>
-.product-video-section {
-  margin: 60px 0;
+/* ===== FULL-BLEED PRODUCT VIDEO (Zara style) ===== */
+.product-video-fullbleed {
+  margin: 80px 0;
 }
+
 .video-text {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
+
 .video-label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   color: var(--text-gray);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
+
 .video-title {
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 300;
   color: var(--text-dark);
-  margin-bottom: 10px;
+  margin-bottom: 16px;
+  line-height: 1.3;
 }
+
 .video-desc {
+  font-size: 0.95rem;
   color: var(--text-gray);
   max-width: 500px;
   margin: 0 auto;
+  line-height: 1.7;
 }
-.video-fullbleed {
+
+/* Full‑width breakout (Zara technique) */
+.video-full {
   width: 100vw;
   position: relative;
   left: 50%;
@@ -294,13 +307,44 @@
   margin-left: -50vw;
   margin-right: -50vw;
 }
+
 .video-ratio {
   position: relative;
   width: 100%;
   background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  aspect-ratio: 16 / 9;   /* modern way – falls back to the iframe's own ratio */
+}
+
+/* For older browsers that don't support aspect-ratio */
+@supports not (aspect-ratio: 16/9) {
+  .video-ratio {
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+  }
+}
+
+/* Make sure the iframe fills the container */
+.video-ratio iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .product-video-fullbleed {
+    margin: 60px 0;
+  }
+  .video-title {
+    font-size: 1.5rem;
+  }
+  .video-text {
+    padding: 0 16px;
+    margin-bottom: 24px;
+  }
 }
   :root {
     --primary-blue: #295797;
