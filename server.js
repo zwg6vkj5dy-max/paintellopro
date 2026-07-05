@@ -1,5 +1,5 @@
 // Ensure deprecation warnings are handled (optional – remove if server-setup.js doesn't exist)
-require('./server-setup'); // Only keep this line if the file actually exists
+// require('./server-setup'); // Only keep this line if the file actually exists
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -8,6 +8,9 @@ const flash = require('connect-flash');
 const path = require('path');
 const bodyParser = require('body-parser');
 require('dotenv').config();
+
+// --- Models (for seeding) ---
+const Product = require('./models/Product');   // adjust path if needed
 
 const app = express();
 
@@ -24,9 +27,29 @@ mongoose.connect(MONGODB_URI, {
   serverSelectionTimeoutMS: 5000,
   socketTimeoutMS: 45000,
 })
-.then(() => {
+.then(async () => {
   console.log('✅ MongoDB connected successfully to PAINTELLO-PRO database');
   console.log('   Database:', mongoose.connection.db.databaseName);
+
+  // --- SEED A FEATURED PRODUCT IF NONE EXISTS ---
+  try {
+    const existingFeatured = await Product.countDocuments({ featured: true });
+    if (existingFeatured === 0) {
+      await Product.create({
+        name: 'دهان بريميوم أبيض',
+        description: 'دهان داخلي عالي الجودة، سهل التطبيق، يجف بسرعة ويعطي لمسة نهائية ناعمة. مثالي لجميع الغرف.',
+        price: 1200,
+        image: 'https://live.staticflickr.com/65535/55343397132_1ae9c890e0_b.jpg',
+        category: 'paint',
+        featured: true
+      });
+      console.log('🌱 Default featured product seeded');
+    } else {
+      console.log('✅ Featured products already exist');
+    }
+  } catch (seedErr) {
+    console.error('⚠️ Seeding warning:', seedErr.message);
+  }
 })
 .catch(err => {
   console.error('❌ MongoDB connection error:', err.message);
@@ -34,21 +57,18 @@ mongoose.connect(MONGODB_URI, {
   process.exit(1);
 });
 
-// ---------------- FIX: Handle both ESM and CommonJS exports of connect-mongo ----------------
+// ---------------- connect-mongo compatibility ----------------
 let MongoStoreModule = require('connect-mongo');
-// Support ESM default export (v4+ when required via CommonJS)
 let MongoStore = MongoStoreModule.default || MongoStoreModule;
 
 let sessionStore;
 
 if (typeof MongoStore.create === 'function') {
-  // ----- connect-mongo v4+ (modern API) -----
   sessionStore = MongoStore.create({
     mongoUrl: MONGODB_URI,
     ttl: 14 * 24 * 60 * 60   // 14 days
   });
 } else if (typeof MongoStore === 'function') {
-  // ----- connect-mongo v3.x or older (legacy API) -----
   const LegacyMongoStore = MongoStore(session);
   sessionStore = new LegacyMongoStore({
     mongooseConnection: mongoose.connection,
@@ -56,17 +76,14 @@ if (typeof MongoStore.create === 'function') {
   });
 } else {
   console.error('❌ Unsupported connect-mongo version. Please install connect-mongo@4 or higher.');
-  console.error('   Run: npm install connect-mongo@latest');
   process.exit(1);
 }
-// --------------------------------------------------------------------------------------------
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.set('trust proxy', 1);
 
-// Session middleware (using the compatible store)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'paintello-secret-key-2024',
   resave: false,
@@ -80,10 +97,8 @@ app.use(session({
   }
 }));
 
-// Flash middleware
 app.use(flash());
 
-// Global locals middleware
 app.use((req, res, next) => {
   res.locals.success = req.flash('success');
   res.locals.error   = req.flash('error');
@@ -102,6 +117,7 @@ app.set('views', path.join(__dirname, 'views'));
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Health check
 app.get('/healty', (req, res) => {
   res.status(200).json({
     status: 'online',
@@ -109,33 +125,18 @@ app.get('/healty', (req, res) => {
   });
 });
 
-// Routes
+// ---------- ROUTES ----------
 const indexRoutes = require('./routes/index');
 app.use('/', indexRoutes);
 
 const publicRoutes = require('./routes/public');
 app.use('/', publicRoutes);
 
-// Health check
-app.get('/health', async (req, res) => {
-  const dbStatus = mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected';
-  const cloudinaryStatus = process.env.CLOUDINARY_CLOUD_NAME ? 'Configured' : 'Not configured';
-  
-  res.json({
-    status: 'OK',
-    app: 'Paintello Pro',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
-    database: {
-      status: dbStatus,
-      name: mongoose.connection.db?.databaseName || 'Unknown'
-    },
-    cloudinary: cloudinaryStatus,
-    session: req.sessionID ? 'Active' : 'Inactive'
-  });
-});
+// ---------- PRODUCT ROUTES ----------
+const productRoutes = require('./routes/products');
+app.use('/products', productRoutes);
 
-// Root route
+// Additional root route (fallback)
 app.get('/', (req, res) => {
   res.render('index', {
     title: 'Paintello Pro - Professional Painter Platform',
@@ -145,49 +146,34 @@ app.get('/', (req, res) => {
 
 // Logout routes
 app.get('/index/logout', (req, res) => {
-  console.log('🚪 Logging out user...');
   const userName = req.session.user?.name || req.session.painter?.name || 'User';
-  
   req.session.destroy((err) => {
-    if (err) {
-      console.error('Logout error:', err);
-      return res.redirect('/painter/dashboard');
-    }
+    if (err) return res.redirect('/painter/dashboard');
     res.clearCookie('connect.sid');
-    console.log('✅ Logout successful for:', userName);
     res.redirect('/');
   });
 });
 
 app.post('/index/logout', (req, res) => {
-  console.log('🚪 POST Logout...');
   const userName = req.session.user?.name || req.session.painter?.name || 'User';
-  
   req.session.destroy((err) => {
-    if (err) {
-      console.error('Logout error:', err);
-      return res.redirect('/painter/dashboard');
-    }
+    if (err) return res.redirect('/painter/dashboard');
     res.clearCookie('connect.sid');
-    console.log('✅ POST Logout successful for:', userName);
     res.redirect('/');
   });
 });
 
-// Error handling middleware
+// Error handling
 app.use((err, req, res, next) => {
   console.error('🚨 Server Error:', err.message);
-  
   if (err.code === 'LIMIT_FILE_SIZE') {
     req.flash('error', 'File too large. Maximum size is 2MB.');
     return res.redirect('back');
   }
-  
   if (err.message.includes('image files')) {
     req.flash('error', 'Only image files are allowed.');
     return res.redirect('back');
   }
-  
   res.status(500).render('error', {
     title: 'Server Error',
     message: 'Something went wrong! Please try again later.',
@@ -206,7 +192,8 @@ app.use((req, res) => {
 
 // Server startup
 const PORT = process.env.PORT || 3000;
-
-
+const server = app.listen(PORT, () => {
+  console.log(`🚀 Paintello Pro server running on port ${PORT}`);
+});
 
 module.exports = app;
