@@ -1064,7 +1064,7 @@
       <% featuredProducts.forEach(product => { %>
       <div class="carousel-card" onclick="window.location.href='/products/<%= product._id %>'">
         <div class="carousel-image">
-          <img src="<%= product.image %>" alt="<%= product.name %>" />
+         <img src="<%= (product.images && product.images.length > 0) ? product.images[0] : (product.image || '/images/default-product.png') %>" alt="<%= product.name %>" />
         </div>
         <div class="carousel-body">
           <h4 class="carousel-title"><%= product.name %></h4>
@@ -1219,12 +1219,14 @@
     map.fitBounds(group.getBounds().pad(0.2));
 </script>
 
-function scrollCarousel(direction) {
-  const track = document.getElementById('productCarousel');
-  const scrollAmount = 250; // approx card width + gap
-  track.scrollBy({
-    left: direction * scrollAmount,
-    behavior: 'smooth'
-  });
-}
+<script>
+  function scrollCarousel(direction) {
+    const track = document.getElementById('productCarousel');
+    if (!track) return;
+    track.scrollBy({
+      left: direction * scrollAmount,
+      behavior: 'smooth'
+    });
+  }
+</script>
 <%- include('../partials/footer') %>
