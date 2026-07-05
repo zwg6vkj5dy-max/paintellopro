@@ -132,9 +132,7 @@ app.use('/', indexRoutes);
 const publicRoutes = require('./routes/public');
 app.use('/', publicRoutes);
 
-// ---------- PRODUCT ROUTES ----------
-const productRoutes = require('./routes/products');
-app.use('/products', productRoutes);
+
 
 // Additional root route (fallback)
 app.get('/', (req, res) => {
