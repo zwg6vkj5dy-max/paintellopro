@@ -56,7 +56,31 @@ router.get('/products/add-to-cart/:id', async (req, res) => {
       cart.totalQty += cart.items[id].qty;
       cart.totalPrice += cart.items[id].price;
     }
-
+// 🔥 Server‑side AddToCart with the same event ID as the browser
+    const eventId = req.query.eventId;
+    const userData = getCleanUserData(req);
+    
+    if (userData && eventId) {
+      await sendMetaCAPIEvent({
+        eventName: 'AddToCart',
+        eventId,
+        userData,
+        customData: {
+          content_name: product.name,
+          content_ids: [product._id.toString()],
+          content_type: 'product',
+          value: product.price * quantity,
+          currency: 'DZD',
+          contents: [{
+            id: product._id.toString(),
+            quantity,
+            item_price: product.price
+          }]
+        },
+        eventSourceUrl: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
+        testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE,
+      });
+    }
     // Redirect to checkout
     res.redirect('/checkout');
   } catch (err) {
@@ -288,6 +312,26 @@ router.get('/products/:id', async (req, res) => {
         testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE,
       });
     }
+// ✅ NEW – ViewContent (server side)
+  await sendMetaCAPIEvent({
+    eventName: 'ViewContent',
+    eventId: viewContentId,
+    userData,
+    customData: {
+      content_name: product.name,
+      content_ids: [product._id.toString()],
+      content_type: 'product',
+      value: product.price,
+      currency: 'DZD',
+      contents: [{
+        id: product._id.toString(),
+        quantity: 1,
+        item_price: product.price
+      }]
+    },
+    eventSourceUrl: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
+    testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE,
+  });
 
     res.render('ar/products/product', {
       title: product.name + ' - Paintello Pro',
@@ -298,7 +342,7 @@ router.get('/products/:id', async (req, res) => {
       metaEventIdCart: addToCartId,
       user: req.session.user || null,
       sessionPainter: req.session.painter || null,
-      whatsappPhone: process.env.WHATSAPP_PHONE || '213555555555',
+      
     });
   } catch (error) {
     console.error('Product detail error:', error);
