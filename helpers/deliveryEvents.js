@@ -52,7 +52,7 @@ async function sendPurchaseForDeliveredCOD(order) {
         content_ids: content_ids,
         contents: contents,
       },
-      eventSourceUrl: `https://${process.env.DOMAIN || "www.paintello.uk"}/order/${order._id}`,
+      eventSourceUrl: `https://${process.env.DOMAIN || "paintellopro.onrender.com"}/order/${order._id}`,
       testEventCode: process.env.FB_TEST_EVENT_CODE,
     });
     console.log(`✅ Purchase event sent for delivered COD order ${order._id}, eventID: ${eventId}`);
