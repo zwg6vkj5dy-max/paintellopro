@@ -342,7 +342,7 @@ router.get('/products/:id', async (req, res) => {
       metaEventIdCart: addToCartId,
       user: req.session.user || null,
       sessionPainter: req.session.painter || null,
-      
+      whatsappPhone: process.env.WHATSAPP_PHONE || '213796530868',
     });
   } catch (error) {
     console.error('Product detail error:', error);
