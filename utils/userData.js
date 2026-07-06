@@ -1,4 +1,4 @@
-// utils/userData.js - FINAL WORKING VERSION (with all mappings)
+// utils/userData.js - FIXED VERSION
 const { isBotRequest } = require("./botDetection");
 
 // ✅ COUNTRY MAPPING TO ISO CODES
@@ -123,18 +123,16 @@ function getCleanUserData(req) {
       userData.email = cleanString(req.body.email);
     }
     
-    // Phone number - Check multiple field names (including clientPhone)
+    // Phone number - CRITICAL: Check multiple field names
     if (req.body.numero) {
       userData.numero = cleanPhoneNumber(req.body.numero);
     } else if (req.body.phone) {
       userData.numero = cleanPhoneNumber(req.body.phone);
     } else if (req.body.telephone) {
       userData.numero = cleanPhoneNumber(req.body.telephone);
-    } else if (req.body.clientPhone) { // 🔹 added for guest orders
-      userData.numero = cleanPhoneNumber(req.body.clientPhone);
     }
     
-    // Names - explicit firstName/lastName fields
+    // Names
     if (req.body.firstName) {
       userData.firstName = cleanString(req.body.firstName);
     } else if (req.body.firstname) {
@@ -147,39 +145,12 @@ function getCleanUserData(req) {
       userData.lastName = cleanString(req.body.lastname);
     }
     
-    // 🔹 NEW: If firstName is still empty, try to extract from 'name' (painter registration)
-    if (!userData.firstName && req.body.name) {
-      const nameParts = cleanString(req.body.name)?.split(/\s+/) || [];
-      if (nameParts.length) {
-        userData.firstName = nameParts[0];
-        if (nameParts.length > 1) {
-          userData.lastName = nameParts.slice(1).join(' ');
-        } else {
-          userData.lastName = '';
-        }
-      }
-    }
-    
-    // 🔹 NEW: If firstName is still empty, try to extract from 'clientName' (guest order)
-    if (!userData.firstName && req.body.clientName) {
-      const nameParts = cleanString(req.body.clientName)?.split(/\s+/) || [];
-      if (nameParts.length) {
-        userData.firstName = nameParts[0];
-        if (nameParts.length > 1) {
-          userData.lastName = nameParts.slice(1).join(' ');
-        } else {
-          userData.lastName = '';
-        }
-      }
-    }
-    
     // Location
-   // Map wilaya to city (Meta's ct parameter)
-if (req.body.wilaya) {
-  userData.city = cleanString(req.body.wilaya);
-}
+    if (req.body.city) {
+      userData.city = cleanString(req.body.city);
+    }
     
-    // Country - Check multiple field names
+    // Country - CRITICAL: Check your form field name
     if (req.body.country) {
       userData.country = cleanCountry(req.body.country);
     } else if (req.body.pays) { // French for country
