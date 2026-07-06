@@ -7,261 +7,6 @@
   sessionPainter: typeof sessionPainter !== 'undefined' ? sessionPainter : null,
   whatsappPhone: typeof whatsappPhone !== 'undefined' ? whatsappPhone : '213796530868'
 }) %>
-
-<!-- ===== PRODUCT HERO / DETAIL SECTION ===== -->
-<section class="product-detail-section" dir="rtl">
-  <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
-    <div class="row g-5">
-      
-      <!-- Left Column: Image Gallery -->
-      <div class="col-lg-7">
-        <!-- Main image + thumbnails -->
-        <div class="image-gallery">
-          <!-- Thumbnails column (vertical on desktop) -->
-          <div class="thumbnails-col">
-            <% const images = (product.images && product.images.length) ? product.images : (product.image ? [product.image] : []); %>
-            <% images.forEach((img, idx) => { %>
-              <button type="button" class="thumb-item <%= idx === 0 ? 'active' : '' %>" data-index="<%= idx %>">
-                <img src="<%= img %>" alt="<%= product.name %>" />
-              </button>
-            <% }); %>
-          </div>
-
-          <!-- Main image -->
-          <div class="main-image-wrapper" id="imageSlider">
-            <% images.forEach((img, idx) => { %>
-              <img src="<%= img %>" alt="<%= product.name %>"
-                   class="main-image slider-img <%= idx === 0 ? 'active' : '' %>"
-                   style="<%= idx === 0 ? 'position:relative;opacity:1;' : 'position:absolute;opacity:0;' %>" />
-            <% }); %>
-            <!-- Arrows (visible on hover) -->
-            <button id="prevSlide" class="gallery-arrow left-arrow">&#10094;</button>
-            <button id="nextSlide" class="gallery-arrow right-arrow">&#10095;</button>
-            <!-- Fullscreen button -->
-            <button id="openLightboxBtn" class="fullscreen-btn">
-              <i class="fas fa-expand"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Gallery grid (small previews) -->
-        <div class="gallery-grid mt-3">
-          <% images.slice(0,4).forEach((img, idx) => { %>
-            <div class="gallery-item" data-index="<%= idx %>">
-              <img src="<%= img %>" alt="<%= product.name %>" />
-            </div>
-          <% }); %>
-        </div>
-      </div>
-      
-      <!-- Right Column: Product Info -->
-      <div class="col-lg-5">
-        <div class="product-info-card">
-          <!-- Category Badge -->
-          <span class="category-badge">
-            <%= product.category === 'paint' ? 'دهان' : product.category === 'tools' ? 'أدوات' : 'إكسسوارات' %>
-          </span>
-          
-          <!-- Title -->
-          <h1 class="product-title"><%= product.name %></h1>
-          
-          <!-- Price -->
-          <div class="price-block">
-            <span class="current-price"><%= product.price.toLocaleString('ar-DZ') %> دج</span>
-          </div>
-          
-          <!-- Stock & Delivery Info -->
-          <div class="delivery-info">
-            <div class="flex-item">
-              <span class="green-dot"></span>
-              <span>متوفر في المخزون – يُشحن في نفس اليوم</span>
-            </div>
-            <div class="flex-item">
-              <i class="fas fa-truck-fast" style="color: var(--accent-blue); margin-left: 8px;"></i>
-              <span>توصيل مجاني لكل الولايات ابتداءً من 5000 دج</span>
-            </div>
-          </div>
-          
-          <!-- Quantity Selector -->
-          <div class="quantity-selector">
-            <span class="qty-label">الكمية :</span>
-            <div class="qty-controls">
-              <button type="button" id="qtyMinus" class="qty-btn">−</button>
-              <input type="text" id="qtyInput" value="1" readonly class="qty-input" />
-              <button type="button" id="qtyPlus" class="qty-btn">+</button>
-            </div>
-          </div>
-          
-          <!-- Buy Now Button (Blue Theme) -->
-         <a id="buyNowBtn" class="btn-buy-now" href="/products/add-to-cart/<%= product._id %>?qty=1" onclick="updateQty(event)">
-   <i class="fas fa-bolt me-2"></i> اشتري الآن
-</a>
-          
-          <!-- WhatsApp Bulk Order Button -->
-          <button id="whatsappBulkBtn" class="btn-whatsapp-bulk">
-            <i class="fab fa-whatsapp me-2"></i> طلب بالجملة عبر واتساب
-          </button>
-          
-          <!-- Tabs: Description / Delivery / Guarantee -->
-          <div class="product-tabs mt-4">
-            <ul class="nav nav-tabs" role="tablist">
-              <li class="nav-item">
-                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#desc" type="button">الوصف</button>
-              </li>
-              <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#delivery" type="button">التوصيل</button>
-              </li>
-              <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#guarantee" type="button">الضمان</button>
-              </li>
-            </ul>
-            <div class="tab-content mt-3">
-              <div class="tab-pane fade show active" id="desc">
-                <p><%= product.description %></p>
-              </div>
-              <div class="tab-pane fade" id="delivery">
-                <ul>
-                  <li>🚚 توصيل سريع إلى جميع الولايات</li>
-                  <li>⏱️ الشحن في نفس اليوم للطلبات قبل 14:00</li>
-                  <li>📦 تغليف آمن ومضمون</li>
-                  <li>📞 تتبع شحنتك عبر واتساب</li>
-                </ul>
-              </div>
-              <div class="tab-pane fade" id="guarantee">
-                <ul>
-                  <li>🛡️ ضمان الجودة لمدة 6 أشهر</li>
-                  <li>🔄 سياسة إرجاع خلال 14 يومًا</li>
-                  <li>✅ فحص المنتج قبل الشحن</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- ===== FULL-WIDTH CLOUDINARY VIDEO ===== -->
-<% if (product.videoFile) { %>
-<section class="product-video-fullbleed" dir="rtl">
-  <div class="container" style="max-width:1200px; margin:0 auto; padding:0 24px;">
-    <div class="video-text">
-      <p class="video-label">المنتج في حركة</p>
-      <h2 class="video-title">الحركة تكشف التفاصيل</h2>
-      <p class="video-desc">شاهد شكل المنتج وسطحه وحجمه من خلال الحركة الطبيعية.</p>
-    </div>
-  </div>
-  <div class="video-full">
-    <div class="video-ratio">
-      <iframe
-        src="<%= product.videoFile %>"
-        frameborder="0"
-        allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-        allowfullscreen
-        style="position:absolute;top:0;left:0;width:100%;height:100%;">
-      </iframe>
-    </div>
-  </div>
-</section>
-<% } %>
-
-<!-- ===== FULL-WIDTH YOUTUBE VIDEO ===== -->
-<% if (product.videoId) { %>
-<section class="product-video-fullbleed" dir="rtl">
-  <div class="container" style="max-width:1200px; margin:0 auto; padding:0 24px;">
-    <div class="video-text">
-      <p class="video-label">فيديو توضيحي</p>
-      <h2 class="video-title">شاهد المنتج عن قرب</h2>
-      <p class="video-desc">فيديو يوضح مميزات المنتج وطريقة استخدامه.</p>
-    </div>
-  </div>
-  <div class="video-full">
-    <div class="video-ratio">
-      <iframe
-        src="https://www.youtube.com/embed/<%= product.videoId %>?rel=0&playsinline=1"
-        frameborder="0"
-        allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-        style="position:absolute;top:0;left:0;width:100%;height:100%;">
-      </iframe>
-    </div>
-  </div>
-</section>
-<% } %>
-
-<!-- ===== RELATED PRODUCTS CAROUSEL ===== -->
-<% if (typeof relatedProducts !== 'undefined' && relatedProducts.length > 0) { %>
-<section class="related-products-section" dir="rtl">
-  <div class="container" style="max-width:1200px; margin:0 auto; padding:0 24px;">
-    <h2 class="related-title">منتجات قد تعجبك</h2>
-    <div class="related-carousel-wrapper">
-      <button class="related-arrow left-arrow-related" onclick="scrollRelated(-280)">&#10094;</button>
-      <div class="related-carousel" id="relatedCarousel">
-        <% relatedProducts.forEach(rp => { %>
-          <a href="/products/<%= rp._id %>" class="related-card">
-            <div class="related-img-wrap">
-              <img src="<%= (rp.images && rp.images[0]) ? rp.images[0] : rp.image %>" alt="<%= rp.name %>" />
-            </div>
-            <div class="related-card-body">
-              <h5 class="related-name"><%= rp.name %></h5>
-              <span class="related-price"><%= rp.price.toLocaleString('ar-DZ') %> دج</span>
-            </div>
-          </a>
-        <% }); %>
-      </div>
-      <button class="related-arrow right-arrow-related" onclick="scrollRelated(280)">&#10095;</button>
-    </div>
-  </div>
-</section>
-<% } %>
-
-<!-- ===== WHATSAPP CHAT WIDGET ===== -->
-<div id="whatsappWidget" class="whatsapp-widget">
-  <!-- Floating Button -->
-  <button id="whatsappToggle" class="whatsapp-float" aria-label="Contact via WhatsApp">
-    <svg viewBox="0 0 24 24" width="32" height="32" fill="white">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-    </svg>
-  </button>
-
-  <!-- Chat Modal -->
-  <div id="whatsappModal" class="whatsapp-modal">
-    <div class="whatsapp-modal-content">
-      <div class="whatsapp-modal-header">
-        <div class="whatsapp-header-left">
-          <img src="/img/logo.png" alt="Paintello" class="whatsapp-header-logo">
-          <span class="whatsapp-header-title">راسلنا عبر واتساب</span>
-        </div>
-        <button id="whatsappClose" class="whatsapp-close-btn">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-          </svg>
-        </button>
-      </div>
-      <div class="whatsapp-modal-body">
-        <div class="whatsapp-product-summary">
-          <div class="whatsapp-product-image">
-            <% if (images && images[0]) { %><img src="<%= images[0] %>" alt="<%= product.name %>"><% } else { %><i class="fas fa-box fa-2x" style="color: var(--primary-blue);"></i><% } %>
-          </div>
-          <div class="whatsapp-product-info">
-            <h4><%= product.name %></h4>
-            <p class="whatsapp-product-price"><%= product.price.toLocaleString('ar-DZ') %> دج</p>
-          </div>
-        </div>
-        <div class="whatsapp-message-area">
-          <label for="whatsappMessage" class="whatsapp-input-label">رسالتك</label>
-          <textarea id="whatsappMessage" class="whatsapp-textarea" rows="3" placeholder="مرحباً، أنا مهتم بهذا المنتج..."></textarea>
-        </div>
-        <button id="whatsappSend" class="whatsapp-send-btn">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-          إرسال عبر واتساب
-        </button>
-        <p class="whatsapp-footer-note">🔒 سيتم إرسال رسالتك عبر واتساب. سنرد عليك في أقرب وقت.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- ===== STYLES ===== -->
 <style>
 /* ===== FULL-BLEED PRODUCT VIDEO (Zara style) ===== */
@@ -499,6 +244,262 @@
   }
 </style>
 
+<!-- ===== PRODUCT HERO / DETAIL SECTION ===== -->
+<section class="product-detail-section" dir="rtl">
+  <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+    <div class="row g-5">
+      
+      <!-- Left Column: Image Gallery -->
+      <div class="col-lg-7">
+        <!-- Main image + thumbnails -->
+        <div class="image-gallery">
+          <!-- Thumbnails column (vertical on desktop) -->
+          <div class="thumbnails-col">
+            <% const images = (product.images && product.images.length) ? product.images : (product.image ? [product.image] : []); %>
+            <% images.forEach((img, idx) => { %>
+              <button type="button" class="thumb-item <%= idx === 0 ? 'active' : '' %>" data-index="<%= idx %>">
+                <img src="<%= img %>" alt="<%= product.name %>" />
+              </button>
+            <% }); %>
+          </div>
+
+          <!-- Main image -->
+          <div class="main-image-wrapper" id="imageSlider">
+            <% images.forEach((img, idx) => { %>
+              <img src="<%= img %>" alt="<%= product.name %>"
+                   class="main-image slider-img <%= idx === 0 ? 'active' : '' %>"
+                   style="<%= idx === 0 ? 'position:relative;opacity:1;' : 'position:absolute;opacity:0;' %>" />
+            <% }); %>
+            <!-- Arrows (visible on hover) -->
+            <button id="prevSlide" class="gallery-arrow left-arrow">&#10094;</button>
+            <button id="nextSlide" class="gallery-arrow right-arrow">&#10095;</button>
+            <!-- Fullscreen button -->
+            <button id="openLightboxBtn" class="fullscreen-btn">
+              <i class="fas fa-expand"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Gallery grid (small previews) -->
+        <div class="gallery-grid mt-3">
+          <% images.slice(0,4).forEach((img, idx) => { %>
+            <div class="gallery-item" data-index="<%= idx %>">
+              <img src="<%= img %>" alt="<%= product.name %>" />
+            </div>
+          <% }); %>
+        </div>
+      </div>
+      
+      <!-- Right Column: Product Info -->
+      <div class="col-lg-5">
+        <div class="product-info-card">
+          <!-- Category Badge -->
+          <span class="category-badge">
+            <%= product.category === 'paint' ? 'دهان' : product.category === 'tools' ? 'أدوات' : 'إكسسوارات' %>
+          </span>
+          
+          <!-- Title -->
+          <h1 class="product-title"><%= product.name %></h1>
+          
+          <!-- Price -->
+          <div class="price-block">
+            <span class="current-price"><%= product.price.toLocaleString('ar-DZ') %> دج</span>
+          </div>
+          
+          <!-- Stock & Delivery Info -->
+          <div class="delivery-info">
+            <div class="flex-item">
+              <span class="green-dot"></span>
+              <span>متوفر في المخزون – يُشحن في نفس اليوم</span>
+            </div>
+            <div class="flex-item">
+              <i class="fas fa-truck-fast" style="color: var(--accent-blue); margin-left: 8px;"></i>
+              <span>توصيل مجاني لكل الولايات ابتداءً من 5000 دج</span>
+            </div>
+          </div>
+          
+          <!-- Quantity Selector -->
+          <div class="quantity-selector">
+            <span class="qty-label">الكمية :</span>
+            <div class="qty-controls">
+              <button type="button" id="qtyMinus" class="qty-btn">−</button>
+              <input type="text" id="qtyInput" value="1" readonly class="qty-input" />
+              <button type="button" id="qtyPlus" class="qty-btn">+</button>
+            </div>
+          </div>
+          
+      <!-- Buy Now Button -->
+<button id="buyNowBtn" class="btn-buy-now">
+  <i class="fas fa-bolt me-2"></i> اشتري الآن
+</button>
+          
+          <!-- WhatsApp Bulk Order Button -->
+          <button id="whatsappBulkBtn" class="btn-whatsapp-bulk">
+            <i class="fab fa-whatsapp me-2"></i> طلب بالجملة عبر واتساب
+          </button>
+          
+          <!-- Tabs: Description / Delivery / Guarantee -->
+          <div class="product-tabs mt-4">
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#desc" type="button">الوصف</button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#delivery" type="button">التوصيل</button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#guarantee" type="button">الضمان</button>
+              </li>
+            </ul>
+            <div class="tab-content mt-3">
+              <div class="tab-pane fade show active" id="desc">
+                <p><%= product.description %></p>
+              </div>
+              <div class="tab-pane fade" id="delivery">
+                <ul>
+                  <li>🚚 توصيل سريع إلى جميع الولايات</li>
+                  <li>⏱️ الشحن في نفس اليوم للطلبات قبل 14:00</li>
+                  <li>📦 تغليف آمن ومضمون</li>
+                  <li>📞 تتبع شحنتك عبر واتساب</li>
+                </ul>
+              </div>
+              <div class="tab-pane fade" id="guarantee">
+                <ul>
+                  <li>🛡️ ضمان الجودة لمدة 6 أشهر</li>
+                  <li>🔄 سياسة إرجاع خلال 14 يومًا</li>
+                  <li>✅ فحص المنتج قبل الشحن</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ===== FULL-WIDTH CLOUDINARY VIDEO ===== -->
+<% if (product.videoFile) { %>
+<section class="product-video-fullbleed" dir="rtl">
+  <div class="container" style="max-width:1200px; margin:0 auto; padding:0 24px;">
+    <div class="video-text">
+      <p class="video-label">المنتج في حركة</p>
+      <h2 class="video-title">الحركة تكشف التفاصيل</h2>
+      <p class="video-desc">شاهد شكل المنتج وسطحه وحجمه من خلال الحركة الطبيعية.</p>
+    </div>
+  </div>
+  <div class="video-full">
+    <div class="video-ratio">
+      <iframe
+        src="<%= product.videoFile %>"
+        frameborder="0"
+        allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+        allowfullscreen
+        style="position:absolute;top:0;left:0;width:100%;height:100%;">
+      </iframe>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- ===== FULL-WIDTH YOUTUBE VIDEO ===== -->
+<% if (product.videoId) { %>
+<section class="product-video-fullbleed" dir="rtl">
+  <div class="container" style="max-width:1200px; margin:0 auto; padding:0 24px;">
+    <div class="video-text">
+      <p class="video-label">فيديو توضيحي</p>
+      <h2 class="video-title">شاهد المنتج عن قرب</h2>
+      <p class="video-desc">فيديو يوضح مميزات المنتج وطريقة استخدامه.</p>
+    </div>
+  </div>
+  <div class="video-full">
+    <div class="video-ratio">
+      <iframe
+        src="https://www.youtube.com/embed/<%= product.videoId %>?rel=0&playsinline=1"
+        frameborder="0"
+        allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        style="position:absolute;top:0;left:0;width:100%;height:100%;">
+      </iframe>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- ===== RELATED PRODUCTS CAROUSEL ===== -->
+<% if (typeof relatedProducts !== 'undefined' && relatedProducts.length > 0) { %>
+<section class="related-products-section" dir="rtl">
+  <div class="container" style="max-width:1200px; margin:0 auto; padding:0 24px;">
+    <h2 class="related-title">منتجات قد تعجبك</h2>
+    <div class="related-carousel-wrapper">
+      <button class="related-arrow left-arrow-related" onclick="scrollRelated(-280)">&#10094;</button>
+      <div class="related-carousel" id="relatedCarousel">
+        <% relatedProducts.forEach(rp => { %>
+          <a href="/products/<%= rp._id %>" class="related-card">
+            <div class="related-img-wrap">
+              <img src="<%= (rp.images && rp.images[0]) ? rp.images[0] : rp.image %>" alt="<%= rp.name %>" />
+            </div>
+            <div class="related-card-body">
+              <h5 class="related-name"><%= rp.name %></h5>
+              <span class="related-price"><%= rp.price.toLocaleString('ar-DZ') %> دج</span>
+            </div>
+          </a>
+        <% }); %>
+      </div>
+      <button class="related-arrow right-arrow-related" onclick="scrollRelated(280)">&#10095;</button>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- ===== WHATSAPP CHAT WIDGET ===== -->
+<div id="whatsappWidget" class="whatsapp-widget">
+  <!-- Floating Button -->
+  <button id="whatsappToggle" class="whatsapp-float" aria-label="Contact via WhatsApp">
+    <svg viewBox="0 0 24 24" width="32" height="32" fill="white">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </button>
+
+  <!-- Chat Modal -->
+  <div id="whatsappModal" class="whatsapp-modal">
+    <div class="whatsapp-modal-content">
+      <div class="whatsapp-modal-header">
+        <div class="whatsapp-header-left">
+          <img src="/img/logo.png" alt="Paintello" class="whatsapp-header-logo">
+          <span class="whatsapp-header-title">راسلنا عبر واتساب</span>
+        </div>
+        <button id="whatsappClose" class="whatsapp-close-btn">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+      </div>
+      <div class="whatsapp-modal-body">
+        <div class="whatsapp-product-summary">
+          <div class="whatsapp-product-image">
+            <% if (images && images[0]) { %><img src="<%= images[0] %>" alt="<%= product.name %>"><% } else { %><i class="fas fa-box fa-2x" style="color: var(--primary-blue);"></i><% } %>
+          </div>
+          <div class="whatsapp-product-info">
+            <h4><%= product.name %></h4>
+            <p class="whatsapp-product-price"><%= product.price.toLocaleString('ar-DZ') %> دج</p>
+          </div>
+        </div>
+        <div class="whatsapp-message-area">
+          <label for="whatsappMessage" class="whatsapp-input-label">رسالتك</label>
+          <textarea id="whatsappMessage" class="whatsapp-textarea" rows="3" placeholder="مرحباً، أنا مهتم بهذا المنتج..."></textarea>
+        </div>
+        <button id="whatsappSend" class="whatsapp-send-btn">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          إرسال عبر واتساب
+        </button>
+        <p class="whatsapp-footer-note">🔒 سيتم إرسال رسالتك عبر واتساب. سنرد عليك في أقرب وقت.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 <!-- ===== LIGHTBOX ELEMENT ===== -->
 <div id="lightbox" class="lightbox-backdrop">
   <button id="lightboxClose" class="lightbox-close"><i class="fas fa-times"></i></button>
@@ -510,11 +511,7 @@
 <!-- ===== JAVASCRIPT ===== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-function updateQty(e) {
-  e.preventDefault();
-  const qty = parseInt(document.getElementById('qtyInput').value) || 1;
-  window.location.href = e.currentTarget.href.replace('qty=1', 'qty=' + qty);
-}
+
   document.addEventListener('DOMContentLoaded', function() {
 
     // ---------- SERVER VALUES → CLIENT VARIABLES ----------
@@ -618,27 +615,31 @@ function updateQty(e) {
       }
     } catch (e) {}
 
-    // ---------- BUY NOW BUTTON (WhatsApp) ----------
+        // ---------- BUY NOW BUTTON (Add to Cart + redirect) ----------
     const buyNowBtn = document.getElementById('buyNowBtn');
-    if (buyNowBtn) {
-      buyNowBtn.addEventListener('click', function() {
-        const qty = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
-        // Pixel AddToCart
+    if (buyNowBtn && qtyInput) {
+      buyNowBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const qty = parseInt(qtyInput.value) || 1;
+        const productId = '<%= product._id %>';
+        const eventId = '<%= metaEventIdCart %>';
+
+        // Browser pixel AddToCart
         try {
           if (typeof fbq !== 'undefined') {
             fbq('track', 'AddToCart', {
-              content_name: productName,
+              content_name: '<%= product.name.replace(/'/g, "\\'") %>',
               content_ids: [productId],
               content_type: 'product',
-              value: productPrice * qty,
+              value: <%= product.price %> * qty,
               currency: 'DZD',
-              contents: [{ id: productId, quantity: qty, item_price: productPrice }]
-            }, { eventID: '<%= metaEventIdCart %>' });
+              contents: [{ id: productId, quantity: qty, item_price: <%= product.price %> }]
+            }, { eventID: eventId });
           }
         } catch (e) {}
-        const phone = '<%= whatsappPhone %>';
-        const text = encodeURIComponent(`أريد شراء ${qty} × "${productName}" بسعر ${productPrice * qty} دج.`);
-        window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+
+        // Redirect to add‑to‑cart route (which handles the server event and redirects to checkout)
+        window.location.href = `/products/add-to-cart/${productId}?qty=${qty}&eventId=${eventId}`;
       });
     }
 
