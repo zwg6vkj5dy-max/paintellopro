@@ -13,7 +13,7 @@ const { createPayment, verifyPayment } = require('../helpers/chargily');
 const { sendPurchaseForDeliveredCOD } = require('../helpers/deliveryEvents');
 const ProductOrder = require('../models/ProductOrder');
 const { sendTelegramMessage } = require('../helpers/telegram');
-const ProductOrder = require('../models/ProductOrder');
+
 
 function generateEventId() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
