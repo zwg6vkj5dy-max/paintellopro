@@ -242,6 +242,75 @@
     .whatsapp-widget { bottom: 20px; left: 20px; }
     .whatsapp-modal { bottom: 80px; left: 10px; }
   }
+/* Description Tab enhancements */
+.desc-section {
+  margin-bottom: 24px;
+}
+
+.desc-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+
+.desc-text {
+  color: var(--text-dark);
+  line-height: 1.9;
+  font-size: 0.95rem;
+}
+
+/* Features list */
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.features-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+}
+
+.features-list li i {
+  color: var(--primary-blue);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* Specifications table */
+.specs-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  font-size: 0.9rem;
+}
+
+.specs-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.spec-key {
+  font-weight: 600;
+  color: var(--primary-blue);
+  background: rgba(41,87,151,0.04);
+  width: 40%;
+  white-space: nowrap;
+}
+
+.spec-value {
+  color: var(--text-dark);
+  background: var(--bg-white);
+}
 </style>
 
 <!-- ===== PRODUCT HERO / DETAIL SECTION ===== -->
@@ -338,40 +407,111 @@
             <i class="fab fa-whatsapp me-2"></i> طلب بالجملة عبر واتساب
           </button>
           
-          <!-- Tabs: Description / Delivery / Guarantee -->
-          <div class="product-tabs mt-4">
-            <ul class="nav nav-tabs" role="tablist">
-              <li class="nav-item">
-                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#desc" type="button">الوصف</button>
-              </li>
-              <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#delivery" type="button">التوصيل</button>
-              </li>
-              <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#guarantee" type="button">الضمان</button>
-              </li>
-            </ul>
-            <div class="tab-content mt-3">
-              <div class="tab-pane fade show active" id="desc">
-                <p><%= product.description %></p>
-              </div>
-              <div class="tab-pane fade" id="delivery">
-                <ul>
-                  <li>🚚 توصيل سريع إلى جميع الولايات</li>
-                  <li>⏱️ الشحن في نفس اليوم للطلبات قبل 14:00</li>
-                  <li>📦 تغليف آمن ومضمون</li>
-                  <li>📞 تتبع شحنتك عبر واتساب</li>
-                </ul>
-              </div>
-              <div class="tab-pane fade" id="guarantee">
-                <ul>
-                  <li>🛡️ ضمان الجودة لمدة 6 أشهر</li>
-                  <li>🔄 سياسة إرجاع خلال 14 يومًا</li>
-                  <li>✅ فحص المنتج قبل الشحن</li>
-                </ul>
-              </div>
-            </div>
-          </div>
+         <!-- Tabs: Description / Delivery / Guarantee -->
+<div class="product-tabs mt-4">
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#desc" type="button">الوصف</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#delivery" type="button">التوصيل</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#guarantee" type="button">الضمان</button>
+    </li>
+  </ul>
+
+  <div class="tab-content mt-3">
+    <!-- Description Tab -->
+<div class="tab-pane fade show active" id="desc">
+
+  <!-- Product Description -->
+  <div class="desc-section">
+    <h4 class="desc-heading">وصف المنتج</h4>
+    <p class="desc-text"><%= product.description %></p>
+  </div>
+
+  <!-- Key Features -->
+  <% if (product.features && product.features.length > 0) { %>
+  <div class="desc-section">
+    <h4 class="desc-heading">المميزات الرئيسية</h4>
+    <ul class="features-list">
+      <% product.features.forEach(f => { %>
+        <li><i class="fas fa-check-circle"></i> <%= f %></li>
+      <% }); %>
+    </ul>
+  </div>
+  <% } %>
+
+  <!-- Specifications Table -->
+  <% if (product.specifications && product.specifications.length > 0) { %>
+  <div class="desc-section">
+    <h4 class="desc-heading">المواصفات الفنية</h4>
+    <table class="specs-table">
+      <tbody>
+        <% product.specifications.forEach(spec => { %>
+          <tr>
+            <td class="spec-key"><%= spec.key %></td>
+            <td class="spec-value"><%= spec.value %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+
+</div>
+
+    <!-- Delivery Tab (Arabic – Paintello Pro style) -->
+    <div class="tab-pane fade" id="delivery">
+      <p><strong>خيارات التوصيل :</strong></p>
+      <p class="mt-2">نقدم توصيلًا قياسيًا وسريعًا مع تتبع كامل لجميع الطلبات.</p>
+
+      <p class="mt-4"><strong>توصيل سريع مجاني :</strong></p>
+      <p class="mt-2">يتم تطبيق التوصيل السريع المجاني تلقائيًا عند الدفع عندما يكون طلبك مؤهلاً (ابتداءً من 5000 دج).</p>
+
+      <p class="mt-4"><strong>مدة الشحن :</strong></p>
+      <p class="mt-2">يتم شحن جميع الطلبات في نفس اليوم إذا تم تقديمها قبل الساعة 14:00.</p>
+
+      <div class="mt-6 p-4 rounded-lg" style="background: rgba(41,87,151,0.08); border: 1px solid var(--primary-blue);">
+        <p class="font-medium" style="color: var(--primary-blue);">أوقات التسليم المقدرة :</p>
+        <ul class="mt-2 space-y-1" style="color: var(--primary-dark);">
+          <li>• توصيل قياسي : 3-5 أيام عمل</li>
+          <li>• توصيل سريع : 1-2 أيام عمل</li>
+          <li>• الولايات البعيدة : 5-8 أيام عمل</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Guarantee Tab (Arabic – Paintello Pro style) -->
+    <div class="tab-pane fade" id="guarantee">
+      <div class="p-4 rounded-lg border" style="background: rgba(41,87,151,0.05); border-color: var(--primary-blue);">
+        <p class="font-semibold" style="color: var(--primary-blue);">ضمان الرضا 100%</p>
+        <p class="mt-1" style="color: var(--primary-dark);">ضمان استرداد كامل للمبلغ خلال 4 أيام دون أي أسئلة.</p>
+      </div>
+
+      <p class="mt-4"><strong>تعهدنا :</strong></p>
+      <p class="mt-2">نحن واثقون من أنك ستحب منتجاتنا. إذا لم تكن راضيًا تمامًا، يمكنك إرجاع المنتج خلال 4 أيام من الاستلام.</p>
+
+      <p class="mt-4"><strong>كيف يعمل :</strong></p>
+      <p class="mt-2">إذا لم تكن راضيًا عن مشترياتك، ما عليك سوى الاتصال بنا خلال 4 أيام من استلام الطلب لبدء عملية الإرجاع.</p>
+      <a href="/track-login" class="learn-more-link">معرفة المزيد</a>
+
+      <p class="mt-4"><strong>ضمان الجودة :</strong></p>
+      <p class="mt-2">يخضع كل منتج لفحوصات جودة صارمة قبل الشحن. نحن نضمن الحرفية والمتانة لمنتجاتنا.</p>
+
+      <div class="mt-6 p-4 rounded-lg" style="background: rgba(41,87,151,0.08); border: 1px solid var(--primary-blue);">
+        <p class="font-medium" style="color: var(--primary-blue);">سياسة الإرجاع :</p>
+        <ul class="mt-2 space-y-1" style="color: var(--primary-dark);">
+          <li>• ضمان استرداد لمدة 4 أيام</li>
+          <li>• بدون طرح أي أسئلة</li>
+          <li>• استرداد كامل على وسيلة الدفع الأصلية</li>
+          <li>• يجب أن يكون المنتج في حالته الأصلية</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
         </div>
       </div>
     </div>
