@@ -4,7 +4,7 @@
 
 /**
  * MAIN BOT DETECTION FUNCTION - Multi-layer approach
- */z
+ */
 function isBotRequest(req, options = {}) {
   const userAgent = req.get('User-Agent') || '';
   const ip = extractIP(req);
@@ -80,7 +80,43 @@ function extractIP(req) {
           req.connection?.remoteAddress ||
           '0.0.0.0');
 }
+/**
+ * Simple user-agent string check (used when full request object not available)
+ */
+function isBotUserAgent(userAgent) {
+  if (!userAgent || typeof userAgent !== 'string') return false;
+  const ua = userAgent.toLowerCase();
 
+  // Combine patterns from all bot layers (scanners, AI, SEO, monitoring, etc.)
+  const botPatterns = [
+    'facebookexternalhit', 'facebot', 'meta-externalagent', 'meta-externalfetcher',
+    'facebookcatalog', 'instagrambot', 'whatsapp',
+    'gptbot', 'chatgpt-user', 'claude-web-crawler', 'omgilibot', 'imagesiftbot',
+    'diffbot', 'cohere-web', 'phiomega', 'llama-web', 'mistralai',
+    'claudebot', 'claude-web', 'anthropic', 'google-extended', 'applebot-extended',
+    'bytespider', 'ccbot', 'perplexitybot', 'amazonbot', 'metabot',
+    'copilot', 'gemini-web', 'grok',
+    'twitterbot', 'xbot', 'linkedinbot', 'slackbot', 'slurp', 'discordbot',
+    'telegrambot', 'pinterest', 'skypeuripreview', 'viber', 'snapchat', 'tumblr',
+    'redditbot', 'bluesky', 'mastodon',
+    'ahrefsbot', 'semrushbot', 'semrush', 'mozl', 'dotbot', 'petalbot', 'mj12bot',
+    'screaming frog', 'siteaudit', 'yandexbot', 'baiduspider', 'bingbot', 'sogou',
+    'exabot', 'seznambot', 'majestic', 'serpstat', 'proximic', 'blexbot',
+    'trendiction', 'alexabot', 'dataprovider',
+    'uptimerobot', 'pingdom', 'gtmetrix', 'lighthouse', 'pagespeed',
+    'google-read-aloud', 'sentry', 'datadog', 'newrelic', 'kuma', 'elastic',
+    'honeycomb', 'segment', 'bugsnag', 'rollbar', 'loggly', 'papertrail', 'splunk',
+    'adsbot-google', 'googlebot-adscrawler', 'mediapartners-google', 'googlebot-image',
+    'googlebot-video', 'adidxbot', 'bingpreview', 'adstxt', 'criteo', 'taboola', 'outbrain',
+    'curl', 'wget', 'python', 'java', 'go-http-client', 'powershell', 'libwww',
+    'httpclient', 'axios', 'requests', 'scrapy', 'guzzle', 'php', 'node-fetch',
+    'fetch', 'urllib', 'headless', 'phantomjs', 'puppeteer', 'selenium', 'playwright',
+    'cypress', 'webdriver', 'faker', 'postman', 'insomnia', 'jmeter', 'rust-http',
+    'hyper', 'reqwest', 'aiohttp'
+  ];
+
+  return botPatterns.some(pattern => ua.includes(pattern));
+}
 /**
  * Layer 1: Meta Security Scanners
  */
@@ -549,5 +585,6 @@ module.exports = {
   getBotClassification,
   isLegitimateAIBot,
   isMaliciousAIBot,
-  extractIP
+  extractIP,
+  isBotUserAgent
 };
