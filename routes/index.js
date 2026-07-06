@@ -12,6 +12,7 @@ var Cart = require("../models/cart");
 const { createPayment, verifyPayment } = require('../helpers/chargily');
 const { sendPurchaseForDeliveredCOD } = require('../helpers/deliveryEvents');
 const ProductOrder = require('../models/ProductOrder');
+const { sendTelegramMessage } = require('../helpers/telegram');
 
 function generateEventId() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -278,7 +279,28 @@ router.get('/products', async (req, res) => {
 router.get('/products/ar', async (req, res) => {
   try {
     const products = await Product.find({ featured: true }).sort({ createdAt: -1 });
-    res.render('ar/products/index', { products }); // create this view or redirect
+
+    // Generate PageView event ID
+    const userData = getCleanUserData(req);
+    const pageViewId = generateEventId();
+
+    // Server-side PageView event
+    if (userData) {
+      await sendMetaCAPIEvent({
+        eventName: 'PageView',
+        eventId: pageViewId,
+        userData,
+        eventSourceUrl: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
+        testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE,
+      });
+    }
+
+    res.render('ar/products/index', {
+      products,
+      metaEventIdPageView: pageViewId,   // <-- pass it to the view
+      user: req.session.user || null,
+      sessionPainter: req.session.painter || null
+    });
   } catch (err) {
     res.status(500).send('Server Error');
   }
@@ -804,7 +826,16 @@ router.post('/checkout', async (req, res) => {
           testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE
         });
       }
-
+await sendTelegramMessage(
+  `🛒 <b>طلب جديد</b> — ${order.guest.firstName} ${order.guest.lastName}\n` +
+  `📱 الهاتف: ${order.guest.numero}\n` +
+  `📍 العنوان: ${order.guest.address}, ${order.guest.commune}, ${order.guest.city}\n` +
+  `💰 المجموع: ${order.totalWithShipping} دج\n` +
+  `🚚 التوصيل: ${order.deliveryDelay}\n` +
+  `📦 الحالة: ${order.status}\n` +
+  `💳 الدفع: ${order.paymentMethod === 'chargily' ? 'CIB / الذهبية' : 'الدفع عند الاستلام'}\n` +
+  `🔗 رابط: https://www.paintello.uk/order/deliver/${order._id}?secret=mySuperSecret123`
+);
       // Clear cart
       req.session.cart = null;
 
