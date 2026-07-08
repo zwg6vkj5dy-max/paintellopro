@@ -13,10 +13,7 @@ const app = express();
 // MongoDB URI
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/paintello';
 
-console.log('🔧 Starting Paintello Pro Server...');
-console.log('   Environment:', process.env.NODE_ENV);
-console.log('   MongoDB:', MONGODB_URI ? 'Configured' : 'Not configured');
-console.log('   Cloudinary:', process.env.CLOUDINARY_CLOUD_NAME ? 'Configured' : 'Not configured');
+
 
 // MongoDB Connection
 mongoose.connect(MONGODB_URI, {
@@ -59,7 +56,7 @@ if (typeof MongoStore.create === 'function') {
   process.exit(1);
 }
 // --------------------------------------------------------------------------------------------
-
+app.locals.fbPixelId = process.env.FB_PIXEL_ID;
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
