@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <%
-  const pixelId = typeof fbPixelId !== 'undefined' ? fbPixelId : '1079041583677854';
+   <%
+  const pixelId = typeof fbPixelId !== 'undefined' ? fbPixelId : process.env.FB_PIXEL_ID;
+
   const pageViewEventId =
     typeof metaEventIdPageView !== 'undefined' && metaEventIdPageView
       ? metaEventIdPageView
@@ -14,12 +15,33 @@
 
   if (typeof user !== 'undefined' && user) {
     if (user.email) advancedMatching.em = user.email;
-    if (user.phone) advancedMatching.ph = user.phone;
+    if (user.phone || user.numero) advancedMatching.ph = user.phone || user.numero;
     if (user.firstName) advancedMatching.fn = user.firstName;
     if (user.lastName) advancedMatching.ln = user.lastName;
   }
+
+  if (typeof sessionPainter !== 'undefined' && sessionPainter) {
+    if (!advancedMatching.em && sessionPainter.email) {
+      advancedMatching.em = sessionPainter.email;
+    }
+
+    if (!advancedMatching.ph && sessionPainter.phone) {
+      advancedMatching.ph = sessionPainter.phone;
+    }
+
+    if (!advancedMatching.fn && sessionPainter.firstName) {
+      advancedMatching.fn = sessionPainter.firstName;
+    } else if (!advancedMatching.fn && sessionPainter.name) {
+      advancedMatching.fn = sessionPainter.name;
+    }
+
+    if (!advancedMatching.ln && sessionPainter.lastName) {
+      advancedMatching.ln = sessionPainter.lastName;
+    }
+  }
 %>
 
+<% if (pixelId) { %>
 <script>
   !function(f,b,e,v,n,t,s){
     if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -30,7 +52,11 @@
     s.parentNode.insertBefore(t,s)
   }(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
 
-  fbq('init', <%- JSON.stringify(pixelId) %>, <%- JSON.stringify(advancedMatching).replace(/</g, '\\u003c') %>);
+  fbq(
+    'init',
+    <%- JSON.stringify(pixelId) %>,
+    <%- JSON.stringify(advancedMatching).replace(/</g, '\\u003c') %>
+  );
 
   fbq('track', 'PageView', {}, {
     eventID: <%- JSON.stringify(pageViewEventId) %>
@@ -46,6 +72,7 @@
   <img height="1" width="1" style="display:none"
        src="https://www.facebook.com/tr?id=<%= pixelId %>&ev=PageView&noscript=1" />
 </noscript>
+<% } %>
 
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
