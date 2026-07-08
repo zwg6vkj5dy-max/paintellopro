@@ -807,23 +807,9 @@
     </div>
 </section>
 
-<!-- Carousel Scroll Logic Handler JS -->
-function scrollProductCarousel(direction) {
-    const track = document.getElementById('productCarousel');
-    if (track) {
-        const firstCard = track.querySelector('.carousel-card');
-        const cardWidth = firstCard ? firstCard.offsetWidth + 24 : 284;
-        
-        // في الـ RTL، التمرير لليمين يكون بقيمة سالبة، لضمان دعم متوافق 100% مع المتصفحات الحديثة:
-        const isRTL = document.documentElement.dir === 'rtl' || document.body.getAttribute('dir') === 'rtl';
-        const scrollAmount = isRTL ? (-direction * cardWidth) : (direction * cardWidth);
-        
-        track.scrollBy({
-            left: scrollAmount,
-            behavior: 'smooth'
-        });
-    }
-}
+
+<!-- Leaflet Map Initialization Script -->
+<script>
     document.addEventListener("DOMContentLoaded", function() {
         // 1. إعداد الخريطة والتركيز على إحداثيات وسط الجزائر ومستوى التقريب (Zoom) مناسب
         var map = L.map('algeriaMap', {
@@ -884,8 +870,6 @@ function scrollProductCarousel(direction) {
         // تعديل طفيف لتحديث حجم الخريطة لتجنب مشاكل العرض عند التحميل الأولي
         setTimeout(function(){ map.invalidateSize(); }, 400);
     });
-</script>
-
 </script>
 
 <%- include('../partials/footer') %>
