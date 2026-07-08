@@ -1,193 +1,48 @@
 <%- include('../partials/header', { title: 'بينتيلو برو - منصة الدهانين المحترفين في الجزائر' }) %>
 
-<!-- Leaflet CSS + JS (same map) -->
+<!-- Leaflet CSS + JS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
-/* ---- Products Carousel ---- */
-.products-section {
-  background: var(--bg-white);
-}
-
-.carousel-container {
-  position: relative;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 60px;
-}
-
-.carousel-track {
-  display: flex;
-  gap: 24px;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  padding: 20px 0;
-  scrollbar-width: none;          /* Firefox */
-  -ms-overflow-style: none;       /* IE/Edge */
-}
-.carousel-track::-webkit-scrollbar {
-  display: none;
-}
-
-.carousel-card {
-  flex: 0 0 220px;
-  background: var(--bg-white);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-light);
-  overflow: hidden;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-}
-.carousel-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--primary-blue);
-  box-shadow: var(--shadow-md);
-}
-
-.carousel-image {
-  width: 100%;
-  height: 160px;
-  background: var(--bg-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.carousel-image img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  padding: 8px;
-}
-
-.carousel-body {
-  padding: 16px;
-  text-align: center;
-}
-
-.carousel-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-dark);
-  margin-bottom: 8px;
-  line-height: 1.4;
-  height: 2.8em;
-  overflow: hidden;
-}
-
-.carousel-price {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--primary-blue);
-  margin-bottom: 12px;
-}
-
-.btn-carousel-detail {
-  width: 100%;
-  padding: 8px;
-  background: transparent;
-  border: 1px solid var(--border-light);
-  border-radius: 40px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text-gray);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-.btn-carousel-detail:hover {
-  border-color: var(--accent-blue);
-  background: rgba(28,132,193,0.05);
-  color: var(--accent-blue);
-}
-
-.carousel-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--bg-white);
-  border: 1px solid var(--border-light);
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
-  font-size: 1.5rem;
-  color: var(--primary-blue);
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.carousel-btn:hover {
-  background: var(--primary-blue);
-  color: white;
-  border-color: var(--primary-blue);
-}
-.carousel-btn.prev {
-  left: 5px;
-}
-.carousel-btn.next {
-  right: 5px;
-}
-
-@media (max-width: 768px) {
-  .carousel-container {
-    padding: 0 40px;
-  }
-  .carousel-card {
-    flex: 0 0 180px;
-  }
-}
-    /* ===== COLOR THEME FROM VISION ANALYSIS =====
-       Primary Blue: #295797
-       Accent Blue:   #1C84C1
-       Light BG:      #E8EEF6
-       White:         #FFFFFF
-    */
+    /* ===== COLOR THEME & SYSTEM VARIABLES ===== */
     :root {
         --primary-blue: #295797;        /* Main brand colour */
         --accent-blue:  #1C84C1;        /* Vibrant sky blue for accents */
         --primary-dark: #1E3F5C;        /* Darker shade for depth */
         --primary-light: #4A7FA8;       /* Lighter variant for gradients */
-        --text-dark: #2D3748;
-        --text-gray: #4A5568;
-        --bg-light: #E8EEF6;            /* Page background tint */
+        --text-dark: #1A202C;
+        --text-gray: #718096;
+        --bg-light: #F8FAFC;            /* Page background tint */
         --bg-white: #FFFFFF;
-        --border-light: #D1DCE6;
-        --shadow-sm: 0 2px 8px rgba(41, 87, 151, 0.08);
-        --shadow-md: 0 4px 12px rgba(41, 87, 151, 0.12);
-        --shadow-lg: 0 8px 24px rgba(41, 87, 151, 0.16);
-        --radius-lg: 24px;
-        --radius-md: 16px;
-        --radius-sm: 12px;
+        --border-light: #E2E8F0;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+        --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.03);
+        --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+        --radius-lg: 16px;
+        --radius-md: 12px;
+        --radius-sm: 8px;
         --hero-gradient-start: #295797;
         --hero-gradient-end: #1C84C1;   /* Accent blue for gradient */
     }
 
-    /* RTL specific */
+    /* Import Arabic fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap');
+
+    body {
+        font-family: 'Tajawal', 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background-color: var(--bg-light);
+    }
+
+    /* RTL Layout Helpers */
     [dir="rtl"] {
         text-align: right;
-        font-family: 'Tajawal', 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
-    [dir="rtl"] .me-1 {
-        margin-right: 0 !important;
-        margin-left: 0.25rem !important;
-    }
-    [dir="rtl"] .me-2 {
-        margin-right: 0 !important;
-        margin-left: 0.5rem !important;
-    }
-    [dir="rtl"] .ms-1 {
-        margin-left: 0 !important;
-        margin-right: 0.25rem !important;
-    }
-    [dir="rtl"] .ms-2 {
-        margin-left: 0 !important;
-        margin-right: 0.5rem !important;
-    }
+    [dir="rtl"] .me-1 { margin-right: 0 !important; margin-left: 0.25rem !important; }
+    [dir="rtl"] .me-2 { margin-right: 0 !important; margin-left: 0.5rem !important; }
+    [dir="rtl"] .ms-1 { margin-left: 0 !important; margin-right: 0.25rem !important; }
+    [dir="rtl"] .ms-2 { margin-left: 0 !important; margin-right: 0.5rem !important; }
+    
     [dir="rtl"] .hero-buttons .btn-hero-primary i,
     [dir="rtl"] .hero-buttons .btn-hero-secondary i {
         margin-left: 8px;
@@ -196,19 +51,12 @@
     [dir="rtl"] .view-all-link i {
         transform: rotate(180deg);
     }
-    [dir="rtl"] .map-legend {
-        flex-direction: row-reverse;
-    }
-    [dir="rtl"] .legend-item {
-        flex-direction: row-reverse;
-    }
+    [dir="rtl"] .map-legend, 
+    [dir="rtl"] .legend-item, 
     [dir="rtl"] .map-stat-card {
         flex-direction: row-reverse;
         text-align: right;
     }
-
-    /* Import Arabic fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap');
 
     /* ---- Language Switcher ---- */
     .language-switcher-modern {
@@ -250,7 +98,7 @@
         color: var(--accent-blue);
     }
 
-    /* ---- Hero Section (blue gradient with white text) ---- */
+    /* ---- Hero Section ---- */
     .hero-modern {
         background: linear-gradient(135deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%);
         position: relative;
@@ -260,10 +108,7 @@
     .hero-modern::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        top: 0; left: 0; right: 0; bottom: 0;
         background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.06)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
         background-size: cover;
         opacity: 0.4;
@@ -308,15 +153,13 @@
         line-height: 1.3;
     }
     .hero-title .highlight-pro {
-        color: #FFD700;  /* Gold for "Pro" as in the image, keep it distinctive */
+        color: #FFD700;
         position: relative;
     }
     .hero-title .highlight-pro::after {
         content: '';
         position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        bottom: 0; left: 0; right: 0;
         height: 3px;
         background: #FFD700;
         border-radius: 4px;
@@ -387,13 +230,9 @@
         color: rgba(255, 255, 255, 0.85);
         font-size: 0.85rem;
     }
-    .trust-item i {
-        color: #FFD700;  /* gold stars */
-    }
-    [dir="rtl"] .trust-item i {
-        margin-left: 6px;
-        margin-right: 0;
-    }
+    .trust-item i { color: #FFD700; }
+    [dir="rtl"] .trust-item i { margin-left: 6px; margin-right: 0; }
+
     .hero-image {
         flex: 1;
         text-align: center;
@@ -406,7 +245,7 @@
         border-radius: var(--radius-md);
     }
 
-    /* ---- Stats Section (light) ---- */
+    /* ---- Stats Section ---- */
     .stats-modern {
         background: var(--bg-white);
         padding: 50px 0;
@@ -421,9 +260,7 @@
         flex-wrap: wrap;
         gap: 40px;
     }
-    .stat-item {
-        text-align: center;
-    }
+    .stat-item { text-align: center; }
     .stat-number {
         font-size: 2rem;
         font-weight: 800;
@@ -437,10 +274,10 @@
         letter-spacing: 0.5px;
     }
 
-    /* ---- Map Section (light) ---- */
+    /* ---- Map Section ---- */
     .map-section-modern {
         padding: 80px 0;
-        background: var(--bg-light);
+        background: #F1F5F9;
         border-top: 1px solid var(--border-light);
         border-bottom: 1px solid var(--border-light);
     }
@@ -455,10 +292,8 @@
         color: var(--text-dark);
         margin-bottom: 16px;
     }
-    .section-header p {
-        font-size: 1rem;
-        color: var(--text-gray);
-    }
+    .section-header p { font-size: 1rem; color: var(--text-gray); }
+    
     #algeriaMap {
         height: 500px;
         border-radius: var(--radius-lg);
@@ -466,7 +301,7 @@
         box-shadow: var(--shadow-md);
         margin-top: 20px;
         z-index: 1;
-        background: #DDE6EF;  /* light map background */
+        background: #DDE6EF;
         border: 1px solid var(--border-light);
     }
     .map-legend {
@@ -488,22 +323,11 @@
         border: 1px solid var(--border-light);
         box-shadow: var(--shadow-sm);
     }
-    .legend-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-    }
-    .legend-dot.high {
-        background: var(--primary-blue);
-        box-shadow: 0 0 0 3px rgba(41, 87, 151, 0.2);
-    }
-    .legend-dot.medium {
-        background: var(--accent-blue);
-        box-shadow: 0 0 0 3px rgba(28, 132, 193, 0.2);
-    }
-    .legend-dot.low {
-        background: #A0C4D9;  /* lighter blue */
-    }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .legend-dot.high { background: var(--primary-blue); box-shadow: 0 0 0 3px rgba(41, 87, 151, 0.2); }
+    .legend-dot.medium { background: var(--accent-blue); box-shadow: 0 0 0 3px rgba(28, 132, 193, 0.2); }
+    .legend-dot.low { background: #A0C4D9; }
+
     .map-stats-grid {
         max-width: 800px;
         margin: 30px auto 0;
@@ -527,10 +351,7 @@
         border-color: var(--accent-blue);
         box-shadow: var(--shadow-md);
     }
-    .map-stat-card i {
-        font-size: 2rem;
-        color: var(--primary-blue);
-    }
+    .map-stat-card i { font-size: 2rem; color: var(--primary-blue); }
     .map-stat-number {
         font-size: 1.5rem;
         font-weight: 800;
@@ -538,12 +359,171 @@
         display: block;
         line-height: 1;
     }
-    .map-stat-label {
-        font-size: 0.8rem;
-        color: var(--text-gray);
-    }
+    .map-stat-label { font-size: 0.8rem; color: var(--text-gray); }
 
-    /* ---- How It Works (light) ---- */
+    /* ---- Modernized Products Carousel Section ---- */
+    .products-section {
+        background: #F8FAFC !important;
+        padding: 80px 0;
+    }
+    .section-header-with-link {
+        max-width: 1200px;
+        margin: 0 auto 40px;
+        padding: 0 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    [dir="rtl"] .section-header-with-link { flex-direction: row-reverse; }
+    .section-header-with-link h2 { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+    .section-header-with-link p { color: var(--text-gray); margin: 0; }
+
+    .view-all-link {
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        padding: 8px 16px;
+        border-radius: 40px;
+        background: rgba(41, 87, 151, 0.06);
+        border: 1px solid rgba(41, 87, 151, 0.1);
+    }
+    .view-all-link:hover { gap: 12px; background: var(--primary-blue); color: white; }
+
+    .carousel-container {
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px;
+    }
+    .carousel-track {
+        display: flex;
+        gap: 24px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        padding: 20px 4px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        snap-type: x mandatory;
+    }
+    .carousel-track::-webkit-scrollbar { display: none; }
+
+    .carousel-card {
+        flex: 0 0 260px;
+        background: var(--bg-white);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-light);
+        overflow: hidden;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+        cursor: pointer;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        snap-align: start;
+    }
+    .carousel-card:hover {
+        transform: translateY(-6px);
+        border-color: #CBD5E1;
+        box-shadow: var(--shadow-lg);
+    }
+    .carousel-image {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        background: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-bottom: 1px solid var(--border-light);
+        position: relative;
+    }
+    .carousel-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 20px;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .carousel-card:hover .carousel-image img { transform: scale(1.06); }
+
+    .carousel-body {
+        padding: 20px;
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+    .carousel-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+        line-height: 1.4;
+        height: 2.8em;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    .carousel-price {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--primary-blue);
+        margin-bottom: 16px;
+    }
+    .btn-carousel-detail {
+        width: 100%;
+        padding: 10px;
+        background: transparent;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-gray);
+        transition: all 0.2s ease;
+        cursor: pointer;
+        margin-top: auto;
+        text-align: center;
+    }
+    .carousel-card:hover .btn-carousel-detail {
+        border-color: var(--primary-blue);
+        background: var(--primary-blue);
+        color: white;
+    }
+    .carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--bg-white);
+        border: 1px solid var(--border-light);
+        border-radius: 50%;
+        width: 46px;
+        height: 46px;
+        font-size: 1.25rem;
+        color: var(--text-dark);
+        cursor: pointer;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+        transition: all 0.2s ease;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .carousel-btn:hover {
+        background: var(--bg-white);
+        color: var(--primary-blue);
+        border-color: #CBD5E1;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08);
+    }
+    .carousel-btn.prev { left: -8px; }
+    .carousel-btn.next { right: -8px; }
+
+    /* ---- How It Works ---- */
     .how-it-works-modern {
         padding: 80px 0;
         background: var(--bg-white);
@@ -579,10 +559,7 @@
         justify-content: center;
         margin: 0 auto 24px;
     }
-    .step-icon-wrapper i {
-        font-size: 2rem;
-        color: white;
-    }
+    .step-icon-wrapper i { font-size: 2rem; color: white; }
     .step-number-modern {
         width: 32px;
         height: 32px;
@@ -596,210 +573,10 @@
         font-weight: 700;
         font-size: 0.85rem;
     }
-    .step-card-modern h3 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--text-dark);
-        margin-bottom: 12px;
-    }
-    .step-card-modern p {
-        color: var(--text-gray);
-        line-height: 1.8;
-        font-size: 0.9rem;
-    }
+    .step-card-modern h3 { font-size: 1.25rem; font-weight: 600; color: var(--text-dark); margin-bottom: 12px; }
+    .step-card-modern p { color: var(--text-gray); line-height: 1.8; font-size: 0.9rem; }
 
-    /* ---- Featured Painters (light) ---- */
-    .featured-modern {
-        padding: 80px 0;
-        background: var(--bg-light);
-        border-top: 1px solid var(--border-light);
-    }
-    .section-header-with-link {
-        max-width: 1200px;
-        margin: 0 auto 40px;
-        padding: 0 24px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 16px;
-    }
-    [dir="rtl"] .section-header-with-link {
-        flex-direction: row-reverse;
-    }
-    .section-header-with-link h2 {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--text-dark);
-        margin-bottom: 8px;
-    }
-    .section-header-with-link p {
-        color: var(--text-gray);
-        margin: 0;
-    }
-    .view-all-link {
-        color: var(--primary-blue);
-        text-decoration: none;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.3s ease;
-        padding: 8px 16px;
-        border-radius: 40px;
-        background: rgba(41, 87, 151, 0.06);
-        border: 1px solid rgba(41, 87, 151, 0.1);
-    }
-    .view-all-link:hover {
-        gap: 12px;
-        background: var(--primary-blue);
-        color: white;
-    }
-    .painters-grid-home {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 24px;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 30px;
-    }
-    .painter-card-home {
-        background: var(--bg-white);
-        border-radius: var(--radius-lg);
-        overflow: hidden;
-        transition: all 0.3s ease;
-        border: 1px solid var(--border-light);
-        cursor: pointer;
-        box-shadow: var(--shadow-sm);
-    }
-    .painter-card-home:hover {
-        transform: translateY(-5px);
-        border-color: var(--primary-blue);
-        box-shadow: var(--shadow-md);
-    }
-    .card-body-home {
-        padding: 24px;
-        text-align: center;
-    }
-    .avatar-home {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin: 0 auto 16px;
-        position: relative;
-        overflow: hidden;
-        background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .avatar-home img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .avatar-home i {
-        font-size: 2rem;
-        color: white;
-    }
-    .verified-badge-home {
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        background: var(--accent-blue);
-        border-radius: 50%;
-        width: 22px;
-        height: 22px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid var(--bg-white);
-    }
-    .verified-badge-home i {
-        font-size: 0.65rem;
-        color: white;
-    }
-    .painter-name-home {
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: var(--text-dark);
-        margin-bottom: 4px;
-    }
-    .painter-location-home {
-        font-size: 0.8rem;
-        color: var(--text-gray);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        margin-bottom: 16px;
-    }
-    [dir="rtl"] .painter-location-home i {
-        margin-left: 4px;
-        margin-right: 0;
-    }
-    .stats-home {
-        display: flex;
-        justify-content: center;
-        gap: 24px;
-        padding: 12px 0;
-        border-top: 1px solid var(--border-light);
-        border-bottom: 1px solid var(--border-light);
-        margin-bottom: 16px;
-    }
-    .stat-home {
-        text-align: center;
-    }
-    .stat-value-home {
-        font-size: 0.9rem;
-        font-weight: 700;
-        color: var(--primary-blue);
-        display: block;
-    }
-    .stat-label-home {
-        font-size: 0.65rem;
-        color: var(--text-gray);
-        text-transform: uppercase;
-    }
-    .rating-home {
-        display: flex;
-        justify-content: center;
-        gap: 4px;
-        margin-bottom: 12px;
-    }
-    .rating-home i {
-        font-size: 0.75rem;
-    }
-    .rating-home .text-warning {
-        color: #FBBF24 !important;
-    }
-    .rating-home .text-muted {
-        color: #CBD5E0 !important;
-    }
-    .price-home {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: var(--primary-blue);
-        margin-bottom: 16px;
-    }
-    .btn-profile-home {
-        width: 100%;
-        padding: 10px;
-        background: transparent;
-        border: 1px solid var(--border-light);
-        border-radius: 40px;
-        font-weight: 500;
-        color: var(--text-gray);
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    .btn-profile-home:hover {
-        border-color: var(--accent-blue);
-        background: rgba(28, 132, 193, 0.05);
-        color: var(--accent-blue);
-    }
-
-    /* ---- CTA Section (blue gradient) ---- */
+    /* ---- CTA Section ---- */
     .cta-modern {
         background: linear-gradient(135deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%);
         padding: 80px 0;
@@ -811,10 +588,7 @@
     .cta-modern::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        top: 0; left: 0; right: 0; bottom: 0;
         background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.05)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat top;
         background-size: cover;
     }
@@ -825,24 +599,10 @@
         position: relative;
         z-index: 2;
     }
-    .cta-modern h2 {
-        font-size: 2rem;
-        font-weight: 700;
-        color: white;
-        margin-bottom: 16px;
-    }
-    .cta-modern p {
-        font-size: 1.1rem;
-        color: rgba(255, 255, 255, 0.85);
-        margin-bottom: 32px;
-        line-height: 1.8;
-    }
-    .cta-buttons {
-        display: flex;
-        gap: 16px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
+    .cta-modern h2 { font-size: 2rem; font-weight: 700; color: white; margin-bottom: 16px; }
+    .cta-modern p { font-size: 1.1rem; color: rgba(255, 255, 255, 0.85); margin-bottom: 32px; line-height: 1.8; }
+    .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    
     .btn-cta-light {
         background: white;
         color: var(--primary-blue);
@@ -856,16 +616,9 @@
         gap: 10px;
         box-shadow: var(--shadow-md);
     }
-    [dir="rtl"] .btn-cta-light i {
-        margin-left: 8px;
-        margin-right: 0;
-    }
-    .btn-cta-light:hover {
-        background: #f0f4fa;
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-lg);
-        color: var(--primary-blue);
-    }
+    [dir="rtl"] .btn-cta-light i { margin-left: 8px; margin-right: 0; }
+    .btn-cta-light:hover { background: #f0f4fa; transform: translateY(-2px); box-shadow: var(--shadow-lg); color: var(--primary-blue); }
+
     .btn-cta-outline {
         background: transparent;
         border: 2px solid rgba(255, 255, 255, 0.4);
@@ -879,108 +632,40 @@
         align-items: center;
         gap: 10px;
     }
-    [dir="rtl"] .btn-cta-outline i {
-        margin-left: 8px;
-        margin-right: 0;
-    }
-    .btn-cta-outline:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: white;
-        color: white;
-        transform: translateY(-2px);
-    }
+    [dir="rtl"] .btn-cta-outline i { margin-left: 8px; margin-right: 0; }
+    .btn-cta-outline:hover { background: rgba(255, 255, 255, 0.1); border-color: white; color: white; transform: translateY(-2px); }
 
-    /* ---- Responsive ---- */
+    /* ---- Responsive Design ---- */
     @media (max-width: 768px) {
-        .hero-title {
-            font-size: 2rem;
-        }
-        .hero-description {
-            font-size: 1rem;
-        }
-        .hero-grid {
-            gap: 40px;
-            text-align: center;
-        }
-        .hero-buttons,
-        .trust-badges {
-            justify-content: center;
-        }
-        .section-header h2 {
-            font-size: 1.6rem;
-        }
-        .steps-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        .painters-grid-home {
-            grid-template-columns: 1fr;
-        }
-        .section-header-with-link {
-            flex-direction: column;
-            text-align: center;
-        }
-        .stats-container {
-            gap: 25px;
-        }
-        .stat-number {
-            font-size: 1.5rem;
-        }
-        .cta-modern h2 {
-            font-size: 1.5rem;
-        }
-        .language-buttons {
-            justify-content: center;
-        }
-        #algeriaMap {
-            height: 350px;
-        }
-        .map-stats-grid {
-            grid-template-columns: 1fr;
-            padding: 0 20px;
-        }
-        .legend-item {
-            font-size: 0.7rem;
-        }
-    }
-    @media (min-width: 769px) and (max-width: 1024px) {
-        .painters-grid-home {
-            grid-template-columns: repeat(2, 1fr);
-        }
+        .hero-title { font-size: 2rem; }
+        .hero-description { font-size: 1rem; }
+        .hero-grid { gap: 40px; text-align: center; }
+        .hero-buttons, .trust-badges, .language-buttons { justify-content: center; }
+        .section-header h2 { font-size: 1.6rem; }
+        .steps-grid { grid-template-columns: 1fr; gap: 20px; }
+        .section-header-with-link { flex-direction: column; text-align: center; }
+        .stats-container { gap: 25px; }
+        .stat-number { font-size: 1.5rem; }
+        .cta-modern h2 { font-size: 1.5rem; }
+        #algeriaMap { height: 350px; }
+        .map-stats-grid { grid-template-columns: 1fr; padding: 0 20px; }
+        .legend-item { font-size: 0.7rem; }
+        .carousel-container { padding: 0 10px; }
+        .carousel-card { flex: 0 0 210px; }
+        .carousel-btn { display: none; }
     }
 
-    /* ---- Animations ---- */
+    /* ---- Smooth Animations ---- */
     @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
     }
-    .hero-content,
-    .hero-image,
-    .step-card-modern,
-    .painter-card-home {
+    .hero-content, .hero-image, .step-card-modern {
         animation: fadeInUp 0.6s ease forwards;
-    }
-    .step-card-modern:nth-child(1) {
-        animation-delay: 0.1s;
-    }
-    .step-card-modern:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-    .step-card-modern:nth-child(3) {
-        animation-delay: 0.3s;
-    }
-    .step-card-modern:nth-child(4) {
-        animation-delay: 0.4s;
     }
 </style>
 
-<!-- ===== LANGUAGE SWITCHER (ARABIC ACTIVE) ===== -->
+<!-- ===== LANGUAGE SWITCHER ===== -->
 <div class="language-switcher-modern">
     <div class="container">
         <div class="language-buttons">
@@ -990,7 +675,7 @@
     </div>
 </div>
 
-<!-- ===== HERO SECTION (ARABIC) ===== -->
+<!-- ===== HERO SECTION ===== -->
 <section class="hero-modern" dir="rtl">
     <div class="hero-container">
         <div class="hero-grid">
@@ -1017,7 +702,7 @@
     </div>
 </section>
 
-<!-- ===== STATS SECTION (ARABIC) ===== -->
+<!-- ===== STATS SECTION ===== -->
 <section class="stats-modern" dir="rtl">
     <div class="stats-container">
         <div class="stat-item"><span class="stat-number">500+</span><span class="stat-label">دهان موثوق</span></div>
@@ -1027,7 +712,7 @@
     </div>
 </section>
 
-<!-- ===== INTERACTIVE MAP SECTION (ARABIC TEXT) ===== -->
+<!-- ===== INTERACTIVE MAP SECTION ===== -->
 <section class="map-section-modern" dir="rtl">
     <div class="container">
         <div class="section-header">
@@ -1047,41 +732,42 @@
         </div>
     </div>
 </section>
-<!-- ===== FEATURED PRODUCTS CAROUSEL (ARABIC) ===== -->
-<section class="featured-modern products-section" dir="rtl">
-  <div class="section-header-with-link">
-    <div>
-      <h2>منتجات مميزة</h2>
-      <p>أفضل الدهانات والأدوات للمحترفين</p>
-    </div>
-    <a href="/products/ar" class="view-all-link">عرض جميع المنتجات <i class="fas fa-arrow-left"></i></a>
-  </div>
 
-  <% if (featuredProducts && featuredProducts.length > 0) { %>
-  <div class="carousel-container">
-    <button class="carousel-btn prev" onclick="scrollCarousel(-1)">&#8249;</button>
-    <div class="carousel-track" id="productCarousel">
-      <% featuredProducts.forEach(product => { %>
-      <div class="carousel-card" onclick="window.location.href='/products/<%= product._id %>'">
-        <div class="carousel-image">
-         <img src="<%= (product.images && product.images.length > 0) ? product.images[0] : (product.image || '/images/default-product.png') %>" alt="<%= product.name %>" />
+<!-- ===== FEATURED PRODUCTS CAROUSEL ===== -->
+<section class="featured-modern products-section" dir="rtl">
+    <div class="section-header-with-link">
+        <div>
+            <h2>منتجات مميزة</h2>
+            <p>أفضل الدهانات والأدوات للمحترفين</p>
         </div>
-        <div class="carousel-body">
-          <h4 class="carousel-title"><%= product.name %></h4>
-          <p class="carousel-price"><%= product.price %> دج</p>
-          <button class="btn-carousel-detail">عرض التفاصيل</button>
-        </div>
-      </div>
-      <% }); %>
+        <a href="/products/ar" class="view-all-link">عرض جميع المنتجات <i class="fas fa-arrow-left"></i></a>
     </div>
-    <button class="carousel-btn next" onclick="scrollCarousel(1)">&#8250;</button>
-  </div>
-  <% } else { %>
-  <p class="text-center" style="color: var(--text-gray);">قريباً – منتجات احترافية للدهانين</p>
-  <% } %>
+
+    <% if (featuredProducts && featuredProducts.length > 0) { %>
+    <div class="carousel-container">
+        <button class="carousel-btn prev" onclick="scrollProductCarousel(-1)"><i class="fas fa-chevron-left"></i></button>
+        <div class="carousel-track" id="productCarousel">
+            <% featuredProducts.forEach(product => { %>
+            <div class="carousel-card" onclick="window.location.href='/products/<%= product._id %>'">
+                <div class="carousel-image">
+                    <img src="<%= (product.images && product.images.length > 0) ? product.images[0] : (product.image || '/images/default-product.png') %>" alt="<%= product.name %>" />
+                </div>
+                <div class="carousel-body">
+                    <h4 class="carousel-title"><%= product.name %></h4>
+                    <p class="carousel-price"><%= product.price.toLocaleString('ar-DZ') %> دج</p>
+                    <button class="btn-carousel-detail">عرض التفاصيل</button>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+        <button class="carousel-btn next" onclick="scrollProductCarousel(1)"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <% } else { %>
+    <p class="text-center" style="color: var(--text-gray); padding: 40px 0;">قريباً – منتجات احترافية للدهانين</p>
+    <% } %>
 </section>
 
-<!-- ===== HOW IT WORKS (ARABIC) ===== -->
+<!-- ===== HOW IT WORKS SECTION ===== -->
 <section class="how-it-works-modern" dir="rtl">
     <div class="section-header">
         <h2>كيف تعمل بينتيلو برو</h2>
@@ -1102,131 +788,38 @@
         </div>
         <div class="step-card-modern">
             <div class="step-number-modern">٣</div>
-            <div class="step-icon-wrapper"><i class="fas fa-paint-roller"></i></div>
-            <h3>ابدأ العمل</h3>
-            <p>يقوم الدهانين المحترفون بإنجاز مشروعك بمواد عالية الجودة</p>
-        </div>
-        <div class="step-card-modern">
-            <div class="step-number-modern">٤</div>
-            <div class="step-icon-wrapper"><i class="fas fa-star"></i></div>
-            <h3>قيم العمل</h3>
-            <p>شارك تجربتك وساعد في الحفاظ على معايير الجودة</p>
+            <div class="step-icon-wrapper"><i class="fas fa-handshake"></i></div>
+            <h3>تواصل ووظف</h3>
+            <p>قارن العروض المستلمة من المحترفين، تواصل معهم واختر الأنسب لمشروعك</p>
         </div>
     </div>
 </section>
 
-<!-- ===== FEATURED PAINTERS (ARABIC) ===== -->
-<section class="featured-modern" dir="rtl">
-    <div class="section-header-with-link">
-        <div><h2>الدهانين المميزين</h2><p>المحترفون الأعلى تقييماً في منطقتك</p></div>
-        <a href="/painters" class="view-all-link">عرض جميع الدهانين <i class="fas fa-arrow-left"></i></a>
-    </div>
-    <div class="painters-grid-home">
-        <% featuredPainters.forEach(painter => { %>
-        <div class="painter-card-home" onclick="window.location.href='/painters/<%= painter._id %>'">
-            <div class="card-body-home">
-                <div class="avatar-home">
-                    <% if (painter.profilePicture && painter.profilePicture.url) { %>
-                    <img src="<%= painter.profilePicture.url %>" alt="<%= painter.name %>">
-                    <% } else { %>
-                    <i class="fas fa-brush"></i>
-                    <% } %>
-                    <% if (painter.verification?.status === 'verified') { %>
-                    <div class="verified-badge-home"><i class="fas fa-check"></i></div>
-                    <% } %>
-                </div>
-                <div class="painter-name-home"><%= painter.name %></div>
-                <div class="painter-location-home"><i class="fas fa-map-marker-alt"></i> <%= painter.location?.wilaya || 'الجزائر' %></div>
-                <div class="stats-home">
-                    <div class="stat-home"><span class="stat-value-home"><%= painter.experience || 0 %></span><span class="stat-label-home">سنوات</span></div>
-                    <div class="stat-home"><span class="stat-value-home"><%= painter.completedJobs || 0 %></span><span class="stat-label-home">مشاريع</span></div>
-                </div>
-                <div class="rating-home">
-                    <% for (let i = 1; i <= 5; i++) { %>
-                    <i class="fas fa-star <%= i <= Math.round(painter.rating || 0) ? 'text-warning' : 'text-muted' %>"></i>
-                    <% } %>
-                    <span style="font-size: 0.7rem; color: var(--text-gray); margin-right: 4px;">(<%= (painter.rating || 0).toFixed(1) %>)</span>
-                </div>
-                <div class="price-home"><%= painter.pricePerSqm || 0 %> دج/م²</div>
-                <button class="btn-profile-home" onclick="event.stopPropagation(); window.location.href='/painters/<%= painter._id %>'">عرض الملف الشخصي</button>
-            </div>
-        </div>
-        <% }); %>
-    </div>
-</section>
-
-<!-- ===== CTA SECTION (ARABIC) ===== -->
+<!-- ===== CTA SECTION ===== -->
 <section class="cta-modern" dir="rtl">
     <div class="cta-container">
-        <h2>مستعد لبدء مشروع الدهان الخاص بك؟</h2>
-        <p>انضم إلى آلاف العملاء الراضين الذين وجدوا دهّامهم المثالي عبر بينتيلو برو</p>
+        <h2>جاهز لبدء مشروع الدهان الخاص بك؟</h2>
+        <p>انضم إلى آلاف العملاء الراضين والدهانين المحترفين في جميع أنحاء الجزائر اليوم.</p>
         <div class="cta-buttons">
-            <a href="/auth/register" class="btn-cta-light"><i class="fas fa-user-plus"></i> ابدأ كعميل</a>
-            <a href="/auth/register-painter" class="btn-cta-outline"><i class="fas fa-brush"></i> انضم كدهان</a>
+            <a href="/painters" class="btn-cta-light"><i class="fas fa-search"></i> ابدأ البحث الآن</a>
+            <a href="/auth/register-painter" class="btn-cta-outline"><i class="fas fa-user-plus"></i> سجل حسابك مجاناً</a>
         </div>
     </div>
 </section>
 
+<!-- Carousel Scroll Logic Handler JS -->
 <script>
-    // Same map initialization with updated marker colors to match new palette
-    var map = L.map('algeriaMap').setView([28.0, 2.0], 6);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" style="color:#295797;">OSM</a> &copy; CartoDB',
-        subdomains: 'abcd',
-        maxZoom: 19,
-        minZoom: 5
-    }).addTo(map);
-
-    const wilayas = [
-        { name: "الجزائر", lat: 36.763056, lng: 3.050556, painters: 128, activity: "high" },
-        { name: "وهران", lat: 35.696944, lng: -0.633056, painters: 86, activity: "high" },
-        { name: "قسنطينة", lat: 36.365, lng: 6.614722, painters: 64, activity: "high" },
-        { name: "عنابة", lat: 36.902778, lng: 7.7525, painters: 42, activity: "medium" },
-        { name: "تيزي وزو", lat: 36.716667, lng: 4.05, painters: 38, activity: "medium" },
-        { name: "بجاية", lat: 36.75, lng: 5.083333, painters: 35, activity: "medium" },
-        { name: "سطيف", lat: 36.183333, lng: 5.4, painters: 52, activity: "medium" },
-        { name: "البليدة", lat: 36.466667, lng: 2.816667, painters: 29, activity: "low" },
-        { name: "تلمسان", lat: 34.882778, lng: -1.316667, painters: 31, activity: "low" },
-        { name: "باتنة", lat: 35.555, lng: 6.178056, painters: 27, activity: "low" },
-        { name: "بسكرة", lat: 34.85, lng: 5.733333, painters: 22, activity: "low" },
-        { name: "الجلفة", lat: 34.666667, lng: 3.25, painters: 18, activity: "low" },
-        { name: "ورقلة", lat: 31.95, lng: 5.316667, painters: 15, activity: "low" },
-        { name: "غرداية", lat: 32.483333, lng: 3.666667, painters: 12, activity: "low" },
-        { name: "تمنراست", lat: 22.785, lng: 5.522778, painters: 8, activity: "low" }
-    ];
-
-    const markerColors = { high: '#295797', medium: '#1C84C1', low: '#A0C4D9' };
-
-    wilayas.forEach(w => {
-        const color = markerColors[w.activity];
-        const customIcon = L.divIcon({
-            html: `<div style="background-color: ${color}; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">${w.painters}</div>`,
-            iconSize: [32, 32],
-            className: 'custom-marker'
-        });
-        const marker = L.marker([w.lat, w.lng], { icon: customIcon }).addTo(map);
-        marker.bindPopup(`
-                <div style="direction:rtl;font-family:'Tajawal','Cairo',sans-serif;background:white;color:#2D3748;border-radius:12px;padding:8px 12px;border:1px solid #D1DCE6;">
-                    <b style="color:#295797;">${w.name}</b><br>
-                    <span style="color:#4A5568;">${w.painters} دهاناً</span><br>
-                    <small style="color:#1C84C1;">محترفون جاهزون للعمل</small>
-                </div>
-            `);
-    });
-
-    L.control.scale({ metric: true, imperial: false }).addTo(map);
-    const group = L.featureGroup(wilayas.map(w => L.marker([w.lat, w.lng])));
-    map.fitBounds(group.getBounds().pad(0.2));
+    function scrollProductCarousel(direction) {
+        const track = document.getElementById('productCarousel');
+        if (track) {
+            const firstCard = track.querySelector('.carousel-card');
+            const cardWidth = firstCard ? firstCard.offsetWidth + 24 : 284;
+            track.scrollBy({
+                left: direction * cardWidth,
+                behavior: 'smooth'
+            });
+        }
+    }
 </script>
 
-<script>
-  function scrollCarousel(direction) {
-    const track = document.getElementById('productCarousel');
-    if (!track) return;
-    track.scrollBy({
-      left: direction * scrollAmount,
-      behavior: 'smooth'
-    });
-  }
-</script>
 <%- include('../partials/footer') %>
