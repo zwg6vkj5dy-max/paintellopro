@@ -1,4 +1,7 @@
-<%- include('../partials/header', { title: 'طلبات العمل - بينتيلو برو', user: painter, painter: painter }) %>
+
+<%- include('../partials/header', { title: 'طلبات العمل - بينتيلو برو',
+    user: painter,
+    painter: painter , isAndroidApp: typeof isAndroidApp !== 'undefined' ? isAndroidApp : false }) %>
 
 <style>
   :root {
