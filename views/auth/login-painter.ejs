@@ -1,366 +1,98 @@
-<%
-  const isAndroid = typeof isAndroidApp !== 'undefined' && isAndroidApp;
-  if (!isAndroid) {
-%>
-    <%- include('../partials/header', { title: 'Painter Login - Paintello Pro' }) %>
-<%
-  }
-%>
+<%- include('../partials/header', { title: 'Painter Login - Paintello Pro' }) %>
 
-<% if (isAndroid) { %>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Painter Login</title>
-  
-  <!-- Bootstrap & Font Awesome -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  
-  <!-- ===== TRACKING SCRIPTS (Meta, GTM, gtag, Clarity) ===== -->
-  <%
-    const pixelId = typeof fbPixelId !== 'undefined' ? fbPixelId : process.env.FB_PIXEL_ID;
-    const pageViewEventId = `browser_pv_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-    const advancedMatching = { country: 'dz' };
-    if (typeof user !== 'undefined' && user) {
-      if (user.email) advancedMatching.em = user.email;
-      if (user.phone || user.numero) advancedMatching.ph = user.phone || user.numero;
-      if (user.firstName) advancedMatching.fn = user.firstName;
-      if (user.lastName) advancedMatching.ln = user.lastName;
-    }
-    if (typeof sessionPainter !== 'undefined' && sessionPainter) {
-      if (!advancedMatching.em && sessionPainter.email) advancedMatching.em = sessionPainter.email;
-      if (!advancedMatching.ph && sessionPainter.phone) advancedMatching.ph = sessionPainter.phone;
-      if (!advancedMatching.fn && sessionPainter.firstName) advancedMatching.fn = sessionPainter.firstName;
-      else if (!advancedMatching.fn && sessionPainter.name) advancedMatching.fn = sessionPainter.name;
-      if (!advancedMatching.ln && sessionPainter.lastName) advancedMatching.ln = sessionPainter.lastName;
-    }
-  %>
-  <% if (pixelId) { %>
-  <script>
-    !function(f,b,e,v,n,t,s){
-      if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)
-    }(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '<%= pixelId %>', { country: 'dz' });
-    fbq('track', 'PageView', {}, { eventID: '<%= pageViewEventId %>' });
-  </script>
-  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=<%= pixelId %>&ev=PageView&noscript=1" /></noscript>
-  <% } %>
-
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-WQVTHK89');</script>
-  <!-- End Google Tag Manager -->
-
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HH68LJB4LB"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-HH68LJB4LB');
-  </script>
-
-  <!-- Clarity -->
-  <script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "u0kvphhg42");
-  </script>
-  
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #3e58b6;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      color: white;
-      padding: 20px;
-    }
-    .login-card {
-      background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      border-radius: 32px;
-      padding: 40px 30px;
-      border: 1px solid rgba(255,255,255,0.15);
-      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-      animation: fadeUp 0.6s ease;
-    }
-    h2 {
-      font-weight: 600;
-      font-size: 1.7rem;
-      margin-bottom: 30px;
-      opacity: 0.95;
-    }
-    .form-group {
-      position: relative;
-      margin-bottom: 20px;
-      text-align: left;
-    }
-    .form-group i {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: rgba(255,255,255,0.6);
-      font-size: 1rem;
-    }
-    .form-control {
-      background: rgba(255,255,255,0.12) !important;
-      border: 1px solid rgba(255,255,255,0.2);
-      color: white !important;
-      border-radius: 16px;
-      padding: 14px 16px 14px 45px;
-      width: 100%;
-      font-size: 1rem;
-      transition: 0.3s;
-      outline: none;
-    }
-    .form-control::placeholder { color: rgba(255,255,255,0.45); }
-    .form-control:focus {
-      background: rgba(255,255,255,0.22) !important;
-      border-color: rgba(255,255,255,0.5);
-      box-shadow: 0 0 0 4px rgba(255,255,255,0.1);
-    }
-    .btn-login {
-      background: white;
-      color: #3e58b6;
-      font-weight: 700;
-      font-size: 1.05rem;
-      padding: 14px;
-      border-radius: 50px;
-      width: 100%;
-      border: none;
-      margin-top: 10px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .btn-login:hover {
-      background: #f0f3ff;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-    }
-    .btn-login:active { transform: scale(0.97); }
-    .signup-link {
-      margin-top: 24px;
-      font-size: 0.95rem;
-      opacity: 0.8;
-    }
-    .signup-link a {
-      color: white;
-      font-weight: 600;
-      text-decoration: underline;
-      margin-left: 4px;
-    }
-    .alert {
-      border-radius: 16px;
-      border: none;
-      padding: 12px 16px;
-      margin-bottom: 20px;
-      font-size: 0.9rem;
-      backdrop-filter: blur(10px);
-      text-align: left;
-    }
-    .alert-success { background: rgba(40,167,69,0.2); border: 1px solid rgba(40,167,69,0.4); color: #d4edda; }
-    .alert-danger  { background: rgba(220,53,69,0.2); border: 1px solid rgba(220,53,69,0.4); color: #f8d7da; }
-    .alert-warning { background: rgba(255,193,7,0.2); border: 1px solid rgba(255,193,7,0.4); color: #fff3cd; }
-    .alert-info    { background: rgba(23,162,184,0.2); border: 1px solid rgba(23,162,184,0.4); color: #d1ecf1; }
-    .btn-close { filter: invert(1); }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-  </style>
-</head>
-<body>
-  <div class="login-card">
-    <h2>Painter Login</h2>
-
-    <!-- Flash Messages -->
-    <% if (typeof success !== 'undefined' && success && success.length) { %>
-      <% success.forEach(msg => { %>
-        <div class="alert alert-success alert-dismissible fade show"><%= msg %></div>
-      <% }) %>
-    <% } %>
-    <% if (typeof error !== 'undefined' && error && error.length) { %>
-      <% error.forEach(msg => { %>
-        <div class="alert alert-danger alert-dismissible fade show"><%= msg %></div>
-      <% }) %>
-    <% } %>
-    <% if (typeof warning !== 'undefined' && warning && warning.length) { %>
-      <% warning.forEach(msg => { %>
-        <div class="alert alert-warning alert-dismissible fade show"><%= msg %></div>
-      <% }) %>
-    <% } %>
-    <% if (typeof info !== 'undefined' && info && info.length) { %>
-      <% info.forEach(msg => { %>
-        <div class="alert alert-info alert-dismissible fade show"><%= msg %></div>
-      <% }) %>
-    <% } %>
-
-    <form action="/auth/login-painter" method="POST">
-      <div class="form-group">
-        <i class="fas fa-envelope"></i>
-        <input type="email" class="form-control" name="email" placeholder="Email Address" required>
-      </div>
-      <div class="form-group">
-        <i class="fas fa-lock"></i>
-        <input type="password" class="form-control" name="password" placeholder="Password" required>
-      </div>
-      <button type="submit" class="btn-login">Login</button>
-    </form>
-
-    <div class="signup-link">
-      Don't have an account?
-      <a href="/auth/register-painter">Register as Painter</a>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4">Painter Login</h2>
+                  <!-- 🔔 Flash Messages -->
+<% if (success && success.length) { %>
+  <% success.forEach(msg => { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fas fa-check-circle me-2"></i><%= msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
-  </div>
-
-  <!-- Bootstrap JS for alerts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    setTimeout(() => {
-      document.querySelectorAll('.alert').forEach(alert => {
-        const bsAlert = new bootstrap.Alert(alert);
-        bsAlert.close();
-      });
-    }, 4000);
-    // CompleteRegistration pixel (if defined)
-    <% if (typeof metaEventIdCompleteRegistration !== 'undefined' && metaEventIdCompleteRegistration) { %>
-    setTimeout(function() {
-      if (typeof fbq !== 'undefined') {
-        fbq('track', 'CompleteRegistration', {
-          content_name: 'Painter Professional Registration',
-          status: 'pending_verification',
-          value: 0,
-          currency: 'DZD'
-        }, {
-          eventID: '<%= metaEventIdCompleteRegistration %>'
-        });
-      }
-    }, 1500);
-    <% } %>
-  </script>
-</body>
-</html>
-
-<% } else { %>
-
-  <!-- ===== ORIGINAL DESKTOP VERSION (unchanged) ===== -->
-  <div class="container py-5">
-      <div class="row justify-content-center">
-          <div class="col-md-6 col-lg-5">
-              <div class="card shadow">
-                  <div class="card-body p-4">
-                      <h2 class="text-center mb-4">Painter Login</h2>
-                    <!-- Flash Messages -->
-  <% if (success && success.length) { %>
-    <% success.forEach(msg => { %>
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle me-2"></i><%= msg %>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-    <% }) %>
-  <% } %>
-
-  <% if (error && error.length) { %>
-    <% error.forEach(msg => { %>
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="fas fa-times-circle me-2"></i><%= msg %>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-    <% }) %>
-  <% } %>
-
-  <% if (warning && warning.length) { %>
-    <% warning.forEach(msg => { %>
-      <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-triangle me-2"></i><%= msg %>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-    <% }) %>
-  <% } %>
-
-  <% if (info && info.length) { %>
-    <% info.forEach(msg => { %>
-      <div class="alert alert-info alert-dismissible fade show" role="alert">
-        <i class="fas fa-info-circle me-2"></i><%= msg %>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-    <% }) %>
-  <% } %>
-  <% if (typeof metaEventIdCompleteRegistration !== 'undefined' && metaEventIdCompleteRegistration) { %>
-  <script>
-    setTimeout(function() {
-      if (typeof fbq !== 'undefined') {
-        fbq('track', 'CompleteRegistration', {
-          content_name: 'Painter Professional Registration',
-          status: 'pending_verification',
-          value: 0,
-          currency: 'DZD'
-        }, {
-          eventID: '<%= metaEventIdCompleteRegistration %>'
-        });
-      }
-    }, 1500);
-  </script>
-  <% } %>
-                      <form action="/auth/login-painter" method="POST">
-                          <div class="mb-3">
-                              <label for="email" class="form-label">Email Address</label>
-                              <input type="email" class="form-control" id="email" name="email" required>
-                          </div>
-                          
-                          <div class="mb-3">
-                              <label for="password" class="form-label">Password</label>
-                              <input type="password" class="form-control" id="password" name="password" required>
-                          </div>
-                          
-                          <div class="d-grid mb-3">
-                              <button type="submit" class="btn btn-primary btn-lg">Login</button>
-                          </div>
-                          
-                          <div class="text-center">
-                              <p class="mb-0">Don't have an account? 
-                                  <a href="/auth/register-painter" class="text-decoration-none">Register as Painter</a>
-                              </p>
-                          </div>
-                      </form>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-  <script>
-    setTimeout(() => {
-      document.querySelectorAll('.alert').forEach(alert => {
-        const bsAlert = new bootstrap.Alert(alert);
-        bsAlert.close();
-      });
-    }, 4000);
-  </script>
-
+  <% }) %>
 <% } %>
 
-<% if (!isAndroid) { %>
-  <%- include('../partials/footer') %>
+<% if (error && error.length) { %>
+  <% error.forEach(msg => { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="fas fa-times-circle me-2"></i><%= msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  <% }) %>
 <% } %>
+
+<% if (warning && warning.length) { %>
+  <% warning.forEach(msg => { %>
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i><%= msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  <% }) %>
+<% } %>
+
+<% if (info && info.length) { %>
+  <% info.forEach(msg => { %>
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+      <i class="fas fa-info-circle me-2"></i><%= msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  <% }) %>
+<% } %>
+<% if (typeof metaEventIdCompleteRegistration !== 'undefined' && metaEventIdCompleteRegistration) { %>
+<script>
+  // Fire CompleteRegistration on login page after successful registration
+  setTimeout(function() {
+    if (typeof fbq !== 'undefined') {
+      fbq('track', 'CompleteRegistration', {
+        content_name: 'Painter Professional Registration',
+        status: 'pending_verification',
+        value: 0,
+        currency: 'DZD'
+      }, {
+        eventID: '<%= metaEventIdCompleteRegistration %>'
+      });
+      console.log('✅ CompleteRegistration fired (browser) with ID:', '<%= metaEventIdCompleteRegistration %>');
+    }
+  }, 1500);
+</script>
+<% } %>
+                    <form action="/auth/login-painter" method="POST">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <p class="mb-0">Don't have an account? 
+                                <a href="/auth/register-painter" class="text-decoration-none">Register as Painter</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+  setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(alert => {
+      const bsAlert = new bootstrap.Alert(alert);
+      bsAlert.close();
+    });
+  }, 4000); // 4 seconds
+</script>
+
+<%- include('../partials/footer') %>
