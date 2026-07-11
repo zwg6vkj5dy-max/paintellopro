@@ -1,8 +1,7 @@
-<%- include('../partials/header', { 
-    title: 'تعديل الملف الشخصي - بينتيلو برو',
+
+<%- include('../partials/header', { title: 'تعديل الملف الشخصي - بينتيلو برو',
     user: painter,
-    painter: painter 
-}) %>
+    painter: painter , isAndroidApp: typeof isAndroidApp !== 'undefined' ? isAndroidApp : false }) %>
 
 <style>
   :root {
