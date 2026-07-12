@@ -182,6 +182,7 @@ router.get('/dashboard', async (req, res) => {
   try {
     const painter = await Painter.findById(req.session.painter._id);
 
+    // Update session with fresh painter data
     req.session.painter = {
       _id: painter._id,
       name: painter.name,
@@ -273,6 +274,14 @@ router.get('/dashboard', async (req, res) => {
       console.error('Error fetching member store products:', productError);
     }
 
+    // --- Meta Events ---
+    // Retrieve and clear the pending Lead event ID (set during login)
+    const leadEventId = req.session.pendingLeadEvent || null;
+    delete req.session.pendingLeadEvent;
+
+    // Generate a fresh PageView event ID for the dashboard
+    const pageViewId = generateEventId();
+
     res.render('painter/dashboard', {
       title: 'Painter Dashboard - Paintello Pro',
       painter: painter,
@@ -280,7 +289,10 @@ router.get('/dashboard', async (req, res) => {
       stats: stats,
       storeProducts: storeProducts,
       success: req.flash('success')[0],
-      error: req.flash('error')[0]
+      error: req.flash('error')[0],
+      // Meta event IDs – will be used in the view for pixel tracking
+      metaEventIdPageView: pageViewId,
+      metaEventIdLead: leadEventId
     });
   } catch (error) {
     console.error('Dashboard error:', error);
