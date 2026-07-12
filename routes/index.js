@@ -440,11 +440,8 @@ router.get('/auth/login-painter', (req, res) => {
 // Painter Registration Routes
 // ---------- PAINTER REGISTRATION PAGE ----------
 router.get('/auth/register-painter', (req, res) => {
-  const completeRegistrationId = generateEventId();
-  req.session.pendingEvents = req.session.pendingEvents || {};
-  req.session.pendingEvents.completeRegistration = completeRegistrationId;
-
-  const pageViewId = generateEventId(); // optional, but good for consistency
+  // no need to generate a CompleteRegistration ID here
+  const pageViewId = generateEventId();
 
   res.render('auth/register-painter', {
     title: 'انضم كدهان - بينتيلو برو',
@@ -457,8 +454,8 @@ router.get('/auth/register-painter', (req, res) => {
     user: req.session.user || null,
     sessionPainter: req.session.painter || null,
     painter: null,
-    metaEventIdPageView: pageViewId,
-    metaEventIdCompleteRegistration: completeRegistrationId,
+    metaEventIdPageView: pageViewId,   // only PageView remains
+    // NO metaEventIdCompleteRegistration here
   });
 });
 
@@ -515,10 +512,11 @@ router.post('/auth/register-painter', uploadIdCard.single('idCard'), async (req,
 
     await painter.save();
 
-    // ---- CAPI CompleteRegistration ----
+        // ----- CAPI CompleteRegistration (already working) -----
     const userData = getCleanUserData(req);
-    let completeRegistrationId = req.session.pendingEvents?.completeRegistration;
-    if (!completeRegistrationId) completeRegistrationId = generateEventId();
+    // Use the same ID for both CAPI and browser
+    const completeRegistrationId = generateEventId();
+
     if (userData) {
       await sendMetaCAPIEvent({
         eventName: 'CompleteRegistration',
@@ -535,10 +533,14 @@ router.post('/auth/register-painter', uploadIdCard.single('idCard'), async (req,
       });
     }
 
+    // ----- Store event ID for browser pixel (will be used on the success page) -----
+    req.session.pendingCompleteRegistration = completeRegistrationId;
+
     // ---- success ----
     console.log(`🆕 New painter registered: ${name} (${email})`);
     req.flash('success', '🎉 Registration successful! Your account is pending verification.');
-    return res.redirect('/auth/login-painter');
+    // Redirect to the intermediate success page
+    return res.redirect('/auth/register-painter/success');
 
   } catch (error) {
     console.error('Painter registration error:', error);
@@ -551,7 +553,21 @@ router.post('/auth/register-painter', uploadIdCard.single('idCard'), async (req,
   }
 });
 
+router.get('/auth/register-painter/success', (req, res) => {
+  const completeRegistrationId = req.session.pendingCompleteRegistration;
+  delete req.session.pendingCompleteRegistration;
 
+  if (!completeRegistrationId) {
+    return res.redirect('/auth/login-painter');
+  }
+
+  res.render('auth/registration-pending', {
+    completeRegistrationId,
+    loginUrl: '/auth/login-painter',
+    fbPixelId: process.env.FB_PIXEL_ID,
+    // No need for header partial – it's a standalone page
+  });
+});
 
 // Handle painter registration with Cloudinary ID card upload
 // 🎨 Painter Login Route (Final Flash Version)
