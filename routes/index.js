@@ -414,18 +414,6 @@ router.get('/auth/login-painter', (req, res) => {
     return res.redirect('/painter/dashboard');
   }
   const pageViewId = generateEventId();
-  let completeRegistrationId = null;
-
-  // Check if we have a pending registration event ID
-  if (req.session.pendingEvents && req.session.pendingEvents.completeRegistration) {
-    completeRegistrationId = req.session.pendingEvents.completeRegistration;
-    // Remove it so it only fires once
-    delete req.session.pendingEvents.completeRegistration;
-    // Optionally clean up the pendingEvents object if empty
-    if (Object.keys(req.session.pendingEvents).length === 0) {
-      delete req.session.pendingEvents;
-    }
-  }
 
   res.render('auth/login-painter', {
     title: 'Painter Login - Paintello Pro',
@@ -433,7 +421,6 @@ router.get('/auth/login-painter', (req, res) => {
     sessionPainter: req.session.painter || null,
     painter: null,
     metaEventIdPageView: pageViewId,
-    metaEventIdCompleteRegistration: completeRegistrationId, // 👈 pass to view
   });
 });
 
@@ -576,14 +563,14 @@ router.post('/auth/login-painter', async (req, res) => {
     const { email, password } = req.body;
     const formData = { email };
 
-    // 🟠 Case 0: Missing fields
+    // Validation
     if (!email || !password) {
       req.flash('error', '⚠️ Please enter both your email and password.');
       req.flash('oldInput', formData);
       return res.redirect('/auth/login-painter');
     }
 
-    // 🔍 Case 1: Painter not found
+    // Find painter
     const painter = await Painter.findOne({ email });
     if (!painter) {
       req.flash('info', 'ℹ️ No account found with this email. You can register as a painter below.');
@@ -591,7 +578,7 @@ router.post('/auth/login-painter', async (req, res) => {
       return res.redirect('/auth/register-painter');
     }
 
-    // 🔐 Case 2: Incorrect password
+    // Check password
     const isMatch = await painter.comparePassword(password);
     if (!isMatch) {
       req.flash('error', '❌ Incorrect password. Please try again or contact support if forgotten.');
@@ -599,7 +586,7 @@ router.post('/auth/login-painter', async (req, res) => {
       return res.redirect('/auth/login-painter');
     }
 
-    // 🕓 Case 3: Account not verified
+    // Verification status
     if (painter.verification.status !== 'verified') {
       let message = '';
       switch (painter.verification.status) {
@@ -617,14 +604,14 @@ router.post('/auth/login-painter', async (req, res) => {
       return res.redirect('/auth/login-painter');
     }
 
-    // 🚫 Case 4: Account inactive
+    // Account active
     if (!painter.isActive) {
       req.flash('error', '🚫 Your account has been deactivated. Please contact support to reactivate it.');
       req.flash('oldInput', formData);
       return res.redirect('/auth/login-painter');
     }
 
-    // ✅ Case 5: Successful login
+    // ----- SUCCESS – Set session -----
     req.session.painter = {
       _id: painter._id,
       name: painter.name,
@@ -634,7 +621,6 @@ router.post('/auth/login-painter', async (req, res) => {
       profilePicture: painter.profilePicture,
       verification: painter.verification
     };
-
     req.session.user = {
       _id: painter._id,
       name: painter.name,
@@ -643,6 +629,27 @@ router.post('/auth/login-painter', async (req, res) => {
       role: 'painter'
     };
 
+    // ----- Meta CAPI Lead Event -----
+    const leadEventId = generateEventId();
+    const userData = getCleanUserData(req);   // Reads from session/user (just set)
+    if (userData) {
+      await sendMetaCAPIEvent({
+        eventName: 'Lead',
+        eventId: leadEventId,
+        userData,
+        customData: {
+          content_category: 'painter_login',
+          login_method: 'email',
+        },
+        eventSourceUrl: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
+        testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE,
+      });
+    }
+
+    // Store event ID for browser pixel (to be used on dashboard)
+    req.session.pendingLeadEvent = leadEventId;
+
+    // Save session and redirect
     req.session.save((err) => {
       if (err) {
         console.error('Session save error:', err);
@@ -650,7 +657,7 @@ router.post('/auth/login-painter', async (req, res) => {
         return res.redirect('/auth/login-painter');
       }
 
-      console.log(`✅ Painter logged in successfully: ${painter.name} (${painter.email})`);
+      console.log(`✅ Painter logged in: ${painter.name} (${painter.email}), Lead event ID: ${leadEventId}`);
       req.flash('success', `🎉 Welcome back, ${painter.name}!`);
       res.redirect('/painter/dashboard');
     });
