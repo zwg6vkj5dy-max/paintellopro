@@ -9,11 +9,13 @@ const DEFAULT_COUNTRY = (process.env.DEFAULT_COUNTRY || "dz").toLowerCase();
 const GRAPH_API_VERSION = process.env.FB_GRAPH_API_VERSION || "v23.0";
 
 function normalizeString(value) {
-  if (value === undefined || value === null) return null;
-  const clean = String(value).trim().toLowerCase();
+  if (value == null) return null;
+  const clean = String(value).trim().toLowerCase()
+   .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // é -> e
+   .replace(/[^a-z0-9]/g, ""); // remove spaces and punctuation for ct/st/zp per Meta
+  // For fn/ln keep as lowercased trimmed only, so use a separate function if you want
   return clean || null;
 }
-
 function normalizePhone(value) {
   if (value === undefined || value === null) return null;
   let phone = String(value).replace(/\D/g, "");
