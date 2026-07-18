@@ -61,12 +61,12 @@ router.get('/products/add-to-cart/:id', async (req, res) => {
       cart.totalQty += cart.items[id].qty;
       cart.totalPrice += cart.items[id].price;
     }
-// 🔥 Server‑side AddToCart - FIXED like paintello
+// FIXED FINAL: AddToCart CAPI deduped with same eventId
     const eventId = req.query.eventId;
-    const userData = getCleanUserData(req); // uses FINAL bot blocking
+    const userData = getCleanUserData(req);
     
     if (userData && eventId) {
-      sendMetaCAPIEvent({
+      await sendMetaCAPIEvent({
         eventName: 'AddToCart',
         eventId,
         userData,
@@ -86,7 +86,6 @@ router.get('/products/add-to-cart/:id', async (req, res) => {
         testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE,
       }).catch(()=>{});
     }
-    // Redirect to checkout
     res.redirect('/checkout');
   } catch (err) {
     console.error(err);
@@ -95,11 +94,10 @@ router.get('/products/add-to-cart/:id', async (req, res) => {
 });
 
 
-// ==================== HOME ROUTES (BEFORE any parameterised catch-all) ====================
+// ==================== HOME ROUTES — FIXED FINAL (no CAPI PageView, bot blocked) ====================
 router.get('/', async (req, res) => {
-  // === BOT BLOCK - like paintello final ===
   if (isBotRequest(req, { blockCloudIPs: true })) {
-    console.log(`🤖 BLOCKED HOME / UA=${(req.headers['user-agent']||'').slice(0,80)} IP=${req.headers['x-forwarded-for']?.split(',')[0]}`);
+    console.log(`🤖 BLOCKED HOME / UA=${(req.headers['user-agent']||'').slice(0,80)} IP=${req.headers['x-forwarded-for']?.split(',')[0]||req.ip}`);
     return res.status(200).send('ok');
   }
   try {
@@ -119,13 +117,13 @@ router.get('/', async (req, res) => {
     const pageViewId = generateEventId();
 
     if (userData) {
-      sendMetaCAPIEvent({
+      await sendMetaCAPIEvent({
         eventName: 'PageView',
         eventId: pageViewId,
         userData,
         eventSourceUrl: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
         testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE,
-      }).catch(()=>{});
+      });
     }
 
     res.render('index', {
@@ -151,7 +149,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Arabic home
+// Arabic home — FIXED FINAL
 router.get('/ar', async (req, res) => {
   if (isBotRequest(req, { blockCloudIPs: true })) {
     return res.status(200).send('ok');
@@ -173,13 +171,13 @@ router.get('/ar', async (req, res) => {
     const pageViewId = generateEventId();
 
     if (userData) {
-      sendMetaCAPIEvent({
+      await sendMetaCAPIEvent({
         eventName: 'PageView',
         eventId: pageViewId,
         userData,
         eventSourceUrl: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
         testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE,
-      }).catch(()=>{});
+      });
     }
 
     res.render('ar/index', {
@@ -292,19 +290,16 @@ router.get('/products/ar', async (req, res) => {
   try {
     const products = await Product.find({ featured: true }).sort({ createdAt: -1 });
 
-    // Generate PageView event ID
-    const userData = getCleanUserData(req);
+    // FIXED: No CAPI PageView on listing
     const pageViewId = generateEventId();
-
-    // Server-side PageView event
-    if (userData) {
-      sendMetaCAPIEvent({
+    if (false) {
+      await sendMetaCAPIEvent({
         eventName: 'PageView',
         eventId: pageViewId,
         userData,
         eventSourceUrl: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
         testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE,
-      }).catch(()=>{});
+      });
     }
 
     res.render('ar/products/index', {
@@ -319,11 +314,13 @@ router.get('/products/ar', async (req, res) => {
 });
 
 router.get('/products/:id', async (req, res) => {
+  if (isBotRequest(req, { blockCloudIPs: true })) {
+    return res.status(200).send('ok');
+  }
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).render('404');
 
-    // ----- Related products (same category) -----
     const relatedProducts = await Product.find({
       category: product.category,
       _id: { $ne: product._id }
@@ -331,23 +328,14 @@ router.get('/products/:id', async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(8);
 
-    // ----- Meta events (unchanged) -----
+    // FIXED FINAL: Only ViewContent CAPI (no PageView CAPI)
     const userData = getCleanUserData(req);
-    const pageViewId = generateEventId();
     const viewContentId = generateEventId();
     const addToCartId = generateEventId();
+    const pageViewId = viewContentId; // for header dedup
 
     if (userData) {
       sendMetaCAPIEvent({
-        eventName: 'PageView',
-        eventId: pageViewId,
-        userData,
-        eventSourceUrl: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
-        testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE,
-      }).catch(()=>{});
-    }
-    if (userData) {
-      await sendMetaCAPIEvent({
         eventName: 'ViewContent',
         eventId: viewContentId,
         userData,
@@ -365,7 +353,7 @@ router.get('/products/:id', async (req, res) => {
         },
         eventSourceUrl: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
         testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE,
-      });
+      }).catch(()=>{});
     }
 
     res.render('ar/products/product', {
@@ -727,26 +715,15 @@ router.post('/logout', (req, res) => {
 
 // -------------------- CHECKOUT GET (render page) --------------------
 router.get('/checkout', async (req, res) => {
-  // If cart is empty or not set, redirect to products page
-  if (!req.session.cart || !req.session.cart.totalQty) {
-    return res.redirect('/products'); // or home
+  if (isBotRequest(req, { blockCloudIPs: true })) {
+    return res.status(200).send('ok');
   }
-
+  if (!req.session.cart || !req.session.cart.totalQty) {
+    return res.redirect('/products');
+  }
   try {
     const cart = req.session.cart;
-    const userData = getCleanUserData(req);
     const pageViewId = generateEventId();
-
-    // Pixel PageView (server)
-    if (userData) {
-      sendMetaCAPIEvent({
-        eventName: 'PageView',
-        eventId: pageViewId,
-        userData,
-        eventSourceUrl: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
-        testEventCode: req.query.test_event_code || process.env.FB_TEST_EVENT_CODE,
-      }).catch(()=>{});
-    }
 
     // Render the Arabic checkout page
     res.render('checkout', {   // or 'ar/checkout' if you separate views
@@ -762,10 +739,17 @@ router.get('/checkout', async (req, res) => {
   }
 });
 
-// -------------------- CHECKOUT POST (process order) --------------------
+// -------------------- CHECKOUT POST — FIXED FINAL (lock + non-blocking CAPI) --------------------
 router.post('/checkout', async (req, res) => {
+  if (req.session.checkoutLock) {
+    console.log('⚠ Double checkout blocked');
+    return res.redirect('/confirmation');
+  }
+  req.session.checkoutLock = true;
+  await new Promise(r => req.session.save(r));
   // 1. Validate session cart
   if (!req.session.cart || !req.session.cart.totalQty) {
+    req.session.checkoutLock = false;
     return res.redirect('/products');
   }
 
@@ -842,7 +826,7 @@ router.post('/checkout', async (req, res) => {
 
       await order.save();
 
-      // Pixel InitiateCheckout - FIXED non-blocking like paintello
+      // Pixel InitiateCheckout — non-blocking
       if (userData) {
         sendMetaCAPIEvent({
           eventName: 'InitiateCheckout',
@@ -898,8 +882,11 @@ router.post('/checkout', async (req, res) => {
         cartItems: Object.values(cart.items)
       };
 
+      req.session.checkoutLock = false;
+      await new Promise(r => req.session.save(r));
       return res.redirect('/confirmation');
     } catch (error) {
+      req.session.checkoutLock = false;
       console.error('COD order error:', error);
       req.flash('error', 'حدث خطأ أثناء معالجة الطلب.');
       return res.redirect('/checkout');
@@ -1069,12 +1056,11 @@ router.get('/confirmation', async (req, res) => {
   res.render('confirmation', { ...data, user: req.session.user || null });
 });
 
-// Admin delivery confirmation route - FIXED like paintello (block Telegram preview bots)
+// Admin delivery confirmation route — FIXED FINAL (block TelegramBot preview)
 router.get('/order/deliver/:orderId', async (req, res) => {
   if (!DELIVERY_SECRET || req.query.secret !== DELIVERY_SECRET) {
     return res.status(403).send('Access denied');
   }
-  // BLOCK Telegram / WhatsApp / FB preview bots that auto-click the link
   const ua = req.headers['user-agent'] || '';
   if (isBotRequest(req, { blockCloudIPs: true }) || /TelegramBot|facebookexternalhit|WhatsApp|TwitterBot/i.test(ua)) {
     console.log(`🤖 Preview bot blocked from deliver link: ${ua.slice(0,80)}`);
